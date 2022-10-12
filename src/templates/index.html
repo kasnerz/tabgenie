@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" media="screen" href = "./static/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="./static/css/custom.css">
+<link rel="shortcut icon" href="./static/img/favicon.ico">
+<meta name="viewport" content = "width=device-width, initial-scale=1.0">
+
+<script src="./static/js/jquery.min.js"></script>
+<script src="./static/js/popper.min.js"></script>
+<script src="./static/js/bootstrap.min.js"></script>
+<script src="./static/js/custom.js"></script>
+</head>
+
+
+<body class="body">
+
+    <div class="container">
+        <div class="row">
+        <div class="col-2">
+            <h1>{{ dataset }}</h1>
+                <nav>
+                    <ul class="pagination">
+                    <li class="page-item">
+                        <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">Previous</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">Next</a>
+                    </li>
+                    </ul>
+                </nav>
+            </div>
+          <div class="col-10">
+            <div id='tablearea' class='table-responsive'> {{ table | safe }}</div>
+          </div>
+        </div>
+      </div>
+
+    
+
+    
+</body>
+
+<!-- <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript'>
+  var graphs = {{ graphJSON | safe }};
+  Plotly.plot('chart', graphs,{});
+</script> -->
