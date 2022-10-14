@@ -23,7 +23,6 @@ def render_table():
     dataset_name = request.args.get('dataset')
     dataset_split = request.args.get('split')
     table_idx = request.args.get('i')
-    increment = request.args.get('inc')
 
     if dataset_name:
         app.config["dataset_name"] = dataset_name
@@ -34,40 +33,44 @@ def render_table():
     if table_idx:
         app.config["table_idx"] = int(table_idx)
 
-    if increment:
-        app.config["table_idx"] += int(increment)
+    return get_table_data()
 
-    table = get_table_html()
-    return table
-
-    # return render_template('index.html',
-    #     dataset=app.config["dataset_name"],
-    #     table=table
-    # )
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     logger.info(f"Page loaded")
-    table = get_table_html()
 
     return render_template('index.html',
         dataset=app.config["dataset_name"],
-        table=table
+        datasets=list(app.config["dataset_paths"].keys()),
+        table_idx=app.config["table_idx"]
     )
+
 
 def load_dataset(dataset_name, split="dev"):
     logger.info(f"Loading {dataset_name}")
     dataset = get_dataset_class_by_name(dataset_name)()
-    dataset.load(splits=[split])
+
+    dataset_paths = app.config["dataset_paths"]
+    dataset.load(splits=[split], path=dataset_paths[dataset_name])
     app.config["datasets"][dataset_name] = dataset
+
+    return dataset
+
 
 
 def get_dataset(dataset_name):
-    return app.config["datasets"].get(dataset_name)
+    dataset = app.config["datasets"].get(dataset_name)
+
+    if not dataset:
+        dataset = load_dataset(dataset)
+
+    return dataset
 
 
-def get_table_html(dataset_name=None, split=None, index=None):
+
+def get_table_data(dataset_name=None, split=None, index=None):
     if not dataset_name:
         dataset_name = app.config["dataset_name"]
 
@@ -79,16 +82,27 @@ def get_table_html(dataset_name=None, split=None, index=None):
 
     dataset = get_dataset(dataset_name)
     html = dataset.get_table_html(split=split, index=index)
-    return html
+    ref = dataset.get_reference(split=split, index=index)
+
+    return {
+        "html": html,
+        "ref": ref
+    }
+
 
 
 def create_app(*args, **kwargs):
     random.seed(42)
 
     app.config["datasets"] = {}
-    app.config["dataset_name"] = "totto"
+    app.config["dataset_name"] = "scigen"
     app.config["dataset_split"] = "dev"
     app.config["table_idx"] = 0
+    app.config["dataset_paths"] = {
+        "totto" :  None,
+        "hitab" : "/lnet/work/people/kasner/datasets/HiTab/data",
+        "scigen" : "/lnet/work/people/kasner/datasets/SciGen/dataset"
+    }
 
     load_dataset(app.config["dataset_name"])
 

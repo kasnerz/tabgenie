@@ -17,21 +17,55 @@
 
     <div class="container">
         <div class="row">
-        <div class="col-2">
-            <h1>{{ dataset }}</h1>
+        <div class="col-2 leftpanel">
+            <div class="infoarea">
+
+              <h2>Table2Text Explorer</h2>
+              <div class="selectarea">
+                <b>dataset</b>
+                <select class="form-select" aria-label="dataset">
+                  <option selected>{{ dataset }}</option>
+                  {% for dataset_name in datasets %}
+                  <option value="{{ dataset_name }}">{{ dataset_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="selectarea">
+                  <b>split</b>
+                  <select class="form-select" aria-label="dataset">
+                    <option selected>dev</option>
+                    <option value="test">test</option>
+                    <option value="train">train</option>
+                  </select>
+              </div>
+
+              <div class="selectarea">
+                <b>example</b>
                 <nav>
                     <ul class="pagination">
                     <li class="page-item">
-                        <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">Previous</a>
+                        <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">«</a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">Next</a>
+                      <a class="page-link" id="page-btn">{{ table_idx }}</a>
+                  </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">»</a>
                     </li>
                     </ul>
                 </nav>
+              </div>
             </div>
+
+                
+
+          </div>
           <div class="col-10">
-            <div id='tablearea' class='table-responsive'> {{ table | safe }}</div>
+            <div id='captionarea' class="shadow p-3 mb-5 bg-body rounded">
+              <b>reference:</b>
+              <div id="reference"></div>
+            </div>
+            <div id='tablearea' class='table-responsive'> </div>
           </div>
         </div>
       </div>

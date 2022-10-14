@@ -1,7 +1,7 @@
 body {
     /* max-width: 1200px; */
     margin: 40px auto;
-    padding: 0 20px;
+    padding: 0 10px;
     /* font: 18px/1.4 'Open Sans', sans-serif;
     color: #495057;
     background-color: #FFFFFF; */
@@ -11,17 +11,28 @@ a {
     --bs-pagination-color: black;
 }
 
+.selectarea {
+    margin-bottom: 20px;
+}
 
+.infoarea {
+    margin-top: 20px;
+}
 
-
-/* #tablearea {
-    max-width: 1200px;
-} */
-
-/* .container > .row > .table > tr.active {
-    background-color:#fff68f
-} */
+#tablearea {
+    margin-top: 5px;
+    padding-left: 30px;
+}
 
 .table-active {
     --bs-table-accent-bg: #fff68f;
+}
+
+.leftpanel {
+    padding-right: 50px;
+    /* border-right: 1px dotted rgb(206, 206, 206); */
+}
+
+#captionarea {
+    margin: 0px 50px 0px 50px
 }
