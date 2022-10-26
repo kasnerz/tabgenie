@@ -127,7 +127,7 @@ class SciGen(Dataset):
 
         tbodies = [h("tr")(tds) for tds in trs]
         tbody_el = h("tbody")(tbodies)
-        table_el = h("table", klass="table table-hover table-sm table-bordered")(tbody_el)
+        table_el = h("table", klass="table table-sm table-bordered")(tbody_el)
         area_el = h("div")(header_el, table_el)
 
         html = area_el.render()
@@ -211,7 +211,7 @@ class HiTab(Dataset):
 
         tbodies = [h("tr")(tds) for tds in trs]
         tbody_el = h("tbody")(tbodies)
-        table_el = h("table", klass="table table-hover table-sm table-bordered")(tbody_el)
+        table_el = h("table", klass="table table-sm table-bordered")(tbody_el)
         area_el = h("div")(header_el, table_el)
 
         html = area_el.render()
@@ -302,7 +302,7 @@ class ToTTo(Dataset):
         
         # footer_el = h("div")(footers)
         
-        table_el = h("table", klass="table table-hover table-sm table-bordered")(thead_el, tbody_el)
+        table_el = h("table", klass="table table-sm table-bordered")(thead_el, tbody_el)
         area_el = h("div")(header_el, table_el)
 
         html = area_el.render()
@@ -312,6 +312,61 @@ class ToTTo(Dataset):
 
     def load(self, splits, path=None):
         dataset = load_dataset("gem", "totto")
+    
+        for split in splits:
+            data = dataset[split if split != "dev" else "validation"]
+            self.data[split] = data
+
+
+class WebNLG(Dataset):
+    """
+    The WebNLG dataset: https://huggingface.co/datasets/web_nlg
+    Contains DBPedia triples and their crowdsourced verbalizations.
+    """
+    name="webnlg"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data = {}
+
+    def get_reference(self, split, index):
+        table_raw = self.data[split][index]
+        return table_raw["target"]
+
+
+    def get_table_html(self, split, index):
+        example = self.data[split][index]
+        theaders = [
+            h("th", scope="col")("subject"),
+            h("th", scope="col")("predicate"),
+            h("th", scope="col")("object"),
+        ]
+        thead_el = None
+        thead_el = h("thead")(theaders)
+        tbodies = []
+
+        for triple in example["input"]:
+            tds = []
+            elems = triple.split("|")
+            for el in elems:
+                el = normalize(el, remove_parentheses=False)
+                td_el = h("td")(el)
+                tds.append(td_el)
+
+            tr_el = h("tr")(tds)
+            tbodies.append(tr_el)
+
+        tbody_el = h("tbody")(tbodies)
+        table_el = h("table", klass="table table-sm table-bordered")(thead_el, tbody_el)
+        area_el = h("div")(table_el)
+
+        html = area_el.render()
+        return lxml.etree.tostring(lxml.html.fromstring(html), encoding='unicode', pretty_print=True)
+
+
+
+    def load(self, splits, path=None):
+        dataset = load_dataset("gem", "web_nlg_en")
     
         for split in splits:
             data = dataset[split if split != "dev" else "validation"]

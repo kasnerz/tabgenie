@@ -36,3 +36,12 @@ a {
 #captionarea {
     margin: 0px 50px 0px 50px
 }
+
+.interactive-cell {
+    cursor: pointer;
+}
+
+#outputarea {
+    margin-top: 10px;
+
+}

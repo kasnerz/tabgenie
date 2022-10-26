@@ -28,12 +28,12 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="6.7277216"
-     inkscape:cx="29.28183"
-     inkscape:cy="52.097875"
+     inkscape:cx="14.863873"
+     inkscape:cy="13.600444"
      inkscape:window-width="1920"
      inkscape:window-height="1020"
      inkscape:window-x="2560"
-     inkscape:window-y="840"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
@@ -44,7 +44,7 @@
      id="layer1"
      transform="translate(-77.748573,-42.078765)">
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.827002;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke;stop-color:#000000"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.215;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke;stop-color:#000000"
        id="rect1725"
        width="8.4421988"
        height="1.4760057"
@@ -52,16 +52,16 @@
        y="54.19751"
        ry="0.73800284" />
     <rect
-       style="fill:#ffe478;fill-opacity:1;stroke:#000000;stroke-width:2.627;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke;stop-color:#000000"
+       style="fill:#ffe478;fill-opacity:1;stroke:#000000;stroke-width:1.588;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke;stop-color:#000000"
        id="rect234"
-       width="12.314918"
-       height="8.8329229"
-       x="79.062073"
-       y="43.392265"
-       ry="1.1314141"
-       rx="1.3664281" />
+       width="13.286801"
+       height="9.5613995"
+       x="78.535172"
+       y="42.877018"
+       ry="1.224725"
+       rx="1.4742657" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.827002;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke;stop-color:#000000"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.215;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke;stop-color:#000000"
        id="rect1727"
        width="8.4421988"
        height="1.4760057"
