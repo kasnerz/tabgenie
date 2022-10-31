@@ -45,3 +45,10 @@ a {
     margin-top: 10px;
 
 }
+
+#page-input {
+    width: 90px;
+    height: 38px;
+    margin-left: 2px;
+    margin-right: 2px;
+}

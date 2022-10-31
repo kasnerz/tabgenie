@@ -36,7 +36,6 @@ def get_dataset_class_by_name(name):
             Available classes: {available_classes}")
         return None
 
-
 class DataEntry:
     """ 
     An entry in the dataset 
@@ -54,10 +53,12 @@ class Dataset:
     """
     Base class for the datasets
     """
-    def __init__(self):
-        self.data = {split: [] for split in ["train", "dev", "test"]}
+    def __init__(self, path):
+        self.splits =  ["train", "dev", "test"]
+        self.data = {split: [] for split in self.splits}
+        self.path = path
 
-    def load(self, splits, path=None):
+    def load(self):
         """
         Load the dataset. Path can be specified for loading from a directory
         or omitted if the dataset is loaded from HF.
@@ -70,6 +71,8 @@ class Dataset:
     def get_reference(self, split, index):
         raise NotImplementedError
 
+    def has_split(self, split):
+        return bool(self.data[split])
 
 
 class SciGen(Dataset):
@@ -81,7 +84,7 @@ class SciGen(Dataset):
 
 
     def get_reference(self, split, index):
-        entry = self.data[split][0][str(index)]
+        entry = self.data[split][index]
         caption = entry["table_caption"]
         caption = caption.replace("[CONTINUE]", "\n")
 
@@ -103,7 +106,7 @@ class SciGen(Dataset):
         
 
     def get_table_html(self, split, index):
-        entry = self.data[split][0][str(index)]
+        entry = self.data[split][index]
 
         headers = []
         headers.append(h("p")(h("h5")(entry["paper"])))
@@ -134,20 +137,18 @@ class SciGen(Dataset):
         return lxml.etree.tostring(lxml.html.fromstring(html), encoding='unicode', pretty_print=True)
 
 
-    def load(self, splits, path):
-        for split in splits:
-            data_dir = "development" if split == "dev" else split
+    def load(self, split):
+        data_dir = "development" if split == "dev" else split
 
-            if split in ["train", "dev"]:
-                file_path = os.path.join(path, data_dir, "medium", f"{split}.json")
-            else:
-                # there is also "test-Other.json", should be looked into
-                file_path = os.path.join(path, data_dir, f"test-CL.json")
+        if split in ["train", "dev"]:
+            file_path = os.path.join(self.path, data_dir, "medium", f"{split}.json")
+        else:
+            # there is also "test-Other.json", should be looked into
+            file_path = os.path.join(self.path, data_dir, f"test-CL.json")
 
-            with open(file_path) as f:
-                j = json.load(f)
-                self.data[split].append(j)
-
+        with open(file_path) as f:
+            j = json.load(f)
+            self.data[split] = list(j.values())
 
 
 class HiTab(Dataset):
@@ -218,20 +219,17 @@ class HiTab(Dataset):
         return lxml.etree.tostring(lxml.html.fromstring(html), encoding='unicode', pretty_print=True)
 
 
-    def load(self, splits, path):
-        for filename in glob.glob(os.path.join(path, "tables", "raw", "*.json")):
+    def load(self, split):
+        for filename in glob.glob(os.path.join(self.path, "tables", "raw", "*.json")):
             with open(filename) as f:
                 j = json.load(f)
                 table_name = os.path.basename(filename).rstrip(".json")
                 self.tables[table_name] = j
 
-        for split in splits:
-            with open(os.path.join(path, f"{split}_samples.jsonl")) as f:
-                for line in f.readlines():
-                    j = json.loads(line)
-                    self.data[split].append(j)
-
-
+        with open(os.path.join(self.path, f"{split}_samples.jsonl")) as f:
+            for line in f.readlines():
+                j = json.loads(line)
+                self.data[split].append(j)
 
 
 class ToTTo(Dataset):
@@ -244,7 +242,6 @@ class ToTTo(Dataset):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data = {}
 
     def get_reference(self, split, index):
         table_raw = self.data[split][index]
@@ -310,12 +307,11 @@ class ToTTo(Dataset):
 
 
 
-    def load(self, splits, path=None):
+    def load(self, split):
         dataset = load_dataset("gem", "totto")
     
-        for split in splits:
-            data = dataset[split if split != "dev" else "validation"]
-            self.data[split] = data
+        data = dataset[split if split != "dev" else "validation"]
+        self.data[split] = data
 
 
 class WebNLG(Dataset):
@@ -327,7 +323,6 @@ class WebNLG(Dataset):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data = {}
 
     def get_reference(self, split, index):
         table_raw = self.data[split][index]
@@ -364,10 +359,85 @@ class WebNLG(Dataset):
         return lxml.etree.tostring(lxml.html.fromstring(html), encoding='unicode', pretty_print=True)
 
 
-
-    def load(self, splits, path=None):
+    def load(self, split):
         dataset = load_dataset("gem", "web_nlg_en")
     
-        for split in splits:
-            data = dataset[split if split != "dev" else "validation"]
-            self.data[split] = data
+        data = dataset[split if split != "dev" else "validation"]
+        self.data[split] = data
+
+
+class LogicNLG(Dataset):
+    """
+    The LogicNLG dataset: https://github.com/wenhuchen/LogicNLG
+    Contains tables from English Wikipedia and crowdsourced verbalizations with logical inferences.
+    """
+    name="logicnlg"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mapping = {}
+
+    def get_reference(self, split, index):
+        table = self.data[split][index]
+        return table["ref"]
+
+
+    def get_table_html(self, split, index):
+        def is_highlighted(i):
+            return j in table["linked_columns"]
+
+        table = self.data[split][index]
+        headers = []
+        headers.append(h("p")(h("h5")(table["title"])))
+        header_el = h("div")(headers)
+
+        theaders = []
+        thead_el = None
+        tbodies = []
+
+        for i, row in enumerate(table["table"]):
+            if i==0:
+                for j, x in enumerate(row):
+                    th_el = h("th", scope="col")(x)
+                    if is_highlighted(i):
+                        th_el.tag.attrs["class"] = "table-active"
+                    theaders.append(th_el)
+                thead_el = h("thead")(theaders)
+            else:
+                tds = []
+                for j, x in enumerate(row):
+                    td_el = h("td")(x)
+                    if is_highlighted(i):
+                        td_el.tag.attrs["class"] = "table-active"
+                    tds.append(td_el)
+                tr_el = h("tr")(tds)
+                tbodies.append(tr_el)
+
+        tbody_el = h("tbody")(tbodies)
+        table_el = h("table", klass="table table-sm table-bordered")(thead_el, tbody_el)
+        area_el = h("div")(header_el, table_el)
+
+        html = area_el.render()
+        return lxml.etree.tostring(lxml.html.fromstring(html), encoding='unicode', pretty_print=True)
+
+
+    def load(self, split):
+        filename = split if split != "dev" else "val"
+
+        with open(os.path.join(self.path, f"{filename}_lm.json")) as f:
+            j = json.load(f)
+        
+        for table_id, examples in j.items():
+            table = []
+            with open(os.path.join(self.path, "all_csv", table_id)) as f:
+                for line in f.readlines():
+                    table.append(line.rstrip("\n").split("#"))
+
+            for example in examples:
+                self.data[split].append({
+                    "table" : table,
+                    "ref" : example[0],
+                    "linked_columns" : example[1],
+                    "title" : example[2],
+                    "template" : example[3]
+                })

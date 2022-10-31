@@ -1,25 +1,33 @@
 var table_idx = 0;
 var total_examples = 1;
-var dataset = "totto";
+// var dataset = "totto";
+var dataset = "logicnlg";
 var split = "dev";
 
-function nextbtn(){
-  table_idx += 1;
+function mod(n, m) {
+  return ((n % m) + m) % m;
+}
 
-  if (table_idx >= total_examples-1) {
-    table_idx = 0;
-  }
-  fetch_table(dataset, split, table_idx);
+function nextbtn(){
+  gotopage(table_idx+1);
 }
 
 function prevbtn(){
-  table_idx -= 1;
-  if (table_idx <= 0) {
-    table_idx = total_examples-1;
-  }
-  fetch_table(dataset, split, table_idx);
+  gotopage(table_idx-1);
 }
 
+function gotobtn(){
+  var n = $("#page-input").val();
+  gotopage(n);
+}
+
+function gotopage(page){
+  table_idx = page;
+  table_idx = mod(table_idx, total_examples - 1);
+
+  fetch_table(dataset, split, table_idx);
+  $("#page-input").val(table_idx);
+}
 
 function get_highlighted_cells() {
   var activeCells = $("#tablearea").find("td.table-active").map(
@@ -74,7 +82,6 @@ function fetch_table(dataset, split, table_idx) {
         }
       );
     });
-  $("#page-btn").html(table_idx);
   $("#model-output").html();
   $("#outputarea").hide();
 }
@@ -84,7 +91,7 @@ $("#dataset-select").on("change", function(e) {
   dataset = $('#dataset-select').val();
   table_idx = 0;
   fetch_table(dataset, split, table_idx);
-  $("#page-btn").html(table_idx);
+  $("#page-input").val(table_idx);
 });
 
 
@@ -93,7 +100,14 @@ $("#split-select").on("change", function(e) {
   split = $('#split-select').val();
   table_idx = 0;
   fetch_table(dataset, split, table_idx);
-  $("#page-btn").html(table_idx);
+  $("#page-input").val(table_idx);
+});
+
+
+$('#page-input').keypress(function(event) {
+  if (event.keyCode == 13) {
+      gotobtn();
+  }
 });
 
 
@@ -101,7 +115,7 @@ $( document ).ready(function() {
   $("#dataset-select").val(dataset).change();
 
   fetch_table(dataset, split, table_idx);
-  $("#page-btn").html(table_idx);
+  $("#page-input").val(table_idx);
 });
 
 

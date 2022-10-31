@@ -38,22 +38,24 @@ def render_table():
     return get_table_data(dataset_name, split, table_idx)
 
 
-def load_dataset_split(dataset_name, split):
-    logger.info(f"Loading {dataset_name} / {split}")
-    dataset = get_dataset_class_by_name(dataset_name)()
-
-    dataset_paths = app.config["dataset_paths"]
-    dataset.load(splits=[split], path=dataset_paths[dataset_name])
-    app.config["datasets"][dataset_name + "/" + split] = dataset
+def initialize_dataset(dataset_name):
+    dataset_path = app.config["dataset_paths"][dataset_name]
+    dataset = get_dataset_class_by_name(dataset_name)(path=dataset_path)
+    app.config["datasets"][dataset_name] = dataset
 
     return dataset
 
 
 def get_dataset(dataset_name, split):
-    dataset = app.config["datasets"].get(dataset_name + "/" + split)
+    dataset = app.config["datasets"].get(dataset_name)
 
     if not dataset:
-        dataset = load_dataset_split(dataset_name, split)
+        logger.info(f"Initializing {dataset_name}")
+        dataset = initialize_dataset(dataset_name)
+
+    if not dataset.has_split(split):
+        logger.info(f"Loading {dataset_name} / {split}")
+        dataset.load(split=split)
 
     return dataset
 
@@ -84,8 +86,9 @@ def create_app(*args, **kwargs):
     app.config["dataset_paths"] = {
         "webnlg" :  None,
         "totto" :  None,
-        "hitab" : "/lnet/work/people/kasner/datasets/HiTab/data",
-        "scigen" : "/lnet/work/people/kasner/datasets/SciGen/dataset"
+        "hitab" : "data/HiTab/data",
+        "scigen" : "data/SciGen/dataset",
+        "logicnlg" : "data/LogicNLG/data"
     }
     return app
 
