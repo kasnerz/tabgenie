@@ -8,6 +8,8 @@ import logging
 from .data import get_dataset_class_by_name
 from collections import defaultdict
 from flask import Flask, render_template, jsonify, request
+from .model import Model
+
 
 app = Flask(__name__)
 
@@ -19,13 +21,38 @@ def success():
     return resp
 
 
+@app.route('/load_model', methods=['GET', 'POST'])
+def load_model():
+    model_name = request.args.get("model")
+
+    logger.info(f"Loading model {model_name}")
+    m = Model()
+    m.load(
+        exp_dir="/lnet/work/people/kasner/projects/ng-nlg/experiments",
+        experiment=model_name
+    )
+    app.config["model"] = m
+    return success()
+
+
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
     if request.method == 'POST':
         content = request.json
         logger.info(f"Incoming content: {content}")
+        m = app.config["model"]
+
+        dataset_name = content["dataset"]
+        split = content["split"]
+        table_idx = content["table_idx"]
+        cells = content["cells"]
+
+        dataset = get_dataset(dataset_name, split)
+        gen_input = dataset.get_generation_input(table_idx, cells)
+
+        out = m.generate(gen_input)
         return {
-            "out" : str(content)
+            "out" : out
         }
 
 
@@ -60,8 +87,8 @@ def get_dataset(dataset_name, split):
     return dataset
 
 
-def get_table_data(dataset, split, index):
-    dataset = get_dataset(dataset, split)
+def get_table_data(dataset_name, split, index):
+    dataset = get_dataset(dataset_name, split)
     html = dataset.get_table_html(split=split, index=index)
     ref = dataset.get_reference(split=split, index=index)
 
@@ -88,7 +115,8 @@ def create_app(*args, **kwargs):
         "totto" :  None,
         "hitab" : "data/HiTab/data",
         "scigen" : "data/SciGen/dataset",
-        "logicnlg" : "data/LogicNLG/data"
+        "logicnlg" : "data/LogicNLG/data",
+        "logic2text" : "data/Logic2Text/dataset"
     }
     return app
 

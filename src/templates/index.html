@@ -19,7 +19,7 @@
         <div class="col-2 leftpanel">
             <div class="infoarea">
 
-              <h2>Table2Text Explorer</h2>
+              <h2>InteracTab</h2>
               <div class="selectarea">
                 <b>dataset</b>
                 <select id="dataset-select" class="form-select" aria-label="dataset">
@@ -53,13 +53,19 @@
                     </ul>
                 </nav>
               </div>
-              <div class="selectarea">
-                <button id="gen-btn" type="button" class="btn btn-success" onclick="generate();">Generate</button>
-              </div>
+              
               <div class="selectarea">
                 <div id="dataset-spinner" class="spinner-border" role="status" style="display: none">
                   <span class="sr-only"></span>
                 </div>
+              </div>
+              <div id="model-spinner" class="selectarea"  style="display: none">
+                <div class="spinner-grow text-primary" role="status">  
+                  <span class="visually-hidden"></span>
+                </div>
+              </div>
+              <div class="selectarea" id="gen-btn" style="display: none">
+                <button type="button" class="btn btn-primary" onclick="generate();" >Generate</button>
               </div>
             </div>
 

@@ -1,7 +1,7 @@
 var table_idx = 0;
 var total_examples = 1;
 // var dataset = "totto";
-var dataset = "logicnlg";
+var dataset = "webnlg";
 var split = "dev";
 
 function mod(n, m) {
@@ -37,22 +37,45 @@ function get_highlighted_cells() {
   return activeCells;
 }
 
+function load_model() {
+  $.ajax({
+    type: "GET",
+    url: "/load_model",
+    data: {
+      "model" : "webnlg"
+    },
+    beforeSend: function() {
+        $("#model-spinner").show();
+    },
+    success: function(data) {
+        $("#model-spinner").hide();
+        $("#gen-btn").show();
+    }
+  })
+}
+
 function generate() {
   cells = get_highlighted_cells();
-  var response = {
-    "cells" : cells
-  }
+  dataset = $('#dataset-select').val();
+  split = $('#split-select').val();
+
+  var request = {
+    "cells" : cells,
+    "dataset" : dataset,
+    "split" : split,
+    "table_idx" : table_idx
+  };
 
   $.ajax({
     type: "POST",
     contentType: "application/json; charset=utf-8",
     url: "/generate",
-    data: JSON.stringify(response),
+    data: JSON.stringify(request),
     success: function (data) {
       output = data["out"];
 
       $("#dataset-spinner").hide();
-      $("#model-output").html(output);
+      $("#model-output").html("<hl>" + output + "</hl>");
       $("#outputarea").show();
     },
     dataType: "json"
@@ -116,6 +139,8 @@ $( document ).ready(function() {
 
   fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
+
+  // load_model();
 });
 
 
