@@ -48,6 +48,7 @@ class Cell:
         self.is_highlighted = False
         self.is_col_header = False
         self.is_row_header = False
+        self.is_dummy = False
 
     def is_header(self):
         return self.is_col_header or self.is_row_header
@@ -87,6 +88,14 @@ class Table:
             return self.cells[i][j]
         except:
             return None
+
+    def get_cell_by_id(self, idx):
+        for row in self.cells:
+            for c in row:
+                if c.idx == idx:
+                    return c
+            
+        return None
 
     def __repr__(self):
         return str(self.__dict__)
@@ -128,8 +137,19 @@ class Dataset:
         return NotImplementedError
 
 
-    def get_generation_input(self, content):
-        import pdb; pdb.set_trace();
+    def get_generation_input(self, split, table_idx, cell_ids):
+        t = self.get_table(split, table_idx)
+        cells = [t.get_cell_by_id(int(idx)) for idx in cell_ids]
+        gen_input = []
+
+        if t.title:
+            gen_input.append("[TITLE] " + t.title)
+
+        for c in cells:
+            gen_input.append("[CELL] " + c.value + " [/CELL]")
+
+        return " ".join(gen_input)
+
     
     def get_table_html(self, split, index):
         t = self.get_table(split, index)
@@ -150,11 +170,11 @@ class Dataset:
         for row in t.cells:
             tds = []
             for c in row:
-                if not c:
+                if c.is_dummy:
                     continue
 
                 eltype = "th" if c.is_header() else "td"
-                td_el = h(eltype, colspan=c.colspan, rowspan=c.rowspan)(c.value)
+                td_el = h(eltype, colspan=c.colspan, rowspan=c.rowspan, cell_idx=c.idx)(c.value)
 
                 if c.is_highlighted:
                     td_el.tag.attrs["class"] = "table-active"
@@ -275,7 +295,7 @@ class HiTab(Dataset):
                         t.get_cell(i,j).rowspan = r["last_row"]-r["first_row"]+1
                         t.get_cell(i,j).colspan = r["last_column"]-r["first_column"]+1
                     else:
-                        t.set_cell(i,j, None)
+                        t.get_cell(i,j).is_dummy = True
 
         self.tables[split][index] = t
         return t
@@ -344,7 +364,7 @@ class ToTTo(Dataset):
 
 class WebNLG(Dataset):
     """
-    The WebNLG dataset: https://huggingface.co/datasets/web_nlg
+    The WebNLG dataset: https://huggingface.co/datasets/GEM/web_nlg
     Contains DBPedia triples and their crowdsourced verbalizations.
     """
     name="webnlg"
@@ -378,6 +398,48 @@ class WebNLG(Dataset):
 
     def load(self, split):
         dataset = load_dataset("gem", "web_nlg_en")
+    
+        data = dataset[split if split != "dev" else "validation"]
+        self.data[split] = data
+
+
+class E2E(Dataset):
+    """
+    The Cleaned E2E dataset: https://huggingface.co/datasets/GEM/e2e_nlg
+    Contains DBPedia triples and their crowdsourced verbalizations.
+    """
+    name="e2e"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def prepare_table(self, split, index):
+        entry = self.data[split][index]
+        t = Table()
+        t.ref = entry["target"]
+        mrs = entry["meaning_representation"].split(", ")
+
+        for mr in mrs:
+            key = mr.split("[")[0]
+            c = Cell()
+            c.value = key
+            c.is_col_header = True
+            t.add_cell(c)
+        t.save_row()
+
+        for mr in mrs:
+            value = mr.split("[")[1][:-1]
+            c = Cell()
+            c.value = value
+            t.add_cell(c)
+        t.save_row()
+            
+
+        self.tables[split][index] = t
+        return t
+
+    def load(self, split):
+        dataset = load_dataset("gem", "e2e_nlg")
     
         data = dataset[split if split != "dev" else "validation"]
         self.data[split] = data
@@ -503,3 +565,61 @@ class Logic2Text(Dataset):
 
         with open(os.path.join(self.path, f"{filename}.json")) as f:
             self.data[split] = json.load(f)
+
+
+class ChartToTextS(Dataset):
+    """
+    The "Statista" subset of the Chart-To-Text dataset: https://github.com/vis-nlp/Chart-to-text/tree/main/statista_dataset/dataset
+    """
+    name = "charttotext-s"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.table_content = {}
+
+    def prepare_table(self, split, index):
+        t = Table()
+        entry = self.data[split][index]
+
+        t.ref = entry["ref"]
+        t.title = entry["title"]
+            
+        for i, row in enumerate(entry["content"]):
+            for j, col in enumerate(row):
+                c = Cell()
+                c.value = col
+                if i == 0:
+                    c.is_col_header = True
+                t.add_cell(c)
+            t.save_row()
+
+        self.tables[split][index] = t
+        return t
+
+
+    def load(self, split):
+        mapping_file = split if split != "dev" else "val"
+
+        with open(os.path.join(self.path, "dataset_split", f"{mapping_file}_index_mapping.csv")) as f:
+            next(f)
+            for line in f:
+                subdir = "." if line.startswith("two_col") else "multiColumn"
+                filename = line.split("-")[1].split(".")[0]
+                
+                with open(os.path.join(self.path, subdir, "data", filename + ".csv")) as g:
+                    content = []
+                    reader = csv.reader(g, delimiter=',', quotechar='"')
+                    for row in reader:
+                        content.append(row)
+
+                with open(os.path.join(self.path, subdir, "captions", filename + ".txt")) as g:
+                    ref = g.read().rstrip("\n")
+
+                with open(os.path.join(self.path, subdir, "titles", filename + ".txt")) as g:
+                    title = g.read().rstrip("\n")
+
+                self.data[split].append({
+                    "content" : content,
+                    "ref" : ref,
+                    "title" : title
+                })

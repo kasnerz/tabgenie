@@ -5,6 +5,7 @@ import os
 import requests
 import json
 import logging
+import argparse
 from .data import get_dataset_class_by_name
 from collections import defaultdict
 from flask import Flask, render_template, jsonify, request
@@ -13,7 +14,7 @@ from .model import Model
 
 app = Flask(__name__)
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO, datefmt='%H:%M:%S')
+logging.basicConfig(format='%(levelname)s - %(message)s', level=logging.INFO, datefmt='%H:%M:%S')
 logger = logging.getLogger(__name__)
 
 def success():
@@ -23,6 +24,9 @@ def success():
 
 @app.route('/load_model', methods=['GET', 'POST'])
 def load_model():
+    if app.config["mode"] == "light":
+        return success()
+
     model_name = request.args.get("model")
 
     logger.info(f"Loading model {model_name}")
@@ -45,12 +49,14 @@ def generate():
         dataset_name = content["dataset"]
         split = content["split"]
         table_idx = content["table_idx"]
-        cells = content["cells"]
+        cell_ids = content["cells"]
 
         dataset = get_dataset(dataset_name, split)
-        gen_input = dataset.get_generation_input(table_idx, cells)
+        gen_input = dataset.get_generation_input(split=split, table_idx=table_idx, cell_ids=cell_ids)
 
+        logger.info(f"Input: {gen_input}")
         out = m.generate(gen_input)
+
         return {
             "out" : out
         }
@@ -110,17 +116,25 @@ def index():
 
 def create_app(*args, **kwargs):
     app.config["datasets"] = {}
+    app.config["mode"] = "light"
     app.config["dataset_paths"] = {
+        "e2e" :  None,
+        "hitab" : "data/HiTab/data",
+        "charttotext-s" : "data/Chart-to-text/statista_dataset/dataset",
+        "logic2text" : "data/Logic2Text/dataset",
+        "logicnlg" : "data/LogicNLG/data",
+        "scigen" : "data/SciGen/dataset",
         "webnlg" :  None,
         "totto" :  None,
-        "hitab" : "data/HiTab/data",
-        "scigen" : "data/SciGen/dataset",
-        "logicnlg" : "data/LogicNLG/data",
-        "logic2text" : "data/Logic2Text/dataset"
     }
     return app
 
 
-if __name__ == "__main__":
-    app = create_app()
-    app.run(debug=True)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mode", type=str, default="full", choices=["full", "light"],
+         help="Deployment mode: full = with model loading, light = visualization only")
+
+    args = parser.parse_args()
+    app.config["mode"] = args.mode
+    app.run()

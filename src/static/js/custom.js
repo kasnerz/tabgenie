@@ -1,7 +1,6 @@
 var table_idx = 0;
 var total_examples = 1;
-// var dataset = "totto";
-var dataset = "webnlg";
+var dataset = "charttotext-s";
 var split = "dev";
 
 function mod(n, m) {
@@ -30,10 +29,18 @@ function gotopage(page){
 }
 
 function get_highlighted_cells() {
-  var activeCells = $("#tablearea").find("td.table-active").map(
+  var activeCells = $("#tablearea").find(".table-active").map(
     function() { 
-      return $(this).text();
+      return $(this).attr("cell-idx");
     }).get();
+
+  // no highlighted cells -> send all cells except headers
+  if (activeCells.length == 0) {
+    activeCells = $("#tablearea").find("td").map(
+      function() { 
+        return $(this).attr("cell-idx");
+      }).get();
+  }
   return activeCells;
 }
 
@@ -42,19 +49,20 @@ function load_model() {
     type: "GET",
     url: "/load_model",
     data: {
-      "model" : "webnlg"
+      "model" : "totto"
     },
     beforeSend: function() {
         $("#model-spinner").show();
     },
     success: function(data) {
         $("#model-spinner").hide();
-        $("#gen-btn").show();
+        $("#gen-btn-area").show();
     }
   })
 }
 
 function generate() {
+  $("#gen-btn").html("Generating...");
   cells = get_highlighted_cells();
   dataset = $('#dataset-select').val();
   split = $('#split-select').val();
@@ -77,6 +85,7 @@ function generate() {
       $("#dataset-spinner").hide();
       $("#model-output").html("<hl>" + output + "</hl>");
       $("#outputarea").show();
+      $("#gen-btn").html("Generate");
     },
     dataType: "json"
   });
@@ -140,7 +149,7 @@ $( document ).ready(function() {
   fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
 
-  // load_model();
+  load_model();
 });
 
 

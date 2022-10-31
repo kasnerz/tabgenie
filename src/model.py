@@ -39,10 +39,10 @@ class Model:
         return out
 
 
-if __name__ == "__main__":
-    m = Model()
-    m.load(
-        exp_dir="/lnet/work/people/kasner/projects/ng-nlg/experiments",
-        experiment="webnlg"
-    )
-    print(m.generate("Prague | capital | Czechia"))
+# if __name__ == "__main__":
+#     m = Model()
+#     m.load(
+#         exp_dir="/lnet/work/people/kasner/projects/ng-nlg/experiments",
+#         experiment="webnlg"
+#     )
+#     print(m.generate("Prague | capital | Czechia"))
