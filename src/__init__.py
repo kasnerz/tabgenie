@@ -112,22 +112,17 @@ def index():
 
     return render_template('index.html',
         datasets=list(app.config["dataset_paths"].keys()),
-        host_prefix=os.environ.get("HOST_PREFIX", ".")
+        host_prefix=app.config["host_prefix"]
     )
 
 
 def create_app(*args, **kwargs):
+    with open('config.json') as f:
+        config = json.load(f)
+
+    app.config.update(config)
+    # app.config.from_file("config.json", load=json.load)
     app.config["datasets"] = {}
-    app.config["dataset_paths"] = {
-        "e2e" :  None,
-        "hitab" : "data/HiTab/data",
-        "charttotext-s" : "data/Chart-to-text/statista_dataset/dataset",
-        "logic2text" : "data/Logic2Text/dataset",
-        "logicnlg" : "data/LogicNLG/data",
-        "scigen" : "data/SciGen/dataset",
-        "webnlg" :  None,
-        "totto" :  None,
-    }
     return app
 
 

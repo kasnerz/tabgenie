@@ -1,0 +1,13 @@
+{
+    "dataset_paths" : {
+        "e2e" : null,
+        "hitab" : "data/HiTab/data",
+        "charttotext-s" : "data/Chart-to-text/statista_dataset/dataset",
+        "logic2text" : "data/Logic2Text/dataset",
+        "logicnlg" : "data/LogicNLG/data",
+        "scigen" : "data/SciGen/dataset",
+        "webnlg" : null,
+        "totto" : null
+    },
+    "host_prefix" : "."
+}
