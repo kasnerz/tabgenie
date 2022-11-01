@@ -1,6 +1,6 @@
 var table_idx = 0;
 var total_examples = 1;
-var dataset = "charttotext-s";
+var dataset = "totto";
 var split = "dev";
 
 function mod(n, m) {
@@ -51,18 +51,19 @@ function load_model() {
     data: {
       "model" : "totto"
     },
-    beforeSend: function() {
-        $("#model-spinner").show();
-    },
+    // beforeSend: function() {
+    //     $("#gen-btn").prop('disabled', true);
+    // },
     success: function(data) {
-        $("#model-spinner").hide();
-        $("#gen-btn-area").show();
+        $("#gen-btn").html('Generate');
+        $("#gen-btn").removeClass('disabled');
     }
   })
 }
 
 function generate() {
   $("#gen-btn").html("Generating...");
+  $("#gen-btn").addClass('disabled');
   cells = get_highlighted_cells();
   dataset = $('#dataset-select').val();
   split = $('#split-select').val();
@@ -86,6 +87,7 @@ function generate() {
       $("#model-output").html("<hl>" + output + "</hl>");
       $("#outputarea").show();
       $("#gen-btn").html("Generate");
+      $("#gen-btn").removeClass('disabled');
     },
     dataType: "json"
   });

@@ -9,8 +9,9 @@ import argparse
 from .data import get_dataset_class_by_name
 from collections import defaultdict
 from flask import Flask, render_template, jsonify, request
-from .model import Model
 
+if os.environ.get('TABGENIE_MODE') != "light":
+    from .model import Model
 
 app = Flask(__name__)
 
@@ -24,7 +25,7 @@ def success():
 
 @app.route('/load_model', methods=['GET', 'POST'])
 def load_model():
-    if app.config["mode"] == "light":
+    if os.environ.get('TABGENIE_MODE') == "light":
         return success()
 
     model_name = request.args.get("model")
@@ -116,7 +117,6 @@ def index():
 
 def create_app(*args, **kwargs):
     app.config["datasets"] = {}
-    app.config["mode"] = "light"
     app.config["dataset_paths"] = {
         "e2e" :  None,
         "hitab" : "data/HiTab/data",
@@ -131,10 +131,4 @@ def create_app(*args, **kwargs):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", type=str, default="full", choices=["full", "light"],
-         help="Deployment mode: full = with model loading, light = visualization only")
-
-    args = parser.parse_args()
-    app.config["mode"] = args.mode
     app.run()
