@@ -112,6 +112,7 @@ def index():
 
     return render_template('index.html',
         datasets=list(app.config["dataset_paths"].keys()),
+        host_prefix=os.environ.get("HOST_PREFIX", ".")
     )
 
 
