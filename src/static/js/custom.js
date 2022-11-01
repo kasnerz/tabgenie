@@ -47,7 +47,7 @@ function get_highlighted_cells() {
 function load_model() {
   $.ajax({
     type: "GET",
-    url: "/load_model",
+    url: "${window.url_prefix}/load_model",
     data: {
       "model" : "totto"
     },
@@ -78,7 +78,7 @@ function generate() {
   $.ajax({
     type: "POST",
     contentType: "application/json; charset=utf-8",
-    url: "/generate",
+    url: "${window.url_prefix}/generate",
     data: JSON.stringify(request),
     success: function (data) {
       output = data["out"];
@@ -94,7 +94,7 @@ function generate() {
 }
 
 function fetch_table(dataset, split, table_idx) {
-  $.get("/table", {
+  $.get("${window.url_prefix}/table", {
     "dataset" : dataset,
     "table_idx" : table_idx,
     "split" : split
