@@ -1,6 +1,7 @@
 var table_idx = 0;
 var total_examples = 1;
 var dataset = window.default_dataset;
+var mode = window.mode;
 var split = "dev";
 
 function mod(n, m) {
@@ -151,7 +152,9 @@ $( document ).ready(function() {
   fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
 
-  load_model();
+  if (mode != "light") {
+    load_model();
+  }
 });
 
 
