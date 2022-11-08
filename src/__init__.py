@@ -9,9 +9,7 @@ import argparse
 from .data import get_dataset_class_by_name
 from collections import defaultdict
 from flask import Flask, render_template, jsonify, request
-
-if os.environ.get('TABGENIE_MODE') != "light":
-    from .model import Model
+from .model import Model
 
 app = Flask(__name__)
 
@@ -25,9 +23,6 @@ def success():
 
 @app.route('/load_model', methods=['GET', 'POST'])
 def load_model():
-    if os.environ.get('TABGENIE_MODE') == "light":
-        return success()
-
     model_name = request.args.get("model")
 
     logger.info(f"Loading model {model_name}")
@@ -112,7 +107,9 @@ def index():
 
     return render_template('index.html',
         datasets=list(app.config["dataset_paths"].keys()),
-        host_prefix=app.config["host_prefix"]
+        default_dataset=app.config["default_dataset"],
+        host_prefix=app.config["host_prefix"],
+        mode=app.config["mode"]
     )
 
 

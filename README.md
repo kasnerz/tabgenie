@@ -9,3 +9,14 @@ Work in progress.
 pip install -r requirements.txt
 flask run
 ```
+
+## Deployment
+```
+pip install gunicorn
+gunicorn "src:create_app()" -b localhost:8989
+```
+
+## Loading datasets
+```
+./download_datasets.sh
+``` 

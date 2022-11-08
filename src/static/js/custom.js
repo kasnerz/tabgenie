@@ -1,6 +1,6 @@
 var table_idx = 0;
 var total_examples = 1;
-var dataset = "totto";
+var dataset = window.default_dataset;
 var split = "dev";
 
 function mod(n, m) {

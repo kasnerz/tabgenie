@@ -1,4 +1,5 @@
 {
+    "mode" : "light",
     "dataset_paths" : {
         "e2e" : null,
         "hitab" : "data/HiTab/data",
@@ -9,5 +10,6 @@
         "webnlg" : null,
         "totto" : null
     },
+    "default_dataset" : "hitab",
     "host_prefix" : "."
 }
