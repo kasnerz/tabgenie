@@ -3,7 +3,11 @@ import logging
 import numpy as np
 import os
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO, datefmt='%H:%M:%S')
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+    datefmt="%H:%M:%S",
+)
 logger = logging.getLogger(__name__)
 
 try:
@@ -11,7 +15,10 @@ try:
     import pytorch_lightning as pl
     from nlg.inference import Seq2SeqInferenceModule
 except:
-    logger.warning("Model related modules not found. This is ok if you are running the app in light mode.")
+    logger.warning(
+        "Model related modules not found. This is ok if you are running the app in light mode."
+    )
+
 
 class Dict2Obj:
     def __init__(self, entries):
@@ -29,11 +36,7 @@ class Model:
         torch.set_num_threads(self.max_threads)
 
         model_path = os.path.join(exp_dir, experiment, checkpoint)
-        args = Dict2Obj({
-            "beam_size" : 1,
-            "gpus" : 1,
-            "max_length" : 1024
-        })
+        args = Dict2Obj({"beam_size": 1, "gpus": 1, "max_length": 1024})
         self.dm = Seq2SeqInferenceModule(args=args, model_path=model_path)
 
     def generate(self, s):

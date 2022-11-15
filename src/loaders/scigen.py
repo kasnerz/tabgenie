@@ -10,7 +10,6 @@ class SciGen(TabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-
     def normalize(self, s):
         # just ignore inline tags and italics
         s = re.sub(r"</*(italic|bold)>", "", s)
@@ -38,7 +37,7 @@ class SciGen(TabularDataset):
             c.value = self.normalize(col)
             c.is_col_header = True
             t.add_cell(c)
-        
+
         t.save_row()
 
         for row in entry["table_content_values"]:
@@ -50,7 +49,6 @@ class SciGen(TabularDataset):
 
         self.tables[split][index] = t
         return t
-
 
     def load(self, split):
         data_dir = "development" if split == "dev" else split

@@ -4,12 +4,14 @@ import os
 
 from .data import Cell, Table, TabularDataset
 
+
 class Logic2Text(TabularDataset):
     """
     The Logic2Text dataset: https://github.com/czyssrs/Logic2Text
     Contains tables + explicit logical forms from which a utterance should be generated.
     """
-    name="logic2text"
+
+    name = "logic2text"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -17,21 +19,23 @@ class Logic2Text(TabularDataset):
     def prepare_table(self, split, index):
         def is_highlighted(i, j):
             # TODO: add other cases in the dataset such as "col_superlative" and "row_superlative" or subsets
-            if all(x in entry["annotation"] for x in ["row_1", "row_2", "col", "col_other"]):
+            if all(
+                x in entry["annotation"] for x in ["row_1", "row_2", "col", "col_other"]
+            ):
                 return (
-                    str(i+1) == entry["annotation"]["row_1"]
-                    or str(i+1) == entry["annotation"]["row_2"]
+                    str(i + 1) == entry["annotation"]["row_1"]
+                    or str(i + 1) == entry["annotation"]["row_2"]
                 ) and (
-                    str(j+1) == entry["annotation"]["col"]
-                    or str(j+1) == entry["annotation"]["col_other"]
+                    str(j + 1) == entry["annotation"]["col"]
+                    or str(j + 1) == entry["annotation"]["col_other"]
                 )
             elif all(x in entry["annotation"] for x in ["row", "col", "col_other"]):
-                return str(i+1) == entry["annotation"]["row"] and (
-                    str(j+1) == entry["annotation"]["col"]
-                    or str(j+1) == entry["annotation"]["col_other"]
+                return str(i + 1) == entry["annotation"]["row"] and (
+                    str(j + 1) == entry["annotation"]["col"]
+                    or str(j + 1) == entry["annotation"]["col_other"]
                 )
             elif "col" in entry["annotation"]:
-                return str(j+1) == entry["annotation"]["col"]
+                return str(j + 1) == entry["annotation"]["col"]
             else:
                 return False
 
@@ -61,7 +65,6 @@ class Logic2Text(TabularDataset):
 
         self.tables[split][index] = t
         return t
-
 
     def load(self, split):
         filename = split if split != "dev" else "valid"

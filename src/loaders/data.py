@@ -17,16 +17,17 @@ from tinyhtml import h
 
 logger = logging.getLogger(__name__)
 
+
 def get_dataset_class_by_name(dataset_name):
     dataset_mapping = {
-        "e2e" : "E2E",
-        "hitab" : "HiTab",
-        "charttotext-s" : "ChartToTextS",
-        "logic2text" : "Logic2Text",
-        "logicnlg" : "LogicNLG",
-        "scigen" : "SciGen",
-        "webnlg" : "WebNLG",
-        "totto" : "ToTTo"
+        "e2e": "E2E",
+        "hitab": "HiTab",
+        "charttotext-s": "ChartToTextS",
+        "logic2text": "Logic2Text",
+        "logicnlg": "LogicNLG",
+        "scigen": "SciGen",
+        "webnlg": "WebNLG",
+        "totto": "ToTTo",
     }
     dataset_module = __import__(
         dataset_name,
@@ -39,9 +40,10 @@ def get_dataset_class_by_name(dataset_name):
 
 
 class Cell:
-    """ 
+    """
     Table cell
     """
+
     def __init__(self):
         self.idx = None
         self.value = None
@@ -63,6 +65,7 @@ class Table:
     """
     Table object
     """
+
     def __init__(self):
         self.title = None
         self.extra_headers = []
@@ -84,7 +87,7 @@ class Table:
 
     def set_cell(self, i, j, c):
         self.cells[i][j] = c
-    
+
     def get_cell(self, i, j):
         try:
             return self.cells[i][j]
@@ -96,7 +99,7 @@ class Table:
             for c in row:
                 if c.idx == idx:
                     return c
-            
+
         return None
 
     def __repr__(self):
@@ -107,8 +110,9 @@ class TabularDataset:
     """
     Base class for the datasets
     """
+
     def __init__(self, path):
-        self.splits =  ["train", "dev", "test"]
+        self.splits = ["train", "dev", "test"]
         self.data = {split: [] for split in self.splits}
         self.tables = {split: {} for split in self.splits}
         self.path = path
@@ -138,7 +142,6 @@ class TabularDataset:
     def prepare_table(self, split, index):
         return NotImplementedError
 
-
     def get_generation_input(self, split, table_idx, cell_ids):
         t = self.get_table(split, table_idx)
         cells = [t.get_cell_by_id(int(idx)) for idx in cell_ids]
@@ -152,7 +155,6 @@ class TabularDataset:
 
         return " ".join(gen_input)
 
-    
     def get_table_html(self, split, index):
         t = self.get_table(split, index)
         headers = []
@@ -176,7 +178,9 @@ class TabularDataset:
                     continue
 
                 eltype = "th" if c.is_header() else "td"
-                td_el = h(eltype, colspan=c.colspan, rowspan=c.rowspan, cell_idx=c.idx)(c.value)
+                td_el = h(eltype, colspan=c.colspan, rowspan=c.rowspan, cell_idx=c.idx)(
+                    c.value
+                )
 
                 if c.is_highlighted:
                     td_el.tag.attrs["class"] = "table-active"
@@ -190,4 +194,6 @@ class TabularDataset:
         area_el = h("div")(header_el, table_el)
 
         html = area_el.render()
-        return lxml.etree.tostring(lxml.html.fromstring(html), encoding='unicode', pretty_print=True)
+        return lxml.etree.tostring(
+            lxml.html.fromstring(html), encoding="unicode", pretty_print=True
+        )

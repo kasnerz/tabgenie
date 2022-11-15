@@ -4,18 +4,19 @@ import os
 
 from .data import Cell, Table, TabularDataset
 
+
 class LogicNLG(TabularDataset):
     """
     The LogicNLG dataset: https://github.com/wenhuchen/LogicNLG
     Contains tables from the repurposed TabFact dataset (English Wikipedia).
     The references are the entailed statements containing logical inferences.
     """
-    name="logicnlg"
+
+    name = "logicnlg"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mapping = {}
-
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]
@@ -36,13 +37,12 @@ class LogicNLG(TabularDataset):
         self.tables[split][index] = t
         return t
 
-
     def load(self, split):
         filename = split if split != "dev" else "val"
 
         with open(os.path.join(self.path, f"{filename}_lm.json")) as f:
             j = json.load(f)
-        
+
         for table_id, examples in j.items():
             table = []
             with open(os.path.join(self.path, "all_csv", table_id)) as f:
@@ -50,10 +50,12 @@ class LogicNLG(TabularDataset):
                     table.append(line.rstrip("\n").split("#"))
 
             for example in examples:
-                self.data[split].append({
-                    "table" : table,
-                    "ref" : example[0],
-                    "linked_columns" : example[1],
-                    "title" : example[2],
-                    "template" : example[3]
-                })
+                self.data[split].append(
+                    {
+                        "table": table,
+                        "ref": example[0],
+                        "linked_columns": example[1],
+                        "title": example[2],
+                        "template": example[3],
+                    }
+                )

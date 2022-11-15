@@ -9,7 +9,8 @@ class WebNLG(TabularDataset):
     The WebNLG dataset: https://huggingface.co/datasets/GEM/web_nlg
     Contains DBPedia triples and their crowdsourced verbalizations.
     """
-    name="webnlg"
+
+    name = "webnlg"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -40,6 +41,6 @@ class WebNLG(TabularDataset):
 
     def load(self, split):
         dataset = load_dataset("gem", "web_nlg_en")
-    
+
         data = dataset[split if split != "dev" else "validation"]
         self.data[split] = data

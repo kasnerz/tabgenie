@@ -6,14 +6,14 @@ from .data import Cell, Table, TabularDataset
 class ToTTo(TabularDataset):
     """
     The ToTTo dataset: https://github.com/google-research-datasets/ToTTo
-    Contains tables from English Wikipedia with highlighted cells 
+    Contains tables from English Wikipedia with highlighted cells
     and the crowdsourced verbalizations of these cells.
     """
-    name="totto"
+
+    name = "totto"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]
@@ -34,7 +34,7 @@ class ToTTo(TabularDataset):
                 c.value = x["value"]
                 c.colspan = x["column_span"]
                 c.rowspan = x["row_span"]
-                c.is_highlighted = [i,j] in entry["highlighted_cells"]
+                c.is_highlighted = [i, j] in entry["highlighted_cells"]
                 c.is_col_header = x["is_header"] and i == 0
                 c.is_row_header = x["is_header"] and i != 0
                 t.add_cell(c)
@@ -43,9 +43,8 @@ class ToTTo(TabularDataset):
         self.tables[split][index] = t
         return t
 
-
     def load(self, split):
         dataset = load_dataset("gem", "totto")
-    
+
         data = dataset[split if split != "dev" else "validation"]
         self.data[split] = data
