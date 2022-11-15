@@ -10,6 +10,7 @@
         "webnlg" : null,
         "totto" : null
     },
-    "default_dataset" : "hitab",
+    "exp_dir" : "/lnet/work/people/kasner/projects/ng-nlg/experiments",
+    "default_dataset" : "scigen",
     "host_prefix" : "."
 }

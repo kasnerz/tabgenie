@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-from email.policy import default
 import os
 import requests
 import json
 import logging
 import argparse
-from .data import get_dataset_class_by_name
+from .loaders.data import get_dataset_class_by_name
 from collections import defaultdict
 from flask import Flask, render_template, jsonify, request
 from .model import Model
@@ -28,7 +27,7 @@ def load_model():
     logger.info(f"Loading model {model_name}")
     m = Model()
     m.load(
-        exp_dir="/lnet/work/people/kasner/projects/ng-nlg/experiments",
+        exp_dir=app.config["exp_dir"],
         experiment=model_name
     )
     app.config["model"] = m
