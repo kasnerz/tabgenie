@@ -24,8 +24,6 @@ class ChartToTextS(TabularDataset):
     The "Statista" subset of the Chart-To-Text dataset: https://github.com/vis-nlp/Chart-to-text/tree/main/statista_dataset/dataset
     """
 
-    name = "charttotext-s"
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.table_content = {}
@@ -49,7 +47,7 @@ class ChartToTextS(TabularDataset):
         self.tables[split][index] = t
         return t
 
-    def load(self, split):
+    def load(self, split, max_examples=None):
         mapping_file = split if split != "dev" else "val"
 
         with open(
@@ -59,6 +57,9 @@ class ChartToTextS(TabularDataset):
         ) as f:
             next(f)
             for line in f:
+                if max_examples is not None:
+                    break
+
                 subdir = "." if line.startswith("two_col") else "multiColumn"
                 filename = line.split("-")[1].split(".")[0]
 

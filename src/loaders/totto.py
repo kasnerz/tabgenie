@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 from datasets import load_dataset
-from .data import Cell, Table, TabularDataset
+from .data import Cell, Table, TabularDataset, HFTabularDataset
 
 
-class ToTTo(TabularDataset):
+class ToTTo(HFTabularDataset):
     """
     The ToTTo dataset: https://github.com/google-research-datasets/ToTTo
     Contains tables from English Wikipedia with highlighted cells
     and the crowdsourced verbalizations of these cells.
     """
 
-    name = "totto"
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.hf_id = 'GEM/totto'
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]
@@ -42,9 +41,3 @@ class ToTTo(TabularDataset):
 
         self.tables[split][index] = t
         return t
-
-    def load(self, split):
-        dataset = load_dataset("gem", "totto")
-
-        data = dataset[split if split != "dev" else "validation"]
-        self.data[split] = data

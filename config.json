@@ -1,16 +1,19 @@
 {
-    "mode" : "light",
-    "dataset_paths" : {
-        "e2e" : null,
-        "hitab" : "data/HiTab/data",
-        "charttotext-s" : "data/Chart-to-text/statista_dataset/dataset",
-        "logic2text" : "data/Logic2Text/dataset",
-        "logicnlg" : "data/LogicNLG/data",
-        "scigen" : "data/SciGen/dataset",
-        "webnlg" : null,
-        "totto" : null
+    "mode": "light",
+    "dataset_paths": {
+        "e2e": null,
+        "hitab": "data/HiTab/data",
+        "charttotext-s": "data/Chart-to-text/statista_dataset/dataset",
+        "logic2text": "data/Logic2Text/dataset",
+        "logicnlg": "data/LogicNLG/data",
+        "scigen": "data/SciGen/dataset",
+        "sportsett": null,
+        "webnlg": null,
+        "wikibio": "data/WikiBio/wikipedia-biography-dataset",
+        "totto": null
     },
-    "exp_dir" : "/lnet/work/people/kasner/projects/ng-nlg/experiments",
-    "default_dataset" : "scigen",
-    "host_prefix" : "."
+    "exp_dir": "/lnet/work/people/kasner/projects/ng-nlg/experiments",
+    "default_dataset": "wikibio",
+    "max_examples_per_split": 10000,
+    "host_prefix": "."
 }

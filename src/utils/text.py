@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# from sacremoses import MosesDetokenizer
 import re
 
 def normalize(s,
@@ -30,3 +31,12 @@ def normalize(s,
             lambda m: rf"{m.group(1)} {m.group(2).lower()}", s)
 
     return s
+
+
+# class Detokenizer:
+#     def __init__(self):
+#         self.detokenizer = MosesDetokenizer(lang='en')
+
+#     def detokenize(self, s):
+#         tokens = s.split()
+#         return self.detokenizer.detokenize(tokens)

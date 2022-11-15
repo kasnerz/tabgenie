@@ -83,7 +83,7 @@ def get_dataset(dataset_name, split):
 
     if not dataset.has_split(split):
         logger.info(f"Loading {dataset_name} / {split}")
-        dataset.load(split=split)
+        dataset.load(split=split, max_examples=app.config["max_examples_per_split"])
 
     return dataset
 

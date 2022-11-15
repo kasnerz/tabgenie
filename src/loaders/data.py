@@ -26,7 +26,9 @@ def get_dataset_class_by_name(dataset_name):
         "logic2text": "Logic2Text",
         "logicnlg": "LogicNLG",
         "scigen": "SciGen",
+        "sportsett": "SportSettBasketball",
         "webnlg": "WebNLG",
+        "wikibio": "WikiBio",
         "totto": "ToTTo",
     }
     dataset_module = __import__(
@@ -44,9 +46,9 @@ class Cell:
     Table cell
     """
 
-    def __init__(self):
+    def __init__(self, value=None):
         self.idx = None
-        self.value = None
+        self.value = value
         self.colspan = 1
         self.rowspan = 1
         self.is_highlighted = False
@@ -117,7 +119,7 @@ class TabularDataset:
         self.tables = {split: {} for split in self.splits}
         self.path = path
 
-    def load(self):
+    def load(self, split, max_examples=None):
         """
         Load the dataset. Path can be specified for loading from a directory
         or omitted if the dataset is loaded from HF.
@@ -197,3 +199,20 @@ class TabularDataset:
         return lxml.etree.tostring(
             lxml.html.fromstring(html), encoding="unicode", pretty_print=True
         )
+
+
+class HFTabularDataset(TabularDataset):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hf_extra_config = None
+
+    def load(self, split, max_examples=None):
+        hf_split = split if split != "dev" else "validation"
+
+        try:
+            dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=datasets.ReadInstruction(hf_split, to=max_examples+1, unit='abs'))
+        except AssertionError:
+            # max_examples is set higher than the total number of examples in the dataset
+            dataset = datasets.load_dataset(self.hf_id, split=hf_split)
+        
+        self.data[split] = dataset

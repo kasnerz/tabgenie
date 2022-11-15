@@ -12,8 +12,6 @@ class LogicNLG(TabularDataset):
     The references are the entailed statements containing logical inferences.
     """
 
-    name = "logicnlg"
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mapping = {}
@@ -37,7 +35,7 @@ class LogicNLG(TabularDataset):
         self.tables[split][index] = t
         return t
 
-    def load(self, split):
+    def load(self, split, max_examples=None):
         filename = split if split != "dev" else "val"
 
         with open(os.path.join(self.path, f"{filename}_lm.json")) as f:
@@ -50,6 +48,9 @@ class LogicNLG(TabularDataset):
                     table.append(line.rstrip("\n").split("#"))
 
             for example in examples:
+                if max_examples is not None:
+                    break
+
                 self.data[split].append(
                     {
                         "table": table,

@@ -11,8 +11,6 @@ class Logic2Text(TabularDataset):
     Contains tables + explicit logical forms from which a utterance should be generated.
     """
 
-    name = "logic2text"
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -66,8 +64,8 @@ class Logic2Text(TabularDataset):
         self.tables[split][index] = t
         return t
 
-    def load(self, split):
+    def load(self, split, max_examples=None):
         filename = split if split != "dev" else "valid"
 
         with open(os.path.join(self.path, f"{filename}.json")) as f:
-            self.data[split] = json.load(f)
+            self.data[split] = json.load(f)[:max_examples]

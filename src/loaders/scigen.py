@@ -50,7 +50,7 @@ class SciGen(TabularDataset):
         self.tables[split][index] = t
         return t
 
-    def load(self, split):
+    def load(self, split, max_examples=None):
         data_dir = "development" if split == "dev" else split
 
         if split in ["train", "dev"]:
@@ -61,4 +61,4 @@ class SciGen(TabularDataset):
 
         with open(file_path) as f:
             j = json.load(f)
-            self.data[split] = list(j.values())
+            self.data[split] = list(j.values())[:max_examples]
