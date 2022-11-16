@@ -41,14 +41,14 @@ class LogicNLG(TabularDataset):
         with open(os.path.join(self.path, f"{filename}_lm.json")) as f:
             j = json.load(f)
 
-        for table_id, examples in j.items():
+        for i, (table_id, examples) in enumerate(j.items()):
             table = []
             with open(os.path.join(self.path, "all_csv", table_id)) as f:
                 for line in f.readlines():
                     table.append(line.rstrip("\n").split("#"))
 
             for example in examples:
-                if max_examples is not None:
+                if max_examples is not None and i > max_examples:
                     break
 
                 self.data[split].append(

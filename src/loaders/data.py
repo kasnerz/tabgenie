@@ -20,11 +20,13 @@ logger = logging.getLogger(__name__)
 
 def get_dataset_class_by_name(dataset_name):
     dataset_mapping = {
+        "dart": "DART",
         "e2e": "E2E",
         "hitab": "HiTab",
         "charttotext-s": "ChartToTextS",
         "logic2text": "Logic2Text",
         "logicnlg": "LogicNLG",
+        "numericnlg": "NumericNLG",
         "scigen": "SciGen",
         "sportsett": "SportSettBasketball",
         "webnlg": "WebNLG",

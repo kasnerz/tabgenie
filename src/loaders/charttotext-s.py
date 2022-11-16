@@ -56,8 +56,8 @@ class ChartToTextS(TabularDataset):
             )
         ) as f:
             next(f)
-            for line in f:
-                if max_examples is not None:
+            for i, line in enumerate(f):
+                if max_examples is not None and i > max_examples:
                     break
 
                 subdir = "." if line.startswith("two_col") else "multiColumn"
