@@ -15,7 +15,7 @@
         "totto": null
     },
     "exp_dir": "/lnet/work/people/kasner/projects/ng-nlg/experiments",
-    "default_dataset": "numericnlg",
+    "default_dataset": "hitab",
     "max_examples_per_split": 10000,
     "host_prefix": "."
 }

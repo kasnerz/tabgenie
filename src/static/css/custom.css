@@ -6,10 +6,32 @@ body {
     color: #495057;
     background-color: #FFFFFF; */
 }
+
 a {
     color: black;
     --bs-pagination-color: black;
 }
+
+.nav-link {
+    color: #3d3e3e;
+    text-decoration-color: #3d3e3e;
+}
+
+.nav-link.active {
+    color: #3d3e3e;
+    text-decoration-color: #3d3e3e;
+}
+
+.nav-link:focus,
+.nav-link:hover {
+    color: #3d3e3e;
+}
+
+/* .nav-link.active,
+.show>.nav-link {
+    color: #212121;
+    font-weight: bold;
+} */
 
 .selectarea {
     margin-bottom: 20px;
@@ -33,12 +55,29 @@ a {
     /* border-right: 1px dotted rgb(206, 206, 206); */
 }
 
-#captionarea {
-    margin: 0px 50px 0px 50px
+#toparea {
+    margin: 0px 0px 0px 30px;
+
+    /* overflow-wrap: break-word; */
+}
+
+#toparea-content {
+    /* outline: 1px solid rgb(230, 230, 230); */
+    /* border: 1px solid rgb(230, 230, 230);
+    border-top: none; */
+    /* margin-left: 5px;
+    margin-right: 5px; */
+    margin-top: 10px;
+    font-size: smaller;
 }
 
 .interactive-cell {
     cursor: pointer;
+}
+
+.toparea-panel {
+    overflow: auto;
+    max-height: 300px;
 }
 
 #outputarea {
@@ -46,9 +85,19 @@ a {
 
 }
 
+#reference {
+    padding: 25px 20px 25px 20px;
+}
+
 #page-input {
     width: 90px;
     height: 38px;
     margin-left: 2px;
     margin-right: 2px;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+    color: white;
+    background-color: #3d3e3e;
 }

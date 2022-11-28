@@ -3,16 +3,16 @@ import json
 import os
 import re
 import glob
+import ast
+from .data import Cell, Table, TabularDataset, HFTabularDataset
 
-from .data import Cell, Table, TabularDataset
 
-
-class HiTab(TabularDataset):
+class HiTab(HFTabularDataset):
     name = "hitab"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.table_content = {}
+        self.hf_id = 'kasnerz/hitab'
 
     def _get_linked_cells(self, linked_cells):
         # the design of the `linked_cells` dictionary is very unintuitive
@@ -25,9 +25,8 @@ class HiTab(TabularDataset):
         t = Table()
         entry = self.data[split][index]
         t.ref = entry["sub_sentence"]
-        content = self.table_content.get(entry["table_id"])
-        linked_cells = self._get_linked_cells(entry["linked_cells"])
-
+        content = ast.literal_eval(entry["table_content"])
+        linked_cells = self._get_linked_cells(ast.literal_eval(entry["linked_cells"]))
         t.title = content["title"]
 
         for i, row in enumerate(content["texts"]):
@@ -54,14 +53,4 @@ class HiTab(TabularDataset):
         self.tables[split][index] = t
         return t
 
-    def load(self, split):
-        for filename in glob.glob(os.path.join(self.path, "tables", "raw", "*.json")):
-            with open(filename) as f:
-                j = json.load(f)
-                table_name = os.path.basename(filename).rstrip(".json")
-                self.table_content[table_name] = j
-
-        with open(os.path.join(self.path, f"{split}_samples.jsonl")) as f:
-            for line in f.readlines():
-                j = json.loads(line)
-                self.data[split].append(j)
+   

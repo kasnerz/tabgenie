@@ -1,86 +1,112 @@
 <!DOCTYPE html>
 <html>
-<head>
-<link rel="stylesheet" media="screen" href = "{{ host_prefix }}/static/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/custom.css">
-<link rel="shortcut icon" href="{{ host_prefix }}/static/img/favicon.ico">
-<meta name="viewport" content = "width=device-width, initial-scale=1.0">
 
-<script src="{{ host_prefix }}/static/js/jquery.min.js"></script>
-<script src="{{ host_prefix }}/static/js/popper.min.js"></script>
-<script src="{{ host_prefix }}/static/js/bootstrap.min.js"></script>
+<head>
+  <link rel="stylesheet" media="screen" href="{{ host_prefix }}/static/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/custom.css">
+  <link rel="shortcut icon" href="{{ host_prefix }}/static/img/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="{{ host_prefix }}/static/js/jquery.min.js"></script>
+  <script src="{{ host_prefix }}/static/js/popper.min.js"></script>
+  <script src="{{ host_prefix }}/static/js/bootstrap.min.js"></script>
 </head>
 
 
 <body class="body">
 
-    <div class="container">
-        <div class="row">
-        <div class="col-2 leftpanel">
-            <div class="infoarea">
+  <div class="container">
+    <div class="row">
+      <div class="col-2 leftpanel">
+        <div class="infoarea">
 
-              <h2>🧞 TabGenie</h2>
-              <div class="selectarea">
-                <b>dataset</b>
-                <select id="dataset-select" class="form-select" aria-label="dataset">
-                  {% for dataset_name in datasets %}
-                    <option value="{{ dataset_name }}">{{ dataset_name }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="selectarea">
-                  <b>split</b>
-                  <select id="split-select" class="form-select" aria-label="dataset">
-                    <option selected>dev</option>
-                    <option value="test">test</option>
-                    <option value="train">train</option>
-                  </select>
-              </div>
-
-              <div class="selectarea">
-                <b>example</b>
-                <nav>
-                    <ul class="pagination">
-                    <li class="page-item">
-                        <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">«</a>
-                    </li>
-                    <li class="page-item">
-                      <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">»</a>
-                    </li>
-                    </ul>
-                </nav>
-              </div>
-              
-              <div class="selectarea">
-                <div id="dataset-spinner" class="spinner-border" role="status" style="display: none">
-                  <span class="sr-only"></span>
-                </div>
-              </div>
-              <div class="selectarea" id="gen-btn-area" {% if mode == "light" %} style="display: none" {% endif %}>
-                <button type="button" id="gen-btn" class="btn btn-dark disabled" onclick="generate();" >Loading model...</button>
-              </div>
-            </div>
-
-
+          <h2>🧞 TabGenie</h2>
+          <div class="selectarea">
+            <b>dataset</b>
+            <select id="dataset-select" class="form-select" aria-label="dataset">
+              {% for dataset_name in datasets %}
+              <option value="{{ dataset_name }}">{{ dataset_name }}</option>
+              {% endfor %}
+            </select>
           </div>
-          <div class="col-10">
-            <div id='captionarea' class="shadow p-3 mb-5 bg-body rounded">
-              <div id='referencearea'>
-                <b>caption:</b>
-                <div id="reference"></div>
-              </div>
-              <div id='outputarea' style="display: none;">
-                <b>model output:</b>
-                <div id="model-output"></div>
-              </div>
+          <div class="selectarea">
+            <b>split</b>
+            <select id="split-select" class="form-select" aria-label="dataset">
+              <option selected>dev</option>
+              <option value="test">test</option>
+              <option value="train">train</option>
+            </select>
+          </div>
+
+          <div class="selectarea">
+            <b>example</b>
+            <nav>
+              <ul class="pagination">
+                <li class="page-item">
+                  <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">«</a>
+                </li>
+                <li class="page-item">
+                  <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">»</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+
+          <div class="selectarea">
+            <div id="dataset-spinner" class="spinner-border" role="status" style="display: none">
+              <span class="sr-only"></span>
             </div>
-            <div id='tablearea' class='table-responsive'> </div>
+          </div>
+          <div class="selectarea" id="gen-btn-area" {% if mode=="light" %} style="display: none" {% endif %}>
+            <button type="button" id="gen-btn" class="btn btn-dark disabled" onclick="generate();">Loading
+              model...</button>
           </div>
         </div>
+
+
       </div>
+      <div class="col-10">
+        <div id='toparea' class="mb-5 rounded">
+          <ul class="nav nav-pills">
+            <li class="nav-item">
+              <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#referencearea" type="button"
+                role="tab">Reference</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#menza-pane" type="button" role="tab">Model
+                output</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#menza-pane" type="button" role="tab">Dataset
+                info</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#menza-pane" type="button" role="tab">Meta info
+              </a>
+            </li>
+          </ul>
+          <div id='toparea-content' class="rounded shadow">
+            <div id='referencearea' class="tab-pane fade show active toparea-panel " role="tabpanel" tabindex="0">
+              <!-- <b>reference:</b> -->
+              <div id="reference"></div>
+            </div>
+            <div id='outputarea' class="tab-pane fade toparea-panel">
+              <div id="model-output"></div>
+            </div>
+            <div id='infoarea' class="tab-pane fade toparea-panel">
+              <div id="dataset-info"></div>
+              <div id='metaarea' class="tab-pane fade toparea-panel">
+                <div id="meta-info"></div>
+              </div>
+            </div>
+          </div>
+          <div id='tablearea' class='table-responsive'> </div>
+        </div>
+      </div>
+    </div>
 
 </body>
 
