@@ -206,10 +206,16 @@ class TabularDataset:
 class HFTabularDataset(TabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.hf_id = None #TODO set
         self.hf_extra_config = None
+        self.split_mapping = {
+            "train" : "train",
+            "dev" : "validation",
+            "test" : "test"
+        }
 
     def load(self, split, max_examples=None):
-        hf_split = split if split != "dev" else "validation"
+        hf_split = self.split_mapping[split]
 
         try:
             dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=datasets.ReadInstruction(hf_split, to=max_examples+1, unit='abs'))
