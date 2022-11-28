@@ -2,13 +2,14 @@
 import json
 import os
 import re
-from .data import Cell, Table, TabularDataset
+import ast
+from .data import Cell, Table, TabularDataset, HFTabularDataset
 from tinyhtml import h
 
-
-class SciGen(TabularDataset):
+class SciGen(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.hf_id = "kasnerz/scigen"
 
     def normalize(self, s):
         # just ignore inline tags and italics
@@ -27,12 +28,11 @@ class SciGen(TabularDataset):
     def prepare_table(self, split, index):
         t = Table()
         entry = self.data[split][index]
-
         caption = entry["table_caption"]
         t.ref = caption.replace("[CONTINUE]", "\n")
         t.title = entry["paper"]
 
-        for col in entry["table_column_names"]:
+        for col in ast.literal_eval(entry["table_column_names"]):
             c = Cell()
             c.value = self.normalize(col)
             c.is_col_header = True
@@ -40,7 +40,7 @@ class SciGen(TabularDataset):
 
         t.save_row()
 
-        for row in entry["table_content_values"]:
+        for row in ast.literal_eval( entry["table_content_values"]):
             for col in row:
                 c = Cell()
                 c.value = self.normalize(col)
@@ -49,16 +49,3 @@ class SciGen(TabularDataset):
 
         self.tables[split][index] = t
         return t
-
-    def load(self, split, max_examples=None):
-        data_dir = "development" if split == "dev" else split
-
-        if split in ["train", "dev"]:
-            file_path = os.path.join(self.path, data_dir, "medium", f"{split}.json")
-        else:
-            # there is also "test-Other.json", should be looked into
-            file_path = os.path.join(self.path, data_dir, f"test-CL.json")
-
-        with open(file_path) as f:
-            j = json.load(f)
-            self.data[split] = list(j.values())[:max_examples]

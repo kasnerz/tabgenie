@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import json
 import os
+import ast
+from .data import Cell, Table, HFTabularDataset
 
-from .data import Cell, Table, TabularDataset
 
-
-class LogicNLG(TabularDataset):
+class LogicNLG(HFTabularDataset):
     """
     The LogicNLG dataset: https://github.com/wenhuchen/LogicNLG
     Contains tables from the repurposed TabFact dataset (English Wikipedia).
@@ -15,18 +15,21 @@ class LogicNLG(TabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mapping = {}
+        self.hf_id = "kasnerz/logicnlg"
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]
         t = Table()
+
+
         t.ref = entry["ref"]
         t.title = entry["title"]
 
-        for i, row in enumerate(entry["table"]):
+        for i, row in enumerate(ast.literal_eval(entry["table"])):
             for j, x in enumerate(row):
                 c = Cell()
                 c.value = x
-                c.is_highlighted = j in entry["linked_columns"]
+                c.is_highlighted = j in ast.literal_eval(entry["linked_columns"])
                 if i == 0:
                     c.is_col_header = True
                 t.add_cell(c)
@@ -34,29 +37,3 @@ class LogicNLG(TabularDataset):
 
         self.tables[split][index] = t
         return t
-
-    def load(self, split, max_examples=None):
-        filename = split if split != "dev" else "val"
-
-        with open(os.path.join(self.path, f"{filename}_lm.json")) as f:
-            j = json.load(f)
-
-        for i, (table_id, examples) in enumerate(j.items()):
-            table = []
-            with open(os.path.join(self.path, "all_csv", table_id)) as f:
-                for line in f.readlines():
-                    table.append(line.rstrip("\n").split("#"))
-
-            for example in examples:
-                if max_examples is not None and i > max_examples:
-                    break
-
-                self.data[split].append(
-                    {
-                        "table": table,
-                        "ref": example[0],
-                        "linked_columns": example[1],
-                        "title": example[2],
-                        "template": example[3],
-                    }
-                )
