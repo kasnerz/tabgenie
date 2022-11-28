@@ -15,11 +15,10 @@
 
 <body class="body">
 
-  <div class="container">
+  <div class="large-container container">
     <div class="row">
       <div class="col-2 leftpanel">
         <div class="infoarea">
-
           <h2>🧞 TabGenie</h2>
           <div class="selectarea">
             <b>dataset</b>
@@ -68,7 +67,46 @@
 
 
       </div>
-      <div class="col-10">
+      <div class="col-7">
+        <!-- <div id='toparea' class="mb-5 rounded">
+          <ul class="nav nav-pills">
+            <li class="nav-item">
+              <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#referencearea" type="button"
+                role="tab">Reference</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#outputarea" type="button" role="tab">Model
+                output</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#infoarea" type="button" role="tab">Dataset
+                info</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#metaarea" type="button" role="tab">Meta info
+              </a>
+            </li>
+          </ul>
+          <div id='toparea-content' class="rounded tab-content">
+            <div id='referencearea' class="tab-pane fade show active toparea-panel " role="tabpanel" tabindex="0">
+              <div id="reference" class="area-content"></div>
+            </div>
+            <div id='outputarea' class="tab-pane fade toparea-panel" role="tabpanel">
+              <div id="model-output" class="area-content"></div>
+            </div>
+            <div id='infoarea' class="tab-pane fade toparea-panel" role="tabpanel">
+              <div id="dataset-info" class="area-content"></div>
+            </div>
+            <div id='metaarea' class="tab-pane fade toparea-panel" role="tabpanel">
+              <div id="meta-info" class="area-content"></div>
+            </div>
+          </div>
+        </div>
+        <hr> -->
+        <div id='tablearea' class='table-responsive'> </div>
+      </div>
+
+      <div class="col-3">
         <div id='toparea' class="mb-5 rounded">
           <ul class="nav nav-pills">
             <li class="nav-item">
@@ -76,37 +114,36 @@
                 role="tab">Reference</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#menza-pane" type="button" role="tab">Model
+              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#outputarea" type="button" role="tab">Model
                 output</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#menza-pane" type="button" role="tab">Dataset
+              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#infoarea" type="button" role="tab">Dataset
                 info</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#menza-pane" type="button" role="tab">Meta info
+              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#metaarea" type="button" role="tab">Meta info
               </a>
             </li>
           </ul>
-          <div id='toparea-content' class="rounded shadow">
+          <div id='toparea-content' class="rounded tab-content">
             <div id='referencearea' class="tab-pane fade show active toparea-panel " role="tabpanel" tabindex="0">
-              <!-- <b>reference:</b> -->
-              <div id="reference"></div>
+              <div id="reference" class="area-content"></div>
             </div>
-            <div id='outputarea' class="tab-pane fade toparea-panel">
-              <div id="model-output"></div>
+            <div id='outputarea' class="tab-pane fade toparea-panel" role="tabpanel">
+              <div id="model-output" class="area-content"></div>
             </div>
-            <div id='infoarea' class="tab-pane fade toparea-panel">
-              <div id="dataset-info"></div>
-              <div id='metaarea' class="tab-pane fade toparea-panel">
-                <div id="meta-info"></div>
-              </div>
+            <div id='infoarea' class="tab-pane fade toparea-panel" role="tabpanel">
+              <div id="dataset-info" class="area-content"></div>
+            </div>
+            <div id='metaarea' class="tab-pane fade toparea-panel" role="tabpanel">
+              <div id="meta-info" class="area-content"></div>
             </div>
           </div>
-          <div id='tablearea' class='table-responsive'> </div>
         </div>
       </div>
     </div>
+  </div>
 
 </body>
 

@@ -68,7 +68,7 @@ a {
     /* margin-left: 5px;
     margin-right: 5px; */
     margin-top: 10px;
-    font-size: smaller;
+    /* font-size: smaller; */
 }
 
 .interactive-cell {
@@ -77,15 +77,14 @@ a {
 
 .toparea-panel {
     overflow: auto;
-    max-height: 300px;
+    /* max-height: 300px; */
 }
 
 #outputarea {
     margin-top: 10px;
-
 }
 
-#reference {
+.area-content {
     padding: 25px 20px 25px 20px;
 }
 
@@ -100,4 +99,11 @@ a {
 .nav-pills .show>.nav-link {
     color: white;
     background-color: #3d3e3e;
+}
+
+.container.large-container {
+    margin-left: 50px;
+    margin-right: 50px;
+    padding-right: 50px;
+    max-width: 2000px;
 }

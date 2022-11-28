@@ -8,20 +8,20 @@ function mod(n, m) {
   return ((n % m) + m) % m;
 }
 
-function nextbtn(){
-  gotopage(table_idx+1);
+function nextbtn() {
+  gotopage(table_idx + 1);
 }
 
-function prevbtn(){
-  gotopage(table_idx-1);
+function prevbtn() {
+  gotopage(table_idx - 1);
 }
 
-function gotobtn(){
+function gotobtn() {
   var n = $("#page-input").val();
   gotopage(n);
 }
 
-function gotopage(page){
+function gotopage(page) {
   table_idx = page;
   table_idx = mod(table_idx, total_examples - 1);
 
@@ -31,14 +31,14 @@ function gotopage(page){
 
 function get_highlighted_cells() {
   var activeCells = $("#tablearea").find(".table-active").map(
-    function() { 
+    function () {
       return $(this).attr("cell-idx");
     }).get();
 
   // no highlighted cells -> send all cells except headers
   if (activeCells.length == 0) {
     activeCells = $("#tablearea").find("td").map(
-      function() { 
+      function () {
         return $(this).attr("cell-idx");
       }).get();
   }
@@ -50,14 +50,14 @@ function load_model() {
     type: "GET",
     url: `${window.url_prefix}/load_model`,
     data: {
-      "model" : "totto"
+      "model": "totto"
     },
     // beforeSend: function() {
     //     $("#gen-btn").prop('disabled', true);
     // },
-    success: function(data) {
-        $("#gen-btn").html('Generate');
-        $("#gen-btn").removeClass('disabled');
+    success: function (data) {
+      $("#gen-btn").html('Generate');
+      $("#gen-btn").removeClass('disabled');
     }
   })
 }
@@ -70,10 +70,10 @@ function generate() {
   split = $('#split-select').val();
 
   var request = {
-    "cells" : cells,
-    "dataset" : dataset,
-    "split" : split,
-    "table_idx" : table_idx
+    "cells": cells,
+    "dataset": dataset,
+    "split": split,
+    "table_idx": table_idx
   };
 
   $.ajax({
@@ -94,34 +94,42 @@ function generate() {
   });
 }
 
+function parse_info(info) {
+  return ("<h5>Description</h5><p>" + info.description + "</p>" +
+    "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +
+    "<h5>Citation:</h5><p><code>" + info.citation + "</code></p>")
+}
+
 function fetch_table(dataset, split, table_idx) {
   $.get(`${window.url_prefix}/table`, {
-    "dataset" : dataset,
-    "table_idx" : table_idx,
-    "split" : split
-  }, function(data) {
-      $("#reference").html( data.ref );
-      $("#tablearea").html( data.html );
-      $("#dataset-spinner").hide();
-      total_examples = data.total_examples;
+    "dataset": dataset,
+    "table_idx": table_idx,
+    "split": split
+  }, function (data) {
+    $("#reference").html(data.ref);
+    $("#tablearea").html(data.html);
+    $("#dataset-spinner").hide();
+    total_examples = data.total_examples;
+    info = parse_info(data.dataset_info);
 
-      ["th", "td"].forEach(
-        function (celltype) {
-          var cells = $("#tablearea").find(celltype);
-          cells.on("click",
-            function() {
-              $(this).toggleClass("table-active");
-              }
-          );
-          $("#tablearea").addClass("interactive-cell");
-        }
-      );
-    });
+    ["th", "td"].forEach(
+      function (celltype) {
+        var cells = $("#tablearea").find(celltype);
+        cells.on("click",
+          function () {
+            $(this).toggleClass("table-active");
+          }
+        );
+        $("#tablearea").addClass("interactive-cell");
+      }
+    );
+    $("#dataset-info").html(info);
+  });
   $("#model-output").html();
   $("#outputarea").hide();
 }
 
-$("#dataset-select").on("change", function(e) {
+$("#dataset-select").on("change", function (e) {
   $("#dataset-spinner").show();
   dataset = $('#dataset-select').val();
   table_idx = 0;
@@ -130,7 +138,7 @@ $("#dataset-select").on("change", function(e) {
 });
 
 
-$("#split-select").on("change", function(e) {
+$("#split-select").on("change", function (e) {
   $("#dataset-spinner").show();
   split = $('#split-select').val();
   table_idx = 0;
@@ -139,14 +147,13 @@ $("#split-select").on("change", function(e) {
 });
 
 
-$('#page-input').keypress(function(event) {
+$('#page-input').keypress(function (event) {
   if (event.keyCode == 13) {
-      gotobtn();
+    gotobtn();
   }
 });
 
-
-$( document ).ready(function() {
+$(document).ready(function () {
   $("#dataset-select").val(dataset).change();
 
   fetch_table(dataset, split, table_idx);

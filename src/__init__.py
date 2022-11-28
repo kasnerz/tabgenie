@@ -92,8 +92,9 @@ def get_table_data(dataset_name, split, index):
     dataset = get_dataset(dataset_name, split)
     html = dataset.get_table_html(split=split, index=index)
     ref = dataset.get_reference(split=split, index=index)
+    dataset_info = dataset.get_info()
 
-    return {"html": html, "ref": ref, "total_examples": len(dataset.data[split])}
+    return {"html": html, "ref": ref, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info}
 
 
 @app.route("/", methods=["GET", "POST"])
