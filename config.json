@@ -6,7 +6,7 @@
         "hitab": null,
         "charttotext-s": "data/Chart-to-text/statista_dataset/dataset",
         "logic2text": "data/Logic2Text/dataset",
-        "logicnlg": "data/LogicNLG/data",
+        "logicnlg": null,
         "scigen": null,
         "sportsett": null,
         "webnlg": null,
@@ -15,7 +15,7 @@
         "totto": null
     },
     "exp_dir": "/lnet/work/people/kasner/projects/ng-nlg/experiments",
-    "default_dataset": "logicnlg",
+    "default_dataset": "logic2text",
     "max_examples_per_split": 10000,
     "host_prefix": "."
 }

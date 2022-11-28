@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import json
 import os
+import ast
+from .data import Cell, Table, HFTabularDataset
 
-from .data import Cell, Table, TabularDataset
 
-
-class Logic2Text(TabularDataset):
+class Logic2Text(HFTabularDataset):
     """
     The Logic2Text dataset: https://github.com/czyssrs/Logic2Text
     Contains tables + explicit logical forms from which a utterance should be generated.
@@ -13,6 +13,7 @@ class Logic2Text(TabularDataset):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.hf_id = "kasnerz/logic2text"
 
     def prepare_table(self, split, index):
         def is_highlighted(i, j):
@@ -38,13 +39,14 @@ class Logic2Text(TabularDataset):
                 return False
 
         entry = self.data[split][index]
+        entry["annotation"] = ast.literal_eval(entry["annotation"])
         t = Table()
         t.ref = entry["sent"]
         t.url = entry["url"]
         t.title = entry["topic"]
         t.extra_headers.append(entry["logic_str"])
 
-        for j, x in enumerate(entry["table_header"]):
+        for j, x in enumerate(ast.literal_eval(entry["table_header"])):
             c = Cell()
             c.value = x
             c.is_highlighted = is_highlighted(0, j)
@@ -52,7 +54,7 @@ class Logic2Text(TabularDataset):
             t.add_cell(c)
 
         t.save_row()
-        for i, row in enumerate(entry["table_cont"]):
+        for i, row in enumerate(ast.literal_eval(entry["table_cont"])):
             for j, x in enumerate(row):
                 c = Cell()
                 c.value = x
@@ -63,9 +65,3 @@ class Logic2Text(TabularDataset):
 
         self.tables[split][index] = t
         return t
-
-    def load(self, split, max_examples=None):
-        filename = split if split != "dev" else "valid"
-
-        with open(os.path.join(self.path, f"{filename}.json")) as f:
-            self.data[split] = json.load(f)[:max_examples]
