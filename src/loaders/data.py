@@ -120,6 +120,7 @@ class TabularDataset:
         self.data = {split: [] for split in self.splits}
         self.tables = {split: {} for split in self.splits}
         self.path = path
+        self.dataset_info = {}
 
     def load(self, split, max_examples=None):
         """
@@ -145,6 +146,9 @@ class TabularDataset:
 
     def prepare_table(self, split, index):
         return NotImplementedError
+
+    def get_info(self):
+        return self.dataset_info
 
     def get_generation_input(self, split, table_idx, cell_ids):
         t = self.get_table(split, table_idx)
@@ -223,4 +227,8 @@ class HFTabularDataset(TabularDataset):
             # max_examples is set higher than the total number of examples in the dataset
             dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=hf_split)
         
+        self.dataset_info = dataset.info.__dict__
         self.data[split] = dataset
+
+    def get_info(self):
+        return {key: self.dataset_info[key] for key in ["citation", "description", "homepage"]}
