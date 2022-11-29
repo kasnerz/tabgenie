@@ -16,6 +16,7 @@ class LogicNLG(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.mapping = {}
         self.hf_id = "kasnerz/logicnlg"
+        self.name = "LogicNLG"
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]

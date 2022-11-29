@@ -14,6 +14,7 @@ class WebNLG(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/web_nlg"
         self.hf_extra_config = "en"
+        self.name = "WebNLG"
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]

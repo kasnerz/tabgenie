@@ -10,6 +10,7 @@ class SciGen(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = "kasnerz/scigen"
+        self.name = "SciGen"
 
     def normalize(self, s):
         # just ignore inline tags and italics

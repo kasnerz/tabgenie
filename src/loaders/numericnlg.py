@@ -13,6 +13,7 @@ class NumericNLG(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = "kasnerz/numericnlg"
+        self.name = "NumericNLG"
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]

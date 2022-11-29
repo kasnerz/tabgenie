@@ -12,6 +12,7 @@ class SportSettBasketball(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/sportsett_basketball"
+        self.name = "SportSett Basketball"
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]

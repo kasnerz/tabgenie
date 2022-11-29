@@ -8,8 +8,6 @@ from .data import Cell, Table, TabularDataset, HFTabularDataset
 
 
 class HiTab(HFTabularDataset):
-    name = "hitab"
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = 'kasnerz/hitab'

@@ -29,6 +29,7 @@ class ChartToTextS(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.table_content = {}
         self.hf_id = "kasnerz/charttotext-s"
+        self.name = "Chart-to-Text (Statista subset)"
 
     def prepare_table(self, split, index):
         t = Table()

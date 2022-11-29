@@ -13,6 +13,7 @@ class WikiBio(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = "wiki_bio"
+        self.name = "WikiBio"
         self.mapping = {}
         self.split_mapping = {
             "train" : "train",

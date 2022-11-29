@@ -14,6 +14,7 @@ class Logic2Text(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = "kasnerz/logic2text"
+        self.name = "Logic2Text"
 
     def prepare_table(self, split, index):
         def is_highlighted(i, j):

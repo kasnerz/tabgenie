@@ -13,6 +13,7 @@ class ToTTo(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = 'GEM/totto'
+        self.name = "ToTTo"
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]

@@ -121,6 +121,7 @@ class TabularDataset:
         self.tables = {split: {} for split in self.splits}
         self.path = path
         self.dataset_info = {}
+        self.name = None
 
     def load(self, split, max_examples=None):
         """
@@ -198,7 +199,7 @@ class TabularDataset:
 
         tbodies = [h("tr")(tds) for tds in trs]
         tbody_el = h("tbody")(tbodies)
-        table_el = h("table", klass="table table-sm table-bordered")(tbody_el)
+        table_el = h("table", klass="table table-sm table-bordered main-table")(tbody_el)
         area_el = h("div")(header_el, table_el)
 
         html = area_el.render()
@@ -217,6 +218,7 @@ class HFTabularDataset(TabularDataset):
             "dev" : "validation",
             "test" : "test"
         }
+        self.dataset_info = {}
 
     def load(self, split, max_examples=None):
         hf_split = self.split_mapping[split]
@@ -231,4 +233,7 @@ class HFTabularDataset(TabularDataset):
         self.data[split] = dataset
 
     def get_info(self):
-        return {key: self.dataset_info[key] for key in ["citation", "description", "homepage"]}
+        info = {key: self.dataset_info[key] for key in ["citation", "description", "homepage"]}
+        info["name"] = self.name
+
+        return info

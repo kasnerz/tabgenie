@@ -13,6 +13,7 @@ class DART(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/dart"
+        self.name = "DART"
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]

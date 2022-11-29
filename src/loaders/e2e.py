@@ -14,6 +14,7 @@ class E2E(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = 'GEM/e2e_nlg'
+        self.name = "E2E"
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]
