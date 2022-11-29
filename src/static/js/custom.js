@@ -3,6 +3,8 @@ var total_examples = 1;
 var dataset = window.default_dataset;
 var mode = window.mode;
 var split = "dev";
+var splitInstance = Split(['#centerpanel', '#rightpanel'], { sizes: [70, 30], gutterSize: 1 });
+
 
 function mod(n, m) {
   return ((n % m) + m) % m;
@@ -85,8 +87,8 @@ function generate() {
       output = data["out"];
 
       $("#dataset-spinner").hide();
-      $("#model-output").html("<hl>" + output + "</hl>");
-      $("#outputarea").show();
+      $("#model-placeholder").html("<hl>" + output + "</hl>");
+      // $("#outputarea").show();
       $("#gen-btn").html("Generate");
       $("#gen-btn").removeClass('disabled');
     },
@@ -95,7 +97,7 @@ function generate() {
 }
 
 function parse_info(info) {
-  return ("<h5>Description</h5><p>" + info.description + "</p>" +
+  return ("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
     "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +
     "<h5>Citation:</h5><p><code>" + info.citation + "</code></p>")
 }
@@ -106,7 +108,8 @@ function fetch_table(dataset, split, table_idx) {
     "table_idx": table_idx,
     "split": split
   }, function (data) {
-    $("#reference").html(data.ref);
+    $("#reference-placeholder").html(data.ref);
+    $("#reference-checkbox").prop("checked", true);
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
     total_examples = data.total_examples;
@@ -125,9 +128,32 @@ function fetch_table(dataset, split, table_idx) {
     );
     $("#dataset-info").html(info);
   });
-  $("#model-output").html();
-  $("#outputarea").hide();
+  $("#model-placeholder").html();
+  // $("#outputarea").hide();
 }
+
+
+$('#reference-checkbox').on('change', function () {
+  if (!this.checked) {
+    $("#reference-output").hide();
+  } else {
+    $("#reference-output").show();
+  }
+});
+
+$('#panel-checkbox').on('change', function () {
+  if ($('#rightpanel').hasClass("show")) {
+    splitInstance.collapse(1);
+    $('#centerpanel').css("overflow-x", "auto");
+    $('.gutter').hide();
+  } else {
+    splitInstance.setSizes([75, 25])
+    $('#centerpanel').css("overflow-x", "scroll");
+    $('.gutter').show();
+  }
+  $('#rightpanel').collapse("toggle");
+
+});
 
 $("#dataset-select").on("change", function (e) {
   $("#dataset-spinner").show();
@@ -153,6 +179,7 @@ $('#page-input').keypress(function (event) {
   }
 });
 
+
 $(document).ready(function () {
   $("#dataset-select").val(dataset).change();
 
@@ -163,5 +190,3 @@ $(document).ready(function () {
     load_model();
   }
 });
-
-
