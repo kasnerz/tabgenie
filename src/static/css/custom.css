@@ -1,8 +1,8 @@
 body {
+    color: #3c4149;
     /* max-width: 1200px; */
     margin: 40px auto;
     padding: 0 10px;
-    color: #3c4149;
     /* font: 18px/1.4 'Open Sans', sans-serif;
     color: #495057;
     background-color: #FFFFFF; */
@@ -16,6 +16,30 @@ a {
 table {
     color: #3c4149 !important;
     font-size: 15px !important;
+}
+
+.dot {
+    height: 25px;
+    width: 25px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+  }
+.txt-placeholder {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-left: 3px solid #334bc7;
+    color: #666;
+    page-break-inside: avoid;
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-top: 10px;
+    max-width: 100%;
+    overflow: auto;
+    padding: 1em 1.5em;
+    display: block;
+    word-wrap: break-word;
 }
 
 .nav-link {
@@ -67,8 +91,8 @@ table {
 }
 
 #rightpanel {
-    margin: 0px 0px 0px 20px;
     height: 100vh;
+    margin: 0px 0px 0px 20px;
 }
 
 
@@ -81,13 +105,13 @@ table {
 }
 
 #collapse-btn {
+    /* border-radius: 10px; */
+    border-color: grey;
     position: fixed;
     /* right: 100%; */
     /* top: 0; */
     right: 0;
     top: 50%;
-    /* border-radius: 10px; */
-    border-color: grey;
     /* background-color: grey; */
     /* border-radius: 10px; */
     /* height: 10px; */
@@ -95,8 +119,8 @@ table {
 }
 
 .panel-resizable {
-    resize: horizontal;
-    overflow: auto
+    overflow: auto;
+    resize: horizontal
 }
 
 .nav-tabs {
@@ -113,13 +137,13 @@ table {
 }
 
 .checkboxarea {
+    padding-bottom: 10px;
     /* display: flex; */
     /* justify-content: center; */
     /* border-radius: 5px; */
     /* border-top: 1px solid #b8b8b8; */
     /* border-bottom: 1px solid #b8b8b8; */
     padding-top: 10px;
-    padding-bottom: 10px;
 }
 
 .output-element {
@@ -136,26 +160,29 @@ table {
 }
 
 #page-input {
-    width: 90px;
     height: 38px;
     margin-left: 2px;
     margin-right: 2px;
+    width: 90px;
 }
 
 .nav-pills .nav-link.active,
 .nav-pills .show>.nav-link {
-    color: #3c4149;
     /* background-color: #3d3e3e; */
-    background-color: #efefef6d;
+    /* background-color: #efefef6d; */
+    background-color: white;
+    border-bottom: 1px solid;
+    color: #3c4149;
     /* background-color: white; */
     font-weight: bold;
+    border-radius: 0px;
 }
 
 .container.large-container {
     margin-left: 50px;
     margin-right: 50px;
-    padding-right: 50px;
     max-width: none;
+    padding-right: 50px;
 }
 
 .split {
@@ -165,8 +192,8 @@ table {
 
 .gutter {
     background-color: #eee;
-    background-repeat: no-repeat;
     background-position: 50%;
+    background-repeat: no-repeat;
 }
 
 .gutter.gutter-horizontal {

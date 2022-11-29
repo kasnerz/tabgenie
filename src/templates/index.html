@@ -39,6 +39,16 @@
           </div>
 
           <div class="selectarea">
+            <b>model</b>
+            <select id="split-select" class="form-select" aria-label="dataset">
+              <option selected>None</option>
+              <option>ToTTo-base</option>
+            </select>
+          </div>
+          <div class="selectarea">
+          </div>
+
+          <div class="selectarea">
             <b>example</b>
             <nav>
               <ul class="pagination">
@@ -55,27 +65,30 @@
             </nav>
           </div>
 
-          <div class="selectarea">
-            <div id="dataset-spinner" class="spinner-border" role="status" style="display: none">
-              <span class="sr-only"></span>
-            </div>
-          </div>
-          <div class="selectarea" id="gen-btn-area" {% if mode=="light" %} style="display: none" {% endif %}>
-            <button type="button" id="gen-btn" class="btn btn-dark disabled" onclick="generate();">Loading
-              model...</button>
-          </div>
 
           <div class="selectarea">
-            <input class="form-check-input" type="checkbox" id="panel-checkbox">
-            <label class="form-check-label" for="panel-checkbox">show panel</label>
+            <input class="form-check-input custom-checkbox" type="checkbox" id="panel-checkbox" checked>
+            <label class="form-check-label custom-control-label" for="panel-checkbox">show panel</label>
           </div>
+
+          <div class="selectarea" id="btn-area">
+            <button type="button" id="gen-btn" class="btn disabled" onclick="generate();">Generate</button>
+            <button type="button" id="exp-btn" class="btn btn-secondary" onclick="exportData();">Export</button>
+          </div>
+
+
         </div>
 
 
       </div>
       <div class="split col-10">
         <div id="centerpanel">
-          <!-- <a href="#" onclick="togglePanel();" id="collapse-btn">«</a> -->
+
+          <div class="d-flex align-items-center justify-content-center">
+            <div id="dataset-spinner" class="spinner-border" role="status" style="display: none">
+              <span class="sr-only"></span>
+            </div>
+          </div>
           <div id='tablearea' class='table-responsive'> </div>
           <!-- <button id="collapse-btn" class="btn" type="button" onclick="togglePanel();">«
           </button> -->
@@ -116,12 +129,12 @@
 
               <div id="reference-output" class="output-element">
                 <b>Reference</b>
-                <div id="reference-placeholder">
+                <div id="reference-placeholder" class="txt-placeholder">
                 </div>
               </div>
               <div id="model-output" class="output-element" style="display: none;">
                 <b>Model</b>
-                <div id="model-placeholder">
+                <div id="model-placeholder" class="txt-placeholder">
                 </div>
               </div>
             </div>

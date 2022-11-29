@@ -96,6 +96,37 @@ function generate() {
   });
 }
 
+
+function exportData() {
+  $("#exp-btn").html("Exporting...");
+  $("#exp-btn").addClass('disabled');
+  dataset = $('#dataset-select').val();
+  split = $('#split-select').val();
+
+  var request = {
+    "dataset": dataset,
+    "split": split,
+    "table_idx": table_idx
+  };
+
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: `${window.url_prefix}/export`,
+    data: JSON.stringify(request),
+    cache: false,
+    processData: false,
+    async: false,
+    success: function (data) {
+      console.log(data);
+      $("#exp-btn").html("Export");
+      $("#exp-btn").removeClass('disabled');
+    },
+    dataType: "json"
+  });
+}
+
+
 function parse_info(info) {
   return ("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
     "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +

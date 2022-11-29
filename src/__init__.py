@@ -7,7 +7,7 @@ import logging
 import argparse
 from .loaders.data import get_dataset_class_by_name
 from collections import defaultdict
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_file
 from .model import Model
 
 app = Flask(__name__)
@@ -55,6 +55,29 @@ def generate():
         out = m.generate(gen_input)
 
         return {"out": out}
+
+
+@app.route('/export', methods=['POST'])
+def export():
+    if request.method == "POST":
+        content = request.json
+        dataset_name = content["dataset"]
+        split = content["split"]
+        table_idx = content["table_idx"]
+
+        os.makedirs("./tmp", exist_ok=True)
+
+        file_to_download = "./tmp/export.json"
+
+        with open(file_to_download, "w") as f:
+            json.dump(dict(content), f)
+
+        logger.info("Sending file")
+        return send_file(file_to_download,
+                        mimetype='text/json',
+                        download_name='export.json',
+                        as_attachment=True)
+
 
 
 @app.route("/table", methods=["GET", "POST"])
