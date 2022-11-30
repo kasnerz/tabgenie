@@ -131,7 +131,7 @@ def index():
 
     return render_template(
         "index.html",
-        datasets=app.config["datasets"],
+        datasets=app.config["available_datasets"],
         default_dataset=app.config["default_dataset"],
         host_prefix=app.config["host_prefix"],
         mode=app.config["mode"],

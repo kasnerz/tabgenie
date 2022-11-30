@@ -1,6 +1,6 @@
 {
     "mode": "light",
-    "datasets": [
+    "available_datasets": [
         "dart",
         "e2e",
         "hitab",
