@@ -56,23 +56,6 @@
           <div class="selectarea">
           </div>
 
-          <div class="selectarea">
-            <b>example</b>
-            <nav>
-              <ul class="pagination">
-                <li class="page-item">
-                  <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">«</a>
-                </li>
-                <li class="page-item">
-                  <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">»</a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-
 
           <div class="selectarea form-switch">
             <input class="form-check-input custom-checkbox" type="checkbox" id="panel-checkbox" checked>
@@ -90,17 +73,32 @@
       </div>
       <div class="split col-10">
         <div id="centerpanel">
-          <div class="topnavs">
+          <!-- <div class="topnavs">
             <ul class="nav nav-pills justify-content-center">
               <li class="nav-item">
                 <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabulararea" type="button"
                   role="tab">Table</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#exportarea" type="button" role="tab">Data</a>
-              </li>
+              
             </ul>
+          </div> -->
+          <div class="selectarea d-flex justify-content-center">
+            <!-- <b>example</b> -->
+            <nav>
+              <ul class="pagination">
+                <li class="page-item">
+                  <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">«</a>
+                </li>
+                <li class="page-item">
+                  <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">»</a>
+                </li>
+              </ul>
+            </nav>
           </div>
+
           <div class="tab-content">
             <div id='tabulararea' class="tab-pane sidepanel-panel active" role="tabpanel">
               <div class="d-flex align-items-center justify-content-center">
@@ -109,11 +107,6 @@
                 </div>
               </div>
               <div id='tablearea' class='table-responsive'> </div>
-            </div>
-            <div id='exportarea' class="tab-pane sidepanel-panel" role="tabpanel">
-              <div class="d-flex align-items-center justify-content-center">
-                <pre><code><div id='export-placeholder'> </div></code></pre>
-              </div>
             </div>
           </div>
         </div>
@@ -131,6 +124,9 @@
                 <a class="nav-link" data-bs-toggle="tab" data-bs-target="#inputarea" type="button" role="tab">Input</a>
               </li> -->
               <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#exportarea" type="button" role="tab">Data</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" data-bs-target="#outputarea" type="button" role="tab">Text</a>
               </li>
             </ul>
@@ -139,7 +135,12 @@
             <div id='infoarea' class="tab-pane sidepanel-panel active" role="tabpanel" tabindex="0">
               <div id="dataset-info" class="area-content"></div>
             </div>
-            <div id='inputarea' class="tab-pane sidepanel-panel " role="tabpanel">
+            <!-- <div id='inputarea' class="tab-pane sidepanel-panel " role="tabpanel">
+            </div> -->
+            <div id='exportarea' class="tab-pane sidepanel-panel" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-center">
+                <pre><code><div id='export-placeholder'> </div></code></pre>
+              </div>
             </div>
             <div id='outputarea' class="tab-pane sidepanel-panel" role="tabpanel">
               <div class="checkboxarea d-flex justify-content-center">

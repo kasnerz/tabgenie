@@ -148,7 +148,6 @@ function parse_info(info) {
 
 function fetch_table(dataset, split, table_idx, export_format) {
   var export_format = $("#format-select").val();
-  console.log(export_format);
 
   $.get(`${window.url_prefix}/table`, {
     "dataset": dataset,
@@ -160,7 +159,6 @@ function fetch_table(dataset, split, table_idx, export_format) {
     $("#reference-checkbox").prop("checked", true);
     $("#tablearea").html(data.html);
     $("#export-placeholder").text(JSON.stringify(data.export, null, 4));
-    console.log(JSON.stringify(data.export, null, 4));
     $("#dataset-spinner").hide();
     total_examples = data.total_examples;
     info = parse_info(data.dataset_info);
@@ -220,6 +218,12 @@ $("#split-select").on("change", function (e) {
   table_idx = 0;
   fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
+});
+
+$("#format-select").on("change", function (e) {
+  $("#dataset-spinner").show();
+  format = $('#format-select').val();
+  fetch_table(dataset, split, table_idx);
 });
 
 

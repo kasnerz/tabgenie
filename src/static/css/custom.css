@@ -108,6 +108,13 @@ pre {
     margin: 0px 0px 0px 20px;
 }
 
+/* 
+#pagebox {
+    position: relative;
+    right: 100%;
+    top: 20;
+} */
+
 
 #sidepanel-content {
     /* border-left: 1px solid #ddd; */

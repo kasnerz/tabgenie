@@ -113,12 +113,18 @@ class Table:
         return self.cells
 
     def get_row_headers(self, row_idx):
-        cells_in_row = self.cells[row_idx]
-        return [x for x in cells_in_row if x.is_row_header]
+        try:
+            cells_in_row = self.cells[row_idx]
+            return [x for x in cells_in_row if x.is_row_header]
+        except Exception as e:
+            logger.exception(e)
 
     def get_col_headers(self, column_idx):
-        cells_in_column = [row[column_idx] for row in self.cells]
-        return [x for x in cells_in_column if x.is_col_header]
+        try:
+            cells_in_column = [row[column_idx] for row in self.cells]
+            return [x for x in cells_in_column if x.is_col_header]
+        except Exception as e:
+            logger.exception(e)
 
     def __repr__(self):
         return str(self.__dict__)
@@ -210,9 +216,9 @@ class TabularDataset:
                     pred = col_headers[0].value
 
                 obj = cell.value
-                triples.append(str((subj, pred, obj)))
+                triples.append([subj, pred, obj])
 
-        return "\n".join(triples)
+        return triples
 
 
     def export_table(self, split, table_idx, export_format):
