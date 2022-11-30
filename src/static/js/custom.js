@@ -96,6 +96,30 @@ function generate() {
   });
 }
 
+function postRequestDownload(url, request) {
+  // https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
+  xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function () {
+    var a;
+    if (xhttp.readyState === 4 && xhttp.status === 200) {
+      // Trick for making downloadable link
+      a = document.createElement('a');
+      a.href = window.URL.createObjectURL(xhttp.response);
+      // Give filename you wish to download
+      a.download = "file.json";
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+    }
+  };
+  // Post data to URL which handles post request
+  xhttp.open("POST", `${window.url_prefix}/${url}`);
+  xhttp.setRequestHeader("Content-Type", "application/json");
+  // You should set responseType as blob for binary responses
+  xhttp.responseType = 'blob';
+  xhttp.send(JSON.stringify(request));
+}
+
 
 function exportData() {
   $("#exp-btn").html("Exporting...");
@@ -109,21 +133,10 @@ function exportData() {
     "table_idx": table_idx
   };
 
-  $.ajax({
-    type: "POST",
-    contentType: "application/json; charset=utf-8",
-    url: `${window.url_prefix}/export`,
-    data: JSON.stringify(request),
-    cache: false,
-    processData: false,
-    async: false,
-    success: function (data) {
-      console.log(data);
-      $("#exp-btn").html("Export");
-      $("#exp-btn").removeClass('disabled');
-    },
-    dataType: "json"
-  });
+  postRequestDownload("export", request);
+
+  $("#exp-btn").html("Export");
+  $("#exp-btn").removeClass('disabled');
 }
 
 
@@ -142,6 +155,8 @@ function fetch_table(dataset, split, table_idx) {
     $("#reference-placeholder").html(data.ref);
     $("#reference-checkbox").prop("checked", true);
     $("#tablearea").html(data.html);
+    $("#export-placeholder").text(JSON.stringify(data.export, null, 4));
+    console.log(JSON.stringify(data.export, null, 4));
     $("#dataset-spinner").hide();
     total_examples = data.total_examples;
     info = parse_info(data.dataset_info);
@@ -175,11 +190,11 @@ $('#reference-checkbox').on('change', function () {
 $('#panel-checkbox').on('change', function () {
   if ($('#rightpanel').hasClass("show")) {
     splitInstance.collapse(1);
-    $('#centerpanel').css("overflow-x", "auto");
+    $('#tabulararea').css("overflow-x", "auto");
     $('.gutter').hide();
   } else {
-    splitInstance.setSizes([75, 25])
-    $('#centerpanel').css("overflow-x", "scroll");
+    splitInstance.setSizes([70, 30])
+    $('#tabulararea').css("overflow-x", "scroll");
     $('.gutter').show();
   }
   $('#rightpanel').collapse("toggle");

@@ -99,12 +99,16 @@ class Table:
             return None
 
     def get_cell_by_id(self, idx):
+        # TODO improve
         for row in self.cells:
             for c in row:
                 if c.idx == idx:
                     return c
 
         return None
+
+    def get_flat_cells(self):
+        return [x for row in self.cells for x in row]
 
     def __repr__(self):
         return str(self.__dict__)
@@ -151,9 +155,14 @@ class TabularDataset:
     def get_info(self):
         return self.dataset_info
 
-    def get_generation_input(self, split, table_idx, cell_ids):
+    def _export_linear(self, split, table_idx, cell_ids):
         t = self.get_table(split, table_idx)
-        cells = [t.get_cell_by_id(int(idx)) for idx in cell_ids]
+
+        if cell_ids:
+            cells = [t.get_cell_by_id(int(idx)) for idx in cell_ids]
+        else:
+            cells = t.get_flat_cells()
+
         gen_input = []
 
         if t.title:
@@ -163,6 +172,36 @@ class TabularDataset:
             gen_input.append("[CELL] " + c.value + " [/CELL]")
 
         return " ".join(gen_input)
+
+    
+    def export_table(self, split, table_idx, export_format):
+        cell_ids = None # TODO implement
+
+        if export_format == "linearize":
+            inp = self._export_linear(split, table_idx, cell_ids)
+        elif export_format == "triples":
+            inp = self._export_triples(split, table_idx, cell_ids)
+        else:
+            raise NotImplementedError(export_format)
+
+        out = self.get_table(split, table_idx).ref
+
+        return {
+            "in" : inp,
+            "out" : out
+        }
+    
+    def export(self, split, table_idxs=None, export_format="linearize"):
+        data = {"data" : []}
+
+        if table_idxs is None:
+            table_idxs = range(len(self.tables))
+        
+        for table_idx in table_idxs:
+            example = self.export_table(split, table_idx, export_format)
+            data["data"].append(example)
+
+        return data
 
     def get_table_html(self, split, index):
         t = self.get_table(split, index)

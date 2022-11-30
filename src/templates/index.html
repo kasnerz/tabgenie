@@ -20,7 +20,7 @@
     <div class="row">
       <div id="leftpanel" class="col-2">
         <div class="infoarea">
-          <h2>🧞 TabGenie</h2>
+          <h2 style="margin-bottom: 20px">🧞 TabGenie</h2>
           <div class="selectarea">
             <b>dataset</b>
             <select id="dataset-select" class="form-select" aria-label="dataset">
@@ -66,16 +66,15 @@
           </div>
 
 
-          <div class="selectarea">
+          <div class="selectarea form-switch">
             <input class="form-check-input custom-checkbox" type="checkbox" id="panel-checkbox" checked>
-            <label class="form-check-label custom-control-label" for="panel-checkbox">show panel</label>
+            <label class="form-check-label custom-control-label" for="panel-checkbox">side panel</label>
           </div>
 
           <div class="selectarea" id="btn-area">
             <button type="button" id="gen-btn" class="btn disabled" onclick="generate();">Generate</button>
-            <button type="button" id="exp-btn" class="btn btn-secondary" onclick="exportData();">Export</button>
+            <!-- <button type="button" id="exp-btn" class="btn btn-secondary" onclick="exportData();">Export</button> -->
           </div>
-
 
         </div>
 
@@ -83,45 +82,64 @@
       </div>
       <div class="split col-10">
         <div id="centerpanel">
-
-          <div class="d-flex align-items-center justify-content-center">
-            <div id="dataset-spinner" class="spinner-border" role="status" style="display: none">
-              <span class="sr-only"></span>
+          <div class="topnavs">
+            <ul class="nav nav-pills justify-content-center">
+              <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabulararea" type="button"
+                  role="tab">Table</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#exportarea" type="button" role="tab">Data</a>
+              </li>
+            </ul>
+          </div>
+          <div class="tab-content">
+            <div id='tabulararea' class="tab-pane sidepanel-panel active" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-center">
+                <div id="dataset-spinner" class="spinner-border" role="status" style="display: none">
+                  <span class="sr-only"></span>
+                </div>
+              </div>
+              <div id='tablearea' class='table-responsive'> </div>
+            </div>
+            <div id='exportarea' class="tab-pane sidepanel-panel" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-center">
+                <pre><code><div id='export-placeholder'> </div></code></pre>
+              </div>
             </div>
           </div>
-          <div id='tablearea' class='table-responsive'> </div>
-          <!-- <button id="collapse-btn" class="btn" type="button" onclick="togglePanel();">«
-          </button> -->
         </div>
 
         <div id="rightpanel" class="collapse show">
           <!-- <div id='sidepanel'> -->
-          <ul class="nav nav-pills justify-content-center">
-            <li class="nav-item">
-              <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#infoarea" type="button"
-                role="tab">Dataset
-                info</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#inputarea" type="button" role="tab">Input</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" data-bs-target="#outputarea" type="button" role="tab">Output</a>
-            </li>
-          </ul>
+          <div class="topnavs">
+            <ul class="nav nav-pills justify-content-center">
+              <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#infoarea" type="button"
+                  role="tab">Dataset
+                  info</a>
+              </li>
+              <!-- <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#inputarea" type="button" role="tab">Input</a>
+              </li> -->
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#outputarea" type="button" role="tab">Text</a>
+              </li>
+            </ul>
+          </div>
           <div id='sidepanel-content' class="tab-content">
-            <div id='infoarea' class="tab-pane fade sidepanel-panel" role="tabpanel" tabindex="0">
+            <div id='infoarea' class="tab-pane sidepanel-panel active" role="tabpanel" tabindex="0">
               <div id="dataset-info" class="area-content"></div>
             </div>
-            <div id='inputarea' class="tab-pane fade sidepanel-panel " role="tabpanel">
+            <div id='inputarea' class="tab-pane sidepanel-panel " role="tabpanel">
             </div>
-            <div id='outputarea' class="tab-pane fade sidepanel-panel" role="tabpanel">
+            <div id='outputarea' class="tab-pane sidepanel-panel" role="tabpanel">
               <div class="checkboxarea d-flex justify-content-center">
-                <div class="form-check form-check-inline">
+                <div class="form-switch form-check form-check-inline">
                   <input class="form-check-input" type="checkbox" id="reference-checkbox" value="option1">
                   <label class="form-check-label" for="reference-checkbox">reference</label>
                 </div>
-                <div class="form-check form-check-inline">
+                <div class="form-switch form-check form-check-inline">
                   <input class="form-check-input" type="checkbox" id="model-checkbox" value="option2" disabled>
                   <label class="form-check-label" for="model-checkbox">model</label>
                 </div>
@@ -138,9 +156,7 @@
                 </div>
               </div>
             </div>
-
           </div>
-          <!-- </div> -->
         </div>
       </div>
     </div>

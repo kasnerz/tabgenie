@@ -36,47 +36,49 @@ def load_model():
 
 @app.route("/generate", methods=["GET", "POST"])
 def generate():
-    if request.method == "POST":
-        content = request.json
-        logger.info(f"Incoming content: {content}")
-        m = app.config["model"]
+    content = request.json
+    logger.info(f"Incoming content: {content}")
+    m = app.config["model"]
 
-        dataset_name = content["dataset"]
-        split = content["split"]
-        table_idx = content["table_idx"]
-        cell_ids = content["cells"]
+    dataset_name = content["dataset"]
+    split = content["split"]
+    table_idx = content["table_idx"]
+    cell_ids = content["cells"]
 
-        dataset = get_dataset(dataset_name, split)
-        gen_input = dataset.get_generation_input(
-            split=split, table_idx=table_idx, cell_ids=cell_ids
-        )
+    dataset = get_dataset(dataset_name, split)
+    gen_input = dataset.get_generation_input(
+        split=split, table_idx=table_idx, cell_ids=cell_ids
+    )
 
-        logger.info(f"Input: {gen_input}")
-        out = m.generate(gen_input)
+    logger.info(f"Input: {gen_input}")
+    out = m.generate(gen_input)
 
-        return {"out": out}
+    return {"out": out}
 
 
-@app.route('/export', methods=['POST'])
-def export():
-    if request.method == "POST":
-        content = request.json
-        dataset_name = content["dataset"]
-        split = content["split"]
-        table_idx = content["table_idx"]
+# @app.route('/export', methods=['GET', 'POST'])
+# def export():
+#     content = request.json
+#     dataset_name = content["dataset"]
+#     split = content["split"]
+#     table_idx = content["table_idx"]
 
-        os.makedirs("./tmp", exist_ok=True)
+#     src_dir = os.path.dirname(os.path.abspath(__file__))
+#     files_dir = os.path.join(src_dir, os.pardir, 'files')
+#     os.makedirs(files_dir, exist_ok=True)
 
-        file_to_download = "./tmp/export.json"
+#     file_to_download = os.path.join(files_dir, "export.json")
+#     dataset = get_dataset(dataset_name, split)
+#     export_content = dataset.export(split, [table_idx], export_format="linearize")
 
-        with open(file_to_download, "w") as f:
-            json.dump(dict(content), f)
+#     with open(file_to_download, "w") as f:
+#         json.dump(dict(export_content), f)
 
-        logger.info("Sending file")
-        return send_file(file_to_download,
-                        mimetype='text/json',
-                        download_name='export.json',
-                        as_attachment=True)
+#     logger.info("Sending file")
+#     return send_file(file_to_download,
+#                     mimetype='text/json',
+#                     download_name='export.json',
+#                     as_attachment=True)
 
 
 
@@ -116,8 +118,9 @@ def get_table_data(dataset_name, split, index):
     html = dataset.get_table_html(split=split, index=index)
     ref = dataset.get_reference(split=split, index=index)
     dataset_info = dataset.get_info()
+    export = dataset.export(split=split, table_idxs=[index], export_format="linearize")
 
-    return {"html": html, "ref": ref, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info}
+    return {"html": html, "ref": ref, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info, "export" : export}
 
 
 @app.route("/", methods=["GET", "POST"])
