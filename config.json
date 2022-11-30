@@ -17,5 +17,6 @@
     "exp_dir": "/lnet/work/people/kasner/projects/ng-nlg/experiments",
     "default_dataset": "webnlg",
     "max_examples_per_split": 100000,
-    "host_prefix": "."
+    "host_prefix": ".",
+    "preload": true
 }

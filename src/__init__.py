@@ -145,6 +145,12 @@ def create_app(*args, **kwargs):
     app.config.update(config)
     # app.config.from_file("config.json", load=json.load)
     app.config["datasets"] = {}
+
+    # preload
+    if config["preload"]:
+        for dataset_name in app.config["available_datasets"]:
+            get_dataset(dataset_name, "dev")
+
     return app
 
 
