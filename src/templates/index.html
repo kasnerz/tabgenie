@@ -20,10 +20,10 @@
     <div class="row">
       <div id="leftpanel" class="col-2">
         <div class="infoarea">
-          <h2 style="margin-bottom: 20px">🧞 TabGenie</h2>
+          <h2 style="margin-bottom: 30px">🧞 TabGenie</h2>
           <div class="selectarea">
             <b>dataset</b>
-            <select id="dataset-select" class="form-select" aria-label="dataset">
+            <select id="dataset-select" class="form-select">
               {% for dataset_name in datasets %}
               <option value="{{ dataset_name }}">{{ dataset_name }}</option>
               {% endfor %}
@@ -31,18 +31,26 @@
           </div>
           <div class="selectarea">
             <b>split</b>
-            <select id="split-select" class="form-select" aria-label="dataset">
-              <option selected>dev</option>
+            <select id="split-select" class="form-select">
+              <option value="dev" selected>dev</option>
               <option value="test">test</option>
               <option value="train">train</option>
             </select>
           </div>
+          <div class="selectarea">
+            <b>data format</b>
+            <select id="format-select" class="form-select">
+              <option value="linearize" selected>linearize</option>
+              <option value="triples">triples</option>
+            </select>
+          </div>
+
 
           <div class="selectarea">
             <b>model</b>
             <select id="split-select" class="form-select" aria-label="dataset">
               <option selected>None</option>
-              <option>ToTTo-base</option>
+              <!-- <option>ToTTo-base</option> -->
             </select>
           </div>
           <div class="selectarea">

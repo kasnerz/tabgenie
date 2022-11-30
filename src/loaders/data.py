@@ -69,7 +69,6 @@ class Table:
     """
     Table object
     """
-
     def __init__(self):
         self.title = None
         self.extra_headers = []
@@ -109,6 +108,17 @@ class Table:
 
     def get_flat_cells(self):
         return [x for row in self.cells for x in row]
+
+    def get_cells(self):
+        return self.cells
+
+    def get_row_headers(self, row_idx):
+        cells_in_row = self.cells[row_idx]
+        return [x for x in cells_in_row if x.is_row_header]
+
+    def get_col_headers(self, column_idx):
+        cells_in_column = [row[column_idx] for row in self.cells]
+        return [x for x in cells_in_column if x.is_col_header]
 
     def __repr__(self):
         return str(self.__dict__)
@@ -173,7 +183,38 @@ class TabularDataset:
 
         return " ".join(gen_input)
 
-    
+    def _export_triples(self, split, table_idx, cell_ids):
+        # default method (dataset-agnostic)
+        t = self.get_table(split, table_idx)
+        title = t.title
+        triples = []
+
+        for i, row in enumerate(t.get_cells()):
+            for j, cell in enumerate(row):
+                if cell.is_header():
+                    continue
+                
+                row_headers = t.get_row_headers(i)
+                col_headers = t.get_col_headers(j)
+
+                if row_headers and col_headers:
+                    subj = row_headers[0].value
+                    pred = col_headers[0].value
+
+                elif row_headers and not col_headers:
+                    subj = title
+                    pred = row_headers[0].value
+                
+                elif col_headers and not row_headers:
+                    subj = title
+                    pred = col_headers[0].value
+
+                obj = cell.value
+                triples.append(str((subj, pred, obj)))
+
+        return "\n".join(triples)
+
+
     def export_table(self, split, table_idx, export_format):
         cell_ids = None # TODO implement
 
@@ -184,24 +225,26 @@ class TabularDataset:
         else:
             raise NotImplementedError(export_format)
 
-        out = self.get_table(split, table_idx).ref
+        return inp
+        # out = self.get_table(split, table_idx).ref
 
-        return {
-            "in" : inp,
-            "out" : out
-        }
+        # return {
+        #     "in" : inp,
+        #     "out" : out
+        # }
     
     def export(self, split, table_idxs=None, export_format="linearize"):
-        data = {"data" : []}
+        return self.export_table(split, table_idxs[0], export_format)
+        # data = {"data" : []}
 
-        if table_idxs is None:
-            table_idxs = range(len(self.tables))
+        # if table_idxs is None:
+        #     table_idxs = range(len(self.tables))
         
-        for table_idx in table_idxs:
-            example = self.export_table(split, table_idx, export_format)
-            data["data"].append(example)
+        # for table_idx in table_idxs:
+        #     example = self.export_table(split, table_idx, export_format)
+        #     data["data"].append(example)
 
-        return data
+        # return data
 
     def get_table_html(self, split, index):
         t = self.get_table(split, index)

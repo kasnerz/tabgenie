@@ -99,6 +99,7 @@ pre {
 
 #tabulararea {
     margin-right: 30px;
+    min-height: 100px;
     /* overflow-x: scroll; */
 }
 

@@ -87,8 +87,9 @@ def render_table():
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")
     table_idx = int(request.args.get("table_idx"))
+    export_format = request.args.get("export_format")
 
-    return get_table_data(dataset_name, split, table_idx)
+    return get_table_data(dataset_name, split, table_idx, export_format)
 
 
 def initialize_dataset(dataset_name):
@@ -113,12 +114,12 @@ def get_dataset(dataset_name, split):
     return dataset
 
 
-def get_table_data(dataset_name, split, index):
+def get_table_data(dataset_name, split, index, export_format):
     dataset = get_dataset(dataset_name, split)
     html = dataset.get_table_html(split=split, index=index)
     ref = dataset.get_reference(split=split, index=index)
     dataset_info = dataset.get_info()
-    export = dataset.export(split=split, table_idxs=[index], export_format="linearize")
+    export = dataset.export(split=split, table_idxs=[index], export_format=export_format)
 
     return {"html": html, "ref": ref, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info, "export" : export}
 

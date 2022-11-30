@@ -96,29 +96,29 @@ function generate() {
   });
 }
 
-function postRequestDownload(url, request) {
-  // https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
-  xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function () {
-    var a;
-    if (xhttp.readyState === 4 && xhttp.status === 200) {
-      // Trick for making downloadable link
-      a = document.createElement('a');
-      a.href = window.URL.createObjectURL(xhttp.response);
-      // Give filename you wish to download
-      a.download = "file.json";
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-    }
-  };
-  // Post data to URL which handles post request
-  xhttp.open("POST", `${window.url_prefix}/${url}`);
-  xhttp.setRequestHeader("Content-Type", "application/json");
-  // You should set responseType as blob for binary responses
-  xhttp.responseType = 'blob';
-  xhttp.send(JSON.stringify(request));
-}
+// function postRequestDownload(url, request) {
+//   // https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
+//   xhttp = new XMLHttpRequest();
+//   xhttp.onreadystatechange = function () {
+//     var a;
+//     if (xhttp.readyState === 4 && xhttp.status === 200) {
+//       // Trick for making downloadable link
+//       a = document.createElement('a');
+//       a.href = window.URL.createObjectURL(xhttp.response);
+//       // Give filename you wish to download
+//       a.download = "file.json";
+//       a.style.display = 'none';
+//       document.body.appendChild(a);
+//       a.click();
+//     }
+//   };
+//   // Post data to URL which handles post request
+//   xhttp.open("POST", `${window.url_prefix}/${url}`);
+//   xhttp.setRequestHeader("Content-Type", "application/json");
+//   // You should set responseType as blob for binary responses
+//   xhttp.responseType = 'blob';
+//   xhttp.send(JSON.stringify(request));
+// }
 
 
 function exportData() {
@@ -146,11 +146,15 @@ function parse_info(info) {
     "<h5>Citation:</h5><p><code>" + info.citation + "</code></p>")
 }
 
-function fetch_table(dataset, split, table_idx) {
+function fetch_table(dataset, split, table_idx, export_format) {
+  var export_format = $("#format-select").val();
+  console.log(export_format);
+
   $.get(`${window.url_prefix}/table`, {
     "dataset": dataset,
     "table_idx": table_idx,
-    "split": split
+    "split": split,
+    "export_format": export_format
   }, function (data) {
     $("#reference-placeholder").html(data.ref);
     $("#reference-checkbox").prop("checked", true);
@@ -190,11 +194,11 @@ $('#reference-checkbox').on('change', function () {
 $('#panel-checkbox').on('change', function () {
   if ($('#rightpanel').hasClass("show")) {
     splitInstance.collapse(1);
-    $('#tabulararea').css("overflow-x", "auto");
+    // $('#tabulararea').css("overflow-x", "auto");
     $('.gutter').hide();
   } else {
     splitInstance.setSizes([70, 30])
-    $('#tabulararea').css("overflow-x", "scroll");
+    // $('#tabulararea').css("overflow-x", "scroll");
     $('.gutter').show();
   }
   $('#rightpanel').collapse("toggle");

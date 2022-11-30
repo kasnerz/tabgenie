@@ -11,6 +11,7 @@ class HiTab(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = 'kasnerz/hitab'
+        self.name = "HiTab"
 
     def _get_linked_cells(self, linked_cells):
         # the design of the `linked_cells` dictionary is very unintuitive
