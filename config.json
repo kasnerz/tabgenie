@@ -1,21 +1,21 @@
 {
     "mode": "light",
-    "dataset_paths": {
-        "dart": null,
-        "e2e": null,
-        "hitab": null,
-        "charttotext-s": null,
-        "logic2text": null,
-        "logicnlg": null,
-        "scigen": null,
-        "sportsett": null,
-        "webnlg": null,
-        "wikibio": null,
-        "numericnlg": null,
-        "totto": null
-    },
+    "datasets": [
+        "dart",
+        "e2e",
+        "hitab",
+        "charttotext-s",
+        "logic2text",
+        "logicnlg",
+        "scigen",
+        "sportsett",
+        "webnlg",
+        "wikibio",
+        "numericnlg",
+        "totto"
+    ],
     "exp_dir": "/lnet/work/people/kasner/projects/ng-nlg/experiments",
     "default_dataset": "webnlg",
-    "max_examples_per_split": 10000,
+    "max_examples_per_split": 100000,
     "host_prefix": "."
 }

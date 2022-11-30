@@ -315,7 +315,7 @@ class HFTabularDataset(TabularDataset):
 
         try:
             dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=datasets.ReadInstruction(hf_split, to=max_examples+1, unit='abs'))
-        except (AssertionError, ValueError):
+        except (AssertionError, ValueError, TypeError):
             # max_examples is set higher than the total number of examples in the dataset
             dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=hf_split)
         

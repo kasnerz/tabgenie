@@ -93,7 +93,8 @@ def render_table():
 
 
 def initialize_dataset(dataset_name):
-    dataset_path = app.config["dataset_paths"][dataset_name]
+    # dataset_path = app.config["dataset_paths"][dataset_name]
+    dataset_path = None # not needed for HF
     dataset = get_dataset_class_by_name(dataset_name)(path=dataset_path)
     app.config["datasets"][dataset_name] = dataset
 
@@ -130,7 +131,7 @@ def index():
 
     return render_template(
         "index.html",
-        datasets=list(app.config["dataset_paths"].keys()),
+        datasets=app.config["datasets"],
         default_dataset=app.config["default_dataset"],
         host_prefix=app.config["host_prefix"],
         mode=app.config["mode"],
