@@ -228,6 +228,8 @@ class TabularDataset:
             inp = self._export_linear(split, table_idx, cell_ids)
         elif export_format == "triples":
             inp = self._export_triples(split, table_idx, cell_ids)
+        elif export_format == "html":
+            inp = self.get_table_html(split, table_idx)
         else:
             raise NotImplementedError(export_format)
 
