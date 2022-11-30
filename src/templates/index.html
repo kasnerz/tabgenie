@@ -117,14 +117,14 @@
           <div class="topnavs">
             <ul class="nav nav-pills justify-content-center">
               <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#outputarea" type="button" role="tab">Text</a>
+                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#outputarea" type="button"
+                  role="tab">Text</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" data-bs-target="#exportarea" type="button" role="tab">Data</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#infoarea" type="button"
-                  role="tab">Dataset
+                <a class="nav-link " data-bs-toggle="tab" data-bs-target="#infoarea" type="button" role="tab">Dataset
                   info</a>
               </li>
               <!-- <li class="nav-item">
@@ -133,9 +133,6 @@
             </ul>
           </div>
           <div id='sidepanel-content' class="tab-content">
-            <div id='infoarea' class="tab-pane sidepanel-panel active" role="tabpanel" tabindex="0">
-              <div id="dataset-info" class="area-content"></div>
-            </div>
             <!-- <div id='inputarea' class="tab-pane sidepanel-panel " role="tabpanel">
             </div> -->
             <div id='exportarea' class="tab-pane sidepanel-panel" role="tabpanel">
@@ -143,7 +140,7 @@
                 <pre><code><div id='export-placeholder'> </div></code></pre>
               </div>
             </div>
-            <div id='outputarea' class="tab-pane sidepanel-panel" role="tabpanel">
+            <div id='outputarea' class="tab-pane sidepanel-panel active" role="tabpanel">
               <div class="checkboxarea d-flex justify-content-center">
                 <div class="form-switch form-check form-check-inline">
                   <input class="form-check-input" type="checkbox" id="reference-checkbox" value="option1">
@@ -165,6 +162,9 @@
                 <div id="model-placeholder" class="txt-placeholder">
                 </div>
               </div>
+            </div>
+            <div id='infoarea' class="tab-pane sidepanel-panel" role="tabpanel" tabindex="0">
+              <div id="dataset-info" class="area-content"></div>
             </div>
           </div>
         </div>
