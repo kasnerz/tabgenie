@@ -7,16 +7,16 @@
         "charttotext-s",
         "logic2text",
         "logicnlg",
+        "numericnlg",
         "scigen",
         "sportsett",
+        "totto",
         "webnlg",
-        "wikibio",
-        "numericnlg",
-        "totto"
+        "wikibio"
     ],
     "exp_dir": "/lnet/work/people/kasner/projects/ng-nlg/experiments",
-    "default_dataset": "webnlg",
-    "max_examples_per_split": 100000,
+    "default_dataset": "totto",
+    "max_examples_per_split": 100,
     "host_prefix": ".",
-    "preload": true
+    "preload": false
 }

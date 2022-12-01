@@ -70,8 +70,7 @@ class Table:
     Table object
     """
     def __init__(self):
-        self.title = None
-        self.extra_headers = []
+        self.headers = {}
         self.cells = []
         self.ref = None
         self.url = None
@@ -181,18 +180,18 @@ class TabularDataset:
 
         gen_input = []
 
-        if t.title:
-            gen_input.append("[TITLE] " + t.title)
+        for key, value in t.headers.items():
+            gen_input.append(f"<{key}> {value}")
 
         for c in cells:
-            gen_input.append("[CELL] " + c.value + " [/CELL]")
+            gen_input.append("<cell> " + c.value)
 
         return " ".join(gen_input)
 
     def _export_triples(self, split, table_idx, cell_ids):
         # default method (dataset-agnostic)
         t = self.get_table(split, table_idx)
-        title = t.title
+        title = t.headers.get("title")
         triples = []
 
         for i, row in enumerate(t.get_cells()):
@@ -256,20 +255,21 @@ class TabularDataset:
 
     def get_table_html(self, split, index):
         t = self.get_table(split, index)
-        headers = []
 
-        if t.title:
-            title_el = h("p")(h("h5")(t.title))
-            if t.url:
-                title_el = h("p")(h("a", href=t.url)(title_el))
-            headers.append(title_el)
+        if t.headers:
+            meta_trs = []
+            for key, value in t.headers.items():
+                meta_trs.append([h("th")(key), h("td")(value)])
 
-        for extra_header in t.extra_headers:
-            headers.append(h("p")(h("b")(extra_header)))
+            meta_tbodies = [h("tr")(tds) for tds in meta_trs]
+            meta_tbody_el = h("tbody")(meta_tbodies)
+            meta_table_el = h("table", klass="table table-sm table-bordered meta-table")(meta_tbody_el)
+            
+            # meta_table_el = h("div")(h("h5")("Meta"), meta_table_el)
+        else: 
+            meta_table_el = None
 
-        header_el = h("div")(headers)
         trs = []
-
         for row in t.cells:
             tds = []
             for c in row:
@@ -290,7 +290,8 @@ class TabularDataset:
         tbodies = [h("tr")(tds) for tds in trs]
         tbody_el = h("tbody")(tbodies)
         table_el = h("table", klass="table table-sm table-bordered main-table")(tbody_el)
-        area_el = h("div")(header_el, table_el)
+        # table_el = h("div")(h("h5")("Data"), table_el)
+        area_el = h("div")(meta_table_el, table_el)
 
         html = area_el.render()
         return lxml.etree.tostring(

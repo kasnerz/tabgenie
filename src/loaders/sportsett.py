@@ -22,10 +22,15 @@ class SportSettBasketball(HFTabularDataset):
 
         ht = entry["teams"]["home"]
         vt = entry["teams"]["vis"]
-        t.title = f"{ht['place']} {ht['name']} vs. {vt['place']} {vt['name']}"
 
-        game_summary = " | ".join([f"{key.title()}: {val}" for key, val in entry["game"].items()])
-        t.extra_headers.append(game_summary)
+        t.headers["home_team_name"] = ht['name']
+        t.headers["home_team_place"] = ht['place']
+        t.headers["visiting_team_name"] = vt['name']
+        t.headers["visiting_team_place"] = vt['place']
+
+        for key, val in entry["game"].items():
+            t.headers[key] = val
+            
         # TODO next games
 
         stat_headers = ["AST", "BLK", "DOUBLE", "DREB", "FG3A", "FG3M", "FG3_PCT", "FGA", "FGM", "FG_PCT", "FTA", "FTM", "FT_PCT", "MIN", "OREB", "PF", "PTS", "STL", "TOV", "TREB", "+/-"]

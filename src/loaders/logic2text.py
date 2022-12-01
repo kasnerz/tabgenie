@@ -43,9 +43,10 @@ class Logic2Text(HFTabularDataset):
         entry["annotation"] = ast.literal_eval(entry["annotation"])
         t = Table()
         t.ref = entry["sent"]
-        t.url = entry["url"]
-        t.title = entry["topic"]
-        t.extra_headers.append(entry["logic_str"])
+
+        t.headers["title"] = entry["topic"]
+        t.headers["url"] = entry["url"]
+        t.headers["logic_str"] = entry["logic_str"]
 
         for j, x in enumerate(ast.literal_eval(entry["table_header"])):
             c = Cell()

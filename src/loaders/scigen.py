@@ -31,7 +31,8 @@ class SciGen(HFTabularDataset):
         entry = self.data[split][index]
         caption = entry["table_caption"]
         t.ref = caption.replace("[CONTINUE]", "\n")
-        t.title = entry["paper"]
+        
+        t.headers["title"] = entry["paper"]
 
         for col in ast.literal_eval(entry["table_column_names"]):
             c = Cell()

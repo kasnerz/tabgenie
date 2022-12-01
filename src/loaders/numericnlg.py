@@ -20,7 +20,7 @@ class NumericNLG(HFTabularDataset):
 
         t = Table()
         t.ref = entry["caption"]
-        t.title = entry["table_name"]
+        t.headers["title"] = entry["table_name"]
 
         for i in range(int(entry["column_header_level"])):
             c = Cell("")

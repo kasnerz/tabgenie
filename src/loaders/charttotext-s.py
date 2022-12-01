@@ -36,7 +36,7 @@ class ChartToTextS(HFTabularDataset):
         entry = self.data[split][index]
 
         t.ref = entry["ref"]
-        t.title = entry["title"]
+        t.headers["title"] = entry["title"]
 
         for i, row in enumerate(ast.literal_eval(entry["content"])):
             for j, col in enumerate(row):

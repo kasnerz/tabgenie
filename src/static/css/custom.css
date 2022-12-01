@@ -13,11 +13,6 @@ a {
     --bs-pagination-color: black;
 }
 
-table {
-    color: #3c4149 !important;
-    font-size: 15px !important;
-}
-
 pre {
     white-space: pre-wrap;
 
@@ -34,7 +29,7 @@ pre {
 .txt-placeholder {
     background: #ffffff;
     border: 1px solid #ddd;
-    border-left: 3px solid #334bc7;
+    border-left: 3px solid #2E96D0;
     color: #666;
     page-break-inside: avoid;
     font-family: monospace;
@@ -226,11 +221,28 @@ pre {
     cursor: col-resize;
 }
 
+
+.meta-table {
+    font-family: monospace;
+    color: rgb(110, 110, 110) !important;
+    font-size: 14px !important;
+    /* background-color: #efefef75; */
+    margin-bottom: 50px;
+    overflow: auto;
+}
+
+.meta-table th {
+    color: rgb(110, 110, 110) !important;
+}
+
 .main-table {
     /* border-collapse: separate; */
     /* border: solid 1px; */
     /* border-radius: 6px; */
     /* overflow: hidden; */
+    font-family: monospace;
+    color: #3c4149 !important;
+    font-size: 14px !important;
 }
 
 

@@ -19,14 +19,16 @@ class ToTTo(HFTabularDataset):
         entry = self.data[split][index]
         t = Table()
         t.ref = entry["target"]
-        t.url = entry["table_webpage_url"]
-        t.title = entry["table_page_title"]
+
+        t.headers["title"] = entry["table_page_title"]
 
         if entry.get("table_section_text"):
-            t.extra_headers.append(entry.get("table_section_text"))
+            t.headers["table_section_text"] = entry["table_section_text"]
 
         if entry.get("table_section_title"):
-            t.extra_headers.append(entry.get("table_section_title"))
+            t.headers["table_section_title"] = entry["table_section_title"]
+        
+        t.headers["url"] = entry["table_webpage_url"]
 
         for i, row in enumerate(entry["table"]):
             for j, x in enumerate(row):

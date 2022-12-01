@@ -26,7 +26,8 @@ class HiTab(HFTabularDataset):
         t.ref = entry["sub_sentence"]
         content = ast.literal_eval(entry["table_content"])
         linked_cells = self._get_linked_cells(ast.literal_eval(entry["linked_cells"]))
-        t.title = content["title"]
+
+        t.headers["title"] = content["title"]
 
         for i, row in enumerate(content["texts"]):
             for j, col in enumerate(row):
