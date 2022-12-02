@@ -15,12 +15,68 @@
 
 
 <body class="body">
+  <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <!-- <img src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24"
+            class="d-inline-block align-text-top"> -->
+        🧞 <b>TabGenie</b>
+      </a>
+      <div class="navblock">
+        <!-- <div>
+          example: 1/100
+        </div> -->
+
+        <!-- <div class="input-group mb-3">
+          <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
+          <span class="input-group-text">/100</span>
+        </div> -->
+
+        <ul class="pagination">
+          <!-- <li class="page-item">
+            <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">«</a>
+          </li> -->
+          <li class="page-item">
+            <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">‹</a>
+          </li>
+          <li class="page-item">
+            <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">›</a>
+          </li>
+          <!-- <li class="page-item">
+            <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">»</a>
+          </li> -->
+        </ul>
+
+
+
+        <ul class="pagination pagination-buttons">
+          <li class="page-item">
+            <a class="page-link" href="#" id="random-btn" onclick="startbtn();">start</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#" id="random-btn" onclick="randombtn();">random</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#" id="random-btn" onclick="endbtn();">end</a>
+          </li>
+
+        </ul>
+      </div>
+      <div class="navblock">
+        About
+      </div>
+    </div>
+  </nav>
+
 
   <div class="large-container container">
     <div class="row">
       <div id="leftpanel" class="col-2">
         <div class="infoarea">
-          <h2 style="margin-bottom: 30px">🧞 TabGenie</h2>
+          <!-- <h2 style="margin-bottom: 30px">🧞 TabGenie</h2> -->
           <div class="selectarea">
             <b>dataset</b>
             <select id="dataset-select" class="form-select">
@@ -83,22 +139,7 @@
               
             </ul>
           </div> -->
-          <div class="selectarea d-flex justify-content-center">
-            <!-- <b>example</b> -->
-            <nav>
-              <ul class="pagination">
-                <li class="page-item">
-                  <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">«</a>
-                </li>
-                <li class="page-item">
-                  <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">»</a>
-                </li>
-              </ul>
-            </nav>
-          </div>
+
 
           <div class="tab-content">
             <div id='tabulararea' class="tab-pane sidepanel-panel active" role="tabpanel">
@@ -107,7 +148,7 @@
                   <span class="sr-only"></span>
                 </div>
               </div>
-              <div id='tablearea' class='table-responsive'> </div>
+              <div id='tablearea' class='table-responsive font-mono'> </div>
             </div>
           </div>
         </div>

@@ -181,10 +181,10 @@ class TabularDataset:
         gen_input = []
 
         for key, value in t.headers.items():
-            gen_input.append(f"<{key}> {value}")
+            gen_input.append(f"[{key}] {value}")
 
         for c in cells:
-            gen_input.append("<cell> " + c.value)
+            gen_input.append("[cell] " + c.value)
 
         return " ".join(gen_input)
 
@@ -263,7 +263,7 @@ class TabularDataset:
 
             meta_tbodies = [h("tr")(tds) for tds in meta_trs]
             meta_tbody_el = h("tbody")(meta_tbodies)
-            meta_table_el = h("table", klass="table table-sm table-bordered meta-table")(meta_tbody_el)
+            meta_table_el = h("table", klass="table table-sm caption-top meta-table")(h("caption")("properties"),meta_tbody_el)
             
             # meta_table_el = h("div")(h("h5")("Meta"), meta_table_el)
         else: 
@@ -289,7 +289,7 @@ class TabularDataset:
 
         tbodies = [h("tr")(tds) for tds in trs]
         tbody_el = h("tbody")(tbodies)
-        table_el = h("table", klass="table table-sm table-bordered main-table")(tbody_el)
+        table_el = h("table", klass="table table-sm table-bordered caption-top main-table")(h("caption")("data"), tbody_el)
         # table_el = h("div")(h("h5")("Data"), table_el)
         area_el = h("div")(meta_table_el, table_el)
 

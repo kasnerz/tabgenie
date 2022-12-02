@@ -1,7 +1,7 @@
 body {
     color: #3c4149;
     /* max-width: 1200px; */
-    margin: 20px auto;
+    /* margin: 20px auto; */
     padding: 0 10px;
     /* font: 18px/1.4 'Open Sans', sans-serif;
     color: #495057;
@@ -29,8 +29,8 @@ pre {
 .txt-placeholder {
     background: #ffffff;
     border: 1px solid #ddd;
-    border-left: 3px solid #2E96D0;
-    color: #666;
+    /* border-left: 3px solid #2e2e2e; */
+    /* color: #666; */
     page-break-inside: avoid;
     font-family: monospace;
     font-size: 13px;
@@ -166,9 +166,9 @@ pre {
 
 }
 
-.topnavs {
+/* .topnavs {
     margin-bottom: 20px;
-}
+} */
 
 #outputarea {
     margin-top: 10px;
@@ -179,11 +179,28 @@ pre {
 }
 
 #page-input {
-    height: 38px;
-    margin-left: 2px;
-    margin-right: 2px;
-    width: 90px;
+    height: 30px;
+    /* margin-left: 2px;
+    margin-right: 2px; */
+    width: 80px;
 }
+
+.pagination {
+    line-height: 15px;
+}
+
+.navbar-brand {
+    padding-left: 20px;
+}
+
+.pagination-buttons {
+    font-size: 14px;
+    padding-left: 20px;
+}
+
+/* .page-item {
+    height: 16px;
+} */
 
 .nav-pills .nav-link.active,
 .nav-pills .show>.nav-link {
@@ -223,16 +240,16 @@ pre {
 
 
 .meta-table {
-    font-family: monospace;
-    color: rgb(110, 110, 110) !important;
+    /* font-family: "IBM Plex Mono" !important; */
+    color: rgb(17, 24, 39) !important;
     font-size: 14px !important;
     /* background-color: #efefef75; */
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     overflow: auto;
 }
 
 .meta-table th {
-    color: rgb(110, 110, 110) !important;
+    /* color: rgb(110, 110, 110) !important; */
 }
 
 .main-table {
@@ -240,13 +257,55 @@ pre {
     /* border: solid 1px; */
     /* border-radius: 6px; */
     /* overflow: hidden; */
-    font-family: monospace;
-    color: #3c4149 !important;
+    /* font-family: "IBM Plex Mono" !important; */
+    color: rgb(17, 24, 39) !important;
     font-size: 14px !important;
 }
 
+.font-mono {
+    font-family: "IBM Plex Mono" !important;
+}
 
 #rightpanel {
     /* background-color: #f4f4f4; */
+
+}
+
+.form-check-input:checked {
+    background-color: #0175ac;
+    border-color: #0175ac;
+}
+
+
+
+/* 
+.navbar .navbar-nav {
+    display: inline-block;
+    float: none;
+    vertical-align: top;
+}
+
+.navbar .navbar-collapse {
+    text-align: center;
+} */
+/* 
+.navbar>.container,
+.navbar>.container-fluid {
+    display: inherit;
+}
+
+.navbar-brand {
+    text-align: left;
+} */
+
+.navblock {
+    display: inline-flex;
+    align-items: center;
+}
+
+.navblock dl,
+ol,
+ul {
+    margin-bottom: 0;
 
 }

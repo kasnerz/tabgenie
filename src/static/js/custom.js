@@ -2,9 +2,13 @@ var table_idx = 0;
 var total_examples = 1;
 var dataset = window.default_dataset;
 var mode = window.mode;
+var url_prefix = window.location.href.split('#')[0];
 var split = "dev";
 var splitInstance = Split(['#centerpanel', '#rightpanel'], { sizes: [70, 30], gutterSize: 1 });
 
+function randint(max) {
+  return Math.floor(Math.random() * max);
+}
 
 function mod(n, m) {
   return ((n % m) + m) % m;
@@ -16,6 +20,18 @@ function nextbtn() {
 
 function prevbtn() {
   gotopage(table_idx - 1);
+}
+
+function startbtn() {
+  gotopage(0);
+}
+
+function endbtn() {
+  gotopage(total_examples - 1);
+}
+
+function randombtn() {
+  gotopage(randint(total_examples - 1));
 }
 
 function gotobtn() {
@@ -50,7 +66,7 @@ function get_highlighted_cells() {
 function load_model() {
   $.ajax({
     type: "GET",
-    url: `${window.url_prefix}/load_model`,
+    url: `${url_prefix}/load_model`,
     data: {
       "model": "totto"
     },
@@ -81,7 +97,7 @@ function generate() {
   $.ajax({
     type: "POST",
     contentType: "application/json; charset=utf-8",
-    url: `${window.url_prefix}/generate`,
+    url: `${url_prefix}/generate`,
     data: JSON.stringify(request),
     success: function (data) {
       output = data["out"];
@@ -113,7 +129,7 @@ function generate() {
 //     }
 //   };
 //   // Post data to URL which handles post request
-//   xhttp.open("POST", `${window.url_prefix}/${url}`);
+//   xhttp.open("POST", `${url_prefix}/${url}`);
 //   xhttp.setRequestHeader("Content-Type", "application/json");
 //   // You should set responseType as blob for binary responses
 //   xhttp.responseType = 'blob';
@@ -149,7 +165,7 @@ function parse_info(info) {
 function fetch_table(dataset, split, table_idx, export_format) {
   var export_format = $("#format-select").val();
 
-  $.get(`${window.url_prefix}/table`, {
+  $.get(`${url_prefix}/table`, {
     "dataset": dataset,
     "table_idx": table_idx,
     "split": split,
