@@ -248,7 +248,8 @@ ul {
 }
 
 .pipelines-block {
-    font-size: smaller;
-    padding-top: 10px;
-    padding-left: 3px;
+    border-radius: 5%;
+    border: 1px solid #ddd;
+    font-size: small;
+    padding: 10px;
 }

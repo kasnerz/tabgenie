@@ -24,78 +24,13 @@ def success():
     return resp
 
 
-# @app.route("/load_model", methods=["GET", "POST"])
-# def load_model():
-#     model_name = request.args.get("model")
-
-#     logger.info(f"Loading model {model_name}")
-#     m = Model()
-#     m.load(exp_dir=app.config["exp_dir"], experiment=model_name)
-#     app.config["model"] = m
-#     return success()
-
-
-# @app.route("/generate", methods=["GET", "POST"])
-# def generate():
-#     content = request.json
-#     logger.info(f"Incoming content: {content}")
-#     m = app.config["model"]
-
-#     dataset_name = content["dataset"]
-#     split = content["split"]
-#     table_idx = content["table_idx"]
-#     cell_ids = content["cells"]
-
-#     dataset = get_dataset(dataset_name, split)
-#     gen_input = dataset.get_generation_input(
-#         split=split, table_idx=table_idx, cell_ids=cell_ids
-#     )
-
-#     logger.info(f"Input: {gen_input}")
-#     out = m.generate(gen_input)
-
-#     return {"out": out}
-
-
-# @app.route('/export', methods=['GET', 'POST'])
-# def export():
-#     content = request.json
-#     dataset_name = content["dataset"]
-#     split = content["split"]
-#     table_idx = content["table_idx"]
-
-#     src_dir = os.path.dirname(os.path.abspath(__file__))
-#     files_dir = os.path.join(src_dir, os.pardir, 'files')
-#     os.makedirs(files_dir, exist_ok=True)
-
-#     file_to_download = os.path.join(files_dir, "export.json")
-#     dataset = get_dataset(dataset_name, split)
-#     export_content = dataset.export(split, [table_idx], export_format="linearize")
-
-#     with open(file_to_download, "w") as f:
-#         json.dump(dict(export_content), f)
-
-#     logger.info("Sending file")
-#     return send_file(file_to_download,
-#                     mimetype='text/json',
-#                     download_name='export.json',
-#                     as_attachment=True)
-
 @app.route("/pipeline", methods=["GET", "POST"])
-def run_pipeline():
+def get_pipeline_output():
     content = request.json
     logger.info(f"Incoming content: {content}")
 
     pipeline_name = content["pipeline"]
-    pipeline = get_pipeline(pipeline_name)
-    
-    dataset = get_dataset(dataset_name=content["dataset"], split=content["split"])
-
-    inp = {
-        "dataset": dataset,
-        "content" : content
-    }
-    out = pipeline.run(inp)
+    out = run_pipeline(pipeline_name, content)
 
     return {"out": out}
 
@@ -105,9 +40,30 @@ def render_table():
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")
     table_idx = int(request.args.get("table_idx"))
-    # export_format = request.args.get("export_format")
+    pipelines = json.loads(request.args.get("pipelines"))
 
-    return get_table_data(dataset_name, split, table_idx)
+    table_data = get_table_data(dataset_name, split, table_idx)
+    table_data["pipeline_outputs"] = []
+
+    for pipeline, attrs in pipelines.items():
+        if not attrs["active"]:
+            continue
+
+        content = {
+            "dataset_obj" : get_dataset(dataset_name, split),
+            "dataset": dataset_name,
+            "table_idx": table_idx,
+            "split": split,
+        }
+        out = run_pipeline(pipeline, content, cache_only=True)
+
+        if out:
+            table_data["pipeline_outputs"].append({
+                "pipeline_name" : pipeline,
+                "out": out
+            })
+
+    return table_data
 
 
 def initialize_dataset(dataset_name):
@@ -155,9 +111,17 @@ def get_table_data(dataset_name, split, index):
     html = dataset.get_table_html(split=split, index=index)
     ref = dataset.get_reference(split=split, index=index)
     dataset_info = dataset.get_info()
-    # export = dataset.export(split=split, table_idxs=[index], export_format=export_format)
 
     return {"html": html, "ref": ref, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info}
+
+
+def run_pipeline(pipeline_name, content, cache_only=False):
+    pipeline = get_pipeline(pipeline_name)
+    dataset_obj = get_dataset(dataset_name=content["dataset"], split=content["split"])
+
+    content["dataset_obj"] = dataset_obj
+    out = pipeline.run(content, cache_only)
+    return out
 
 
 @app.route("/", methods=["GET", "POST"])

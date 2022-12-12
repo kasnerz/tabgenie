@@ -48,6 +48,12 @@ function gotopage(page) {
   $("#page-input").val(table_idx);
 }
 
+function format_info(info) {
+  return ("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
+    "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +
+    "<h5>Citation:</h5><p><code>" + info.citation + "</code></p>")
+}
+
 function get_highlighted_cells() {
   var activeCells = $("#tablearea").find(".table-active").map(
     function () {
@@ -81,6 +87,43 @@ function get_highlighted_cells() {
 //   })
 // }
 
+function is_pipeline_active(pipeline) {
+  return $(`#out-${pipeline}`).length > 0;
+}
+
+function has_pipeline_content(pipeline) {
+  return get_pipeline_placeholder(pipeline).text() !== "";
+}
+
+function get_pipeline_placeholder(pipeline) {
+  if (!is_pipeline_active(pipeline)) {
+    $("#outputarea").append(`<div class="pipeline-output" id="out-${pipeline}">
+    <label>${pipeline}</label>
+    <div id="out-${pipeline}-placeholder" class="font-mono"></div>
+    </div>`);
+  }
+  return $(`#out-${pipeline}-placeholder`);
+}
+
+function remove_pipeline_placeholder(pipeline) {
+  $(`#out-${pipeline}`).remove();
+}
+function set_pipeline_output(pipeline, output) {
+  var placeholder = get_pipeline_placeholder(pipeline);
+  placeholder.html(output);
+}
+function erase_pipeline_output(pipeline) {
+  if (is_pipeline_active(pipeline)) {
+    set_pipeline_output(pipeline, "");
+  }
+}
+
+function reset_pipeline_outputs() {
+  for (var pipeline in pipelines) {
+    erase_pipeline_output(pipeline);
+  }
+}
+
 function run_pipeline(pipeline) {
   cells = get_highlighted_cells();
   dataset = $('#dataset-select').val();
@@ -89,7 +132,6 @@ function run_pipeline(pipeline) {
   var payload = {
     "cells": cells,
   };
-
   var request = {
     "pipeline": pipeline,
     "dataset": dataset,
@@ -105,50 +147,26 @@ function run_pipeline(pipeline) {
     data: JSON.stringify(request),
     success: function (data) {
       output = data["out"];
-
-      $("#dataset-spinner").hide();
-
-      if ($(`#out-${pipeline}`).length) {
-        $(`#out-${pipeline}-placeholder`).html(output);
-      } else {
-        $("#outputarea").append(`<div class="pipeline-output" id="out-${pipeline}">
-            <label>${pipeline}</label>
-            <div id="out-${pipeline}-placeholder" class="font-mono">${output}</div>
-        </div>`);
-      }
-      // $("#outputarea").show();
-      // $("#gen-btn").html("Generate");
-      // $("#gen-btn").removeClass('disabled');
+      // $("#dataset-spinner").hide();
+      set_pipeline_output(pipeline, output);
     },
     dataType: "json"
   });
 }
 
-$('.pipeline-checkbox').on('change', function () {
-  pipeline_name = $(this)[0].id;
-  var pipeline_name = $(`label[for='${pipeline_name}']`).text();
-  pipelines['translate'].active = !pipelines['translate'].active;
-});
-
-function parse_info(info) {
-  return ("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
-    "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +
-    "<h5>Citation:</h5><p><code>" + info.citation + "</code></p>")
-}
 
 function fetch_table(dataset, split, table_idx, export_format) {
-  var export_format = $("#format-select").val();
-
   $.get(`${url_prefix}/table`, {
     "dataset": dataset,
     "table_idx": table_idx,
     "split": split,
-    "export_format": export_format
+    "pipelines": JSON.stringify(pipelines)
   }, function (data) {
+    reset_pipeline_outputs();
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
     total_examples = data.total_examples;
-    info = parse_info(data.dataset_info);
+    info = format_info(data.dataset_info);
 
     ["th", "td"].forEach(
       function (celltype) {
@@ -163,16 +181,32 @@ function fetch_table(dataset, split, table_idx, export_format) {
     );
     $("#dataset-info").html(info);
 
+    for (var pipeline_out of data.pipeline_outputs) {
+      set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
+    }
+
     for (var pipeline in pipelines) {
-      if (pipelines[pipeline].active == 1) {
-        console.log("running pipeline " + pipeline);
+      if (pipelines[pipeline].active && !has_pipeline_content(pipeline)) {
         run_pipeline(pipeline);
       }
     }
-
   });
 }
 
+$('.pipeline-checkbox').on('change', function () {
+  pipeline_name = $(this)[0].id;
+  var pipeline_name = $(`label[for='${pipeline_name}']`).text();
+
+  state = pipelines[pipeline_name].active;
+
+  if (state == 1) {
+    remove_pipeline_placeholder(pipeline_name);
+    pipelines[pipeline_name].active = 0
+  } else {
+    run_pipeline(pipeline_name);
+    pipelines[pipeline_name].active = 1;
+  }
+});
 
 $('#panel-checkbox').on('change', function () {
   if ($('#rightpanel').hasClass("show")) {
@@ -212,19 +246,13 @@ $("#format-select").on("change", function (e) {
 
 
 $('#page-input').keypress(function (event) {
+  // Enter = Go to page
   if (event.keyCode == 13) {
     gotobtn();
   }
 });
 
-
 $(document).ready(function () {
   $("#dataset-select").val(dataset).change();
-
-  // fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
-
-  // if (mode != "light") {
-  //   load_model();
-  // }
 });

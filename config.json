@@ -19,6 +19,7 @@
     "host_prefix": ".",
     "preload": false,
     "pipelines": [
+        "reference",
         "translate"
     ]
 }
