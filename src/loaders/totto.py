@@ -20,15 +20,15 @@ class ToTTo(HFTabularDataset):
         t = Table()
         t.ref = entry["target"]
 
-        t.headers["title"] = entry["table_page_title"]
+        t.props["title"] = entry["table_page_title"]
 
         if entry.get("table_section_text"):
-            t.headers["table_section_text"] = entry["table_section_text"]
+            t.props["table_section_text"] = entry["table_section_text"]
 
         if entry.get("table_section_title"):
-            t.headers["table_section_title"] = entry["table_section_title"]
+            t.props["table_section_title"] = entry["table_section_title"]
         
-        t.headers["url"] = entry["table_webpage_url"]
+        t.props["url"] = entry["table_webpage_url"]
 
         for i, row in enumerate(entry["table"]):
             for j, x in enumerate(row):

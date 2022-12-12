@@ -70,7 +70,7 @@ class Table:
     Table object
     """
     def __init__(self):
-        self.headers = {}
+        self.props = {}
         self.cells = []
         self.ref = None
         self.url = None
@@ -180,7 +180,7 @@ class TabularDataset:
 
         gen_input = []
 
-        for key, value in t.headers.items():
+        for key, value in t.props.items():
             gen_input.append(f"[{key}] {value}")
 
         for c in cells:
@@ -191,7 +191,7 @@ class TabularDataset:
     def _export_triples(self, split, table_idx, cell_ids):
         # default method (dataset-agnostic)
         t = self.get_table(split, table_idx)
-        title = t.headers.get("title")
+        title = t.props.get("title")
         triples = []
 
         for i, row in enumerate(t.get_cells()):
@@ -256,9 +256,9 @@ class TabularDataset:
     def get_table_html(self, split, index):
         t = self.get_table(split, index)
 
-        if t.headers:
+        if t.props:
             meta_trs = []
-            for key, value in t.headers.items():
+            for key, value in t.props.items():
                 meta_trs.append([h("th")(key), h("td")(value)])
 
             meta_tbodies = [h("tr")(tds) for tds in meta_trs]

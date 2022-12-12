@@ -2,6 +2,7 @@ var table_idx = 0;
 var total_examples = 1;
 var dataset = window.default_dataset;
 var mode = window.mode;
+var pipelines = window.pipelines;
 var url_prefix = window.location.href.split('#')[0];
 var split = "dev";
 var splitInstance = Split(['#centerpanel', '#rightpanel'], { sizes: [70, 30], gutterSize: 1 });
@@ -41,7 +42,7 @@ function gotobtn() {
 
 function gotopage(page) {
   table_idx = page;
-  table_idx = mod(table_idx, total_examples - 1);
+  table_idx = mod(table_idx, total_examples);
 
   fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
@@ -63,98 +64,71 @@ function get_highlighted_cells() {
   return activeCells;
 }
 
-function load_model() {
-  $.ajax({
-    type: "GET",
-    url: `${url_prefix}/load_model`,
-    data: {
-      "model": "totto"
-    },
-    // beforeSend: function() {
-    //     $("#gen-btn").prop('disabled', true);
-    // },
-    success: function (data) {
-      $("#gen-btn").html('Generate');
-      $("#gen-btn").removeClass('disabled');
-    }
-  })
-}
+// function load_model() {
+//   $.ajax({
+//     type: "GET",
+//     url: `${url_prefix}/load_model`,
+//     data: {
+//       "model": "totto"
+//     },
+//     // beforeSend: function() {
+//     //     $("#gen-btn").prop('disabled', true);
+//     // },
+//     success: function (data) {
+//       $("#gen-btn").html('Generate');
+//       $("#gen-btn").removeClass('disabled');
+//     }
+//   })
+// }
 
-function generate() {
-  $("#gen-btn").html("Generating...");
-  $("#gen-btn").addClass('disabled');
+function run_pipeline(pipeline) {
   cells = get_highlighted_cells();
   dataset = $('#dataset-select').val();
   split = $('#split-select').val();
 
-  var request = {
+  var payload = {
     "cells": cells,
+  };
+
+  var request = {
+    "pipeline": pipeline,
     "dataset": dataset,
     "split": split,
-    "table_idx": table_idx
+    "table_idx": table_idx,
+    "payload": payload
   };
 
   $.ajax({
     type: "POST",
     contentType: "application/json; charset=utf-8",
-    url: `${url_prefix}/generate`,
+    url: `${url_prefix}/pipeline`,
     data: JSON.stringify(request),
     success: function (data) {
       output = data["out"];
 
       $("#dataset-spinner").hide();
-      $("#model-placeholder").html("<hl>" + output + "</hl>");
+
+      if ($(`#out-${pipeline}`).length) {
+        $(`#out-${pipeline}-placeholder`).html(output);
+      } else {
+        $("#outputarea").append(`<div class="pipeline-output" id="out-${pipeline}">
+            <label>${pipeline}</label>
+            <div id="out-${pipeline}-placeholder" class="font-mono">${output}</div>
+        </div>`);
+      }
       // $("#outputarea").show();
-      $("#gen-btn").html("Generate");
-      $("#gen-btn").removeClass('disabled');
+      // $("#gen-btn").html("Generate");
+      // $("#gen-btn").removeClass('disabled');
     },
     dataType: "json"
   });
 }
 
-// function postRequestDownload(url, request) {
-//   // https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
-//   xhttp = new XMLHttpRequest();
-//   xhttp.onreadystatechange = function () {
-//     var a;
-//     if (xhttp.readyState === 4 && xhttp.status === 200) {
-//       // Trick for making downloadable link
-//       a = document.createElement('a');
-//       a.href = window.URL.createObjectURL(xhttp.response);
-//       // Give filename you wish to download
-//       a.download = "file.json";
-//       a.style.display = 'none';
-//       document.body.appendChild(a);
-//       a.click();
-//     }
-//   };
-//   // Post data to URL which handles post request
-//   xhttp.open("POST", `${url_prefix}/${url}`);
-//   xhttp.setRequestHeader("Content-Type", "application/json");
-//   // You should set responseType as blob for binary responses
-//   xhttp.responseType = 'blob';
-//   xhttp.send(JSON.stringify(request));
-// }
-
-
-function exportData() {
-  $("#exp-btn").html("Exporting...");
-  $("#exp-btn").addClass('disabled');
-  dataset = $('#dataset-select').val();
-  split = $('#split-select').val();
-
-  var request = {
-    "dataset": dataset,
-    "split": split,
-    "table_idx": table_idx
-  };
-
-  postRequestDownload("export", request);
-
-  $("#exp-btn").html("Export");
-  $("#exp-btn").removeClass('disabled');
-}
-
+$('.pipeline-checkbox').on('change', function () {
+  pipeline_name = $(this)[0].id;
+  var pipeline_name = $(`label[for='${pipeline_name}']`).text();
+  pipelines['translate'].active = !pipelines['translate'].active;
+});
 
 function parse_info(info) {
   return ("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
@@ -171,10 +145,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
     "split": split,
     "export_format": export_format
   }, function (data) {
-    $("#reference-placeholder").html(data.ref);
-    $("#reference-checkbox").prop("checked", true);
     $("#tablearea").html(data.html);
-    $("#export-placeholder").text(JSON.stringify(data.export, null, 4));
     $("#dataset-spinner").hide();
     total_examples = data.total_examples;
     info = parse_info(data.dataset_info);
@@ -191,19 +162,17 @@ function fetch_table(dataset, split, table_idx, export_format) {
       }
     );
     $("#dataset-info").html(info);
+
+    for (var pipeline in pipelines) {
+      if (pipelines[pipeline].active == 1) {
+        console.log("running pipeline " + pipeline);
+        run_pipeline(pipeline);
+      }
+    }
+
   });
-  $("#model-placeholder").html();
-  // $("#outputarea").hide();
 }
 
-
-$('#reference-checkbox').on('change', function () {
-  if (!this.checked) {
-    $("#reference-output").hide();
-  } else {
-    $("#reference-output").show();
-  }
-});
 
 $('#panel-checkbox').on('change', function () {
   if ($('#rightpanel').hasClass("show")) {
@@ -216,7 +185,6 @@ $('#panel-checkbox').on('change', function () {
     $('.gutter').show();
   }
   $('#rightpanel').collapse("toggle");
-
 });
 
 $("#dataset-select").on("change", function (e) {
@@ -238,7 +206,7 @@ $("#split-select").on("change", function (e) {
 
 $("#format-select").on("change", function (e) {
   $("#dataset-spinner").show();
-  format = $('#format-select').val();
+  console.log("on format select");
   fetch_table(dataset, split, table_idx);
 });
 
@@ -253,10 +221,10 @@ $('#page-input').keypress(function (event) {
 $(document).ready(function () {
   $("#dataset-select").val(dataset).change();
 
-  fetch_table(dataset, split, table_idx);
+  // fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
 
-  if (mode != "light") {
-    load_model();
-  }
+  // if (mode != "light") {
+  //   load_model();
+  // }
 });

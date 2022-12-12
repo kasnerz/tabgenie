@@ -44,9 +44,9 @@ class Logic2Text(HFTabularDataset):
         t = Table()
         t.ref = entry["sent"]
 
-        t.headers["title"] = entry["topic"]
-        t.headers["url"] = entry["url"]
-        t.headers["logic_str"] = entry["logic_str"]
+        t.props["title"] = entry["topic"]
+        t.props["url"] = entry["url"]
+        t.props["logic_str"] = entry["logic_str"]
 
         for j, x in enumerate(ast.literal_eval(entry["table_header"])):
             c = Cell()

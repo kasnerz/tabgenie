@@ -23,13 +23,13 @@ class SportSettBasketball(HFTabularDataset):
         ht = entry["teams"]["home"]
         vt = entry["teams"]["vis"]
 
-        t.headers["home_team_name"] = ht['name']
-        t.headers["home_team_place"] = ht['place']
-        t.headers["visiting_team_name"] = vt['name']
-        t.headers["visiting_team_place"] = vt['place']
+        t.props["home_team_name"] = ht['name']
+        t.props["home_team_place"] = ht['place']
+        t.props["visiting_team_name"] = vt['name']
+        t.props["visiting_team_place"] = vt['place']
 
         for key, val in entry["game"].items():
-            t.headers[key] = val
+            t.props[key] = val
             
         # TODO next games
 
@@ -40,6 +40,10 @@ class SportSettBasketball(HFTabularDataset):
         t.add_cell(c)
 
         c = Cell("entity")
+        c.is_col_header = True
+        t.add_cell(c)
+
+        c = Cell("period")
         c.is_col_header = True
         t.add_cell(c)
 
@@ -58,8 +62,14 @@ class SportSettBasketball(HFTabularDataset):
 
             line_score = entry["teams"][team]["line_score"]
 
+            c_game = Cell("all")
+            c_game.is_row_header = True
+            c_game.rowspan = 0
+            t.add_cell(c_game)
+
             for key in line_score.keys():
                 c_team.rowspan += 1
+                c_game.rowspan += 1
                 c = Cell(key)
                 c.is_row_header = True
                 t.add_cell(c)
@@ -75,18 +85,26 @@ class SportSettBasketball(HFTabularDataset):
             box_score = entry["teams"][team]["box_score"]
 
             for item in box_score:
-                c_team.rowspan += 1
-                c = Cell(item["name"])
-                c.is_row_header = True
-                t.add_cell(c)
+                c_player = Cell(item["name"])
+                c_player.is_row_header = True
+                c_player.rowspan = 0
+                t.add_cell(c_player)
 
-                for header in stat_headers:
-                    val = line_score[key].get(header)
+                for key in line_score.keys():
+                    c_team.rowspan += 1
+                    c_player.rowspan += 1
 
-                    c = Cell()
-                    c.value = val if val else ""
-                    t.add_cell(c)
-                t.save_row()
+                    c_period = Cell(key)
+                    c_period.is_row_header = True
+                    t.add_cell(c_period)
+
+                    for header in stat_headers:
+                        val = line_score[key].get(header)
+                        c = Cell()
+                        c.value = val if val else ""
+                        t.add_cell(c)
+
+                    t.save_row()
 
         self.tables[split][index] = t
         return t

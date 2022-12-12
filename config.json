@@ -1,6 +1,5 @@
 {
-    "mode": "light",
-    "available_datasets": [
+    "datasets": [
         "dart",
         "e2e",
         "hitab",
@@ -18,5 +17,8 @@
     "default_dataset": "totto",
     "max_examples_per_split": 100,
     "host_prefix": ".",
-    "preload": false
+    "preload": false,
+    "pipelines": [
+        "translate"
+    ]
 }

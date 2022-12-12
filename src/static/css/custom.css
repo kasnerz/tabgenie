@@ -29,8 +29,6 @@ pre {
 .txt-placeholder {
     background: #ffffff;
     border: 1px solid #ddd;
-    /* border-left: 3px solid #2e2e2e; */
-    /* color: #666; */
     page-break-inside: avoid;
     font-family: monospace;
     font-size: 13px;
@@ -58,12 +56,6 @@ pre {
     color: #3d3e3e;
 }
 
-/* .nav-link.active,
-.show>.nav-link {
-    color: #212121;
-    font-weight: bold;
-} */
-
 .selectarea {
     margin-bottom: 20px;
 }
@@ -89,7 +81,6 @@ pre {
 #leftpanel {
     padding-right: 50px;
     margin-top: 0px;
-    /* border-right: 1px dotted rgb(206, 206, 206); */
 }
 
 #tabulararea {
@@ -103,34 +94,12 @@ pre {
     margin: 0px 0px 0px 20px;
 }
 
-/* 
-#pagebox {
-    position: relative;
-    right: 100%;
-    top: 20;
-} */
-
-
-#sidepanel-content {
-    /* border-left: 1px solid #ddd; */
-    /* border-right: 1px solid #ddd; */
-    /* border-bottom: 1px solid #ddd; */
-    /* border-radius: 0px 0px 5px 5px; */
-    /* padding: 10px; */
-}
 
 #collapse-btn {
-    /* border-radius: 10px; */
     border-color: grey;
     position: fixed;
-    /* right: 100%; */
-    /* top: 0; */
     right: 0;
     top: 50%;
-    /* background-color: grey; */
-    /* border-radius: 10px; */
-    /* height: 10px; */
-    /* width: 10px; */
 }
 
 .panel-resizable {
@@ -148,16 +117,10 @@ pre {
 
 .sidepanel-panel {
     overflow: auto;
-    /* max-height: 300px; */
 }
 
 .checkboxarea {
     padding-bottom: 10px;
-    /* display: flex; */
-    /* justify-content: center; */
-    /* border-radius: 5px; */
-    /* border-top: 1px solid #b8b8b8; */
-    /* border-bottom: 1px solid #b8b8b8; */
     padding-top: 10px;
 }
 
@@ -165,10 +128,6 @@ pre {
     margin-top: 10px;
 
 }
-
-/* .topnavs {
-    margin-bottom: 20px;
-} */
 
 #outputarea {
     margin-top: 10px;
@@ -180,8 +139,6 @@ pre {
 
 #page-input {
     height: 30px;
-    /* margin-left: 2px;
-    margin-right: 2px; */
     width: 80px;
 }
 
@@ -198,18 +155,11 @@ pre {
     padding-left: 20px;
 }
 
-/* .page-item {
-    height: 16px;
-} */
-
 .nav-pills .nav-link.active,
 .nav-pills .show>.nav-link {
-    /* background-color: #3d3e3e; */
-    /* background-color: #efefef6d; */
     background-color: white;
     border-bottom: 1px solid;
     color: #3c4149;
-    /* background-color: white; */
     font-weight: bold;
     border-radius: 0px;
 }
@@ -233,70 +183,57 @@ pre {
 }
 
 .gutter.gutter-horizontal {
-    /* background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg=='); */
     background-color: #dedddd;
     cursor: col-resize;
 }
 
 
 .meta-table {
-    /* font-family: "IBM Plex Mono" !important; */
     color: rgb(17, 24, 39) !important;
     font-size: 14px !important;
-    /* background-color: #efefef75; */
     margin-bottom: 30px;
     overflow: auto;
 }
 
-.meta-table th {
-    /* color: rgb(110, 110, 110) !important; */
-}
 
 .main-table {
-    /* border-collapse: separate; */
-    /* border: solid 1px; */
-    /* border-radius: 6px; */
-    /* overflow: hidden; */
-    /* font-family: "IBM Plex Mono" !important; */
+
     color: rgb(17, 24, 39) !important;
     font-size: 14px !important;
 }
 
 .font-mono {
-    font-family: "IBM Plex Mono" !important;
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }
 
-#rightpanel {
-    /* background-color: #f4f4f4; */
-
-}
 
 .form-check-input:checked {
     background-color: #0175ac;
     border-color: #0175ac;
 }
 
-
-
-/* 
-.navbar .navbar-nav {
-    display: inline-block;
-    float: none;
-    vertical-align: top;
+.pipeline-output {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5%;
+    margin: 10px;
+    position: relative;
+    font-size: smaller;
 }
 
-.navbar .navbar-collapse {
-    text-align: center;
-} */
-/* 
-.navbar>.container,
-.navbar>.container-fluid {
-    display: inherit;
+.pipeline-output>label {
+    position: absolute;
+    font-size: smaller;
+    top: -8px;
+    left: 20px;
+    padding-left: 3px;
+    padding-right: 3px;
+    background-color: white;
 }
 
-.navbar-brand {
-    text-align: left;
-} */
+.form-switch {
+    margin-right: 50px;
+}
 
 .navblock {
     display: inline-flex;
@@ -308,4 +245,10 @@ ol,
 ul {
     margin-bottom: 0;
 
+}
+
+.pipelines-block {
+    font-size: smaller;
+    padding-top: 10px;
+    padding-left: 3px;
 }

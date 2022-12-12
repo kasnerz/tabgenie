@@ -29,7 +29,7 @@ class WikiBio(HFTabularDataset):
 
         t = Table()
         t.ref = entry["target_text"]
-        t.headers["title"] = self.normalize(entry["input_text"]["context"].rstrip("\n"))
+        t.props["title"] = self.normalize(entry["input_text"]["context"].rstrip("\n"))
         table = entry["input_text"]["table"]
 
         for key, val in zip(table["column_header"], table["content"]):
