@@ -129,15 +129,12 @@ function run_pipeline(pipeline) {
   dataset = $('#dataset-select').val();
   split = $('#split-select').val();
 
-  var payload = {
-    "cells": cells,
-  };
   var request = {
     "pipeline": pipeline,
     "dataset": dataset,
     "split": split,
     "table_idx": table_idx,
-    "payload": payload
+    "cells": cells
   };
 
   $.ajax({
@@ -152,6 +149,15 @@ function run_pipeline(pipeline) {
     },
     dataType: "json"
   });
+}
+
+function reload_pipelines() {
+  reset_pipeline_outputs();
+  for (var pipeline in pipelines) {
+    if (pipelines[pipeline].active) {
+      run_pipeline(pipeline);
+    }
+  }
 }
 
 
@@ -206,6 +212,19 @@ $('.pipeline-checkbox').on('change', function () {
     run_pipeline(pipeline_name);
     pipelines[pipeline_name].active = 1;
   }
+});
+
+$('#table-checkbox').on('change', function () {
+  if ($('#centerpanel').hasClass("show")) {
+    splitInstance.collapse(0);
+    // $('#tabulararea').css("overflow-x", "auto");
+    $('.gutter').hide();
+  } else {
+    splitInstance.setSizes([70, 30])
+    // $('#tabulararea').css("overflow-x", "scroll");
+    $('.gutter').show();
+  }
+  $('#centerpanel').collapse("toggle");
 });
 
 $('#panel-checkbox').on('change', function () {

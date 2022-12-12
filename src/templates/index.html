@@ -4,6 +4,7 @@
 <head>
   <link rel="stylesheet" media="screen" href="{{ host_prefix }}/static/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/custom.css">
+  <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/d3graphs.css">
   <link rel="shortcut icon" href="{{ host_prefix }}/static/img/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,6 +12,7 @@
   <script src="{{ host_prefix }}/static/js/popper.min.js"></script>
   <script src="{{ host_prefix }}/static/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.3.5/split.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
 </head>
 
 
@@ -47,7 +49,11 @@
         </ul>
       </div>
       <div class="navblock">
-        <div class="form-switch">
+        <div class="form-switch form-switch-table">
+          <input class="form-check-input custom-checkbox" type="checkbox" id="table-checkbox" checked>
+          <label class="form-check-label custom-control-label" for="table-checkbox">table</label>
+        </div>
+        <div class="form-switch form-switch-panel">
           <input class="form-check-input custom-checkbox" type="checkbox" id="panel-checkbox" checked>
           <label class="form-check-label custom-control-label" for="panel-checkbox">panel</label>
         </div>
@@ -90,13 +96,16 @@
                   pipeline_name }}</label>
               </div>
               {% endfor %}
+
+              <button type="button" id="gen-btn" class="btn btn-secondary btn-sm" onclick="reload_pipelines();">Reload
+                ⟳</button>
             </div>
           </div>
         </div>
 
       </div>
       <div class="split col-10">
-        <div id="centerpanel">
+        <div id="centerpanel" class="collapse show">
           <div class="tab-content">
             <div id='tabulararea' class="tab-pane sidepanel-panel active" role="tabpanel">
               <div class="d-flex align-items-center justify-content-center">
@@ -145,3 +154,4 @@
 </script>
 
 <script src="{{ host_prefix }}/static/js/custom.js"></script>
+<script src="{{ host_prefix }}/static/js/d3graphs.js"></script>

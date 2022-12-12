@@ -14,12 +14,13 @@
         "wikibio"
     ],
     "exp_dir": "/lnet/work/people/kasner/projects/ng-nlg/experiments",
-    "default_dataset": "totto",
-    "max_examples_per_split": 100,
+    "default_dataset": "webnlg",
+    "max_examples_per_split": 10000,
     "host_prefix": ".",
     "preload": false,
     "pipelines": [
         "reference",
-        "translate"
+        "model_api",
+        "graph"
     ]
 }

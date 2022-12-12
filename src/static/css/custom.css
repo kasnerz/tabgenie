@@ -231,8 +231,12 @@ pre {
     background-color: white;
 }
 
-.form-switch {
+.form-switch-panel {
     margin-right: 50px;
+}
+
+.form-switch-table {
+    margin-right: 20px;
 }
 
 .navblock {
@@ -250,6 +254,10 @@ ul {
 .pipelines-block {
     border-radius: 5%;
     border: 1px solid #ddd;
-    font-size: small;
-    padding: 10px;
+    /* font-size: small; */
+    padding: 15px;
+}
+
+#gen-btn {
+    margin-top: 10px;
 }

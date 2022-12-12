@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 
+import lxml.etree
+import lxml.html
+
+
 def get_pipeline_class_by_name(pipeline_name):
     pipeline_mapping = {
         "translate": "TranslatePipeline",
-        "reference": "ReferencePipeline"
+        "reference": "ReferencePipeline",
+        "model_local": "ModelLocalPipeline",
+        "model_api": "ModelAPIPipeline",
+        "graph" : "GraphPipeline"
     }
     pipeline_module = __import__(
         pipeline_name,
@@ -21,6 +28,12 @@ class Processor:
 
     def text2html(self, text):
         return f"<div> {text} </div>"
+
+    def html_render(self, el):
+        html = el.render()
+        return lxml.etree.tostring(
+            lxml.html.fromstring(html), encoding="unicode", pretty_print=True
+        )
 
 
 class Pipeline:
