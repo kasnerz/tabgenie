@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class ModelAPIPipeline(Pipeline):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.processors = [LinearizeProcessor(), ModelAPIProcessor()]
+        self.processors = [LinearizeProcessor(), ModelAPIProcessor(model_url=self.cfg["model_url"])]
 
     def to_key(self, content):
         cells = content.get("cells", None)
@@ -33,13 +33,16 @@ class ModelAPIPipeline(Pipeline):
 
 class ModelAPIProcessor(Processor):
     
+    def __init__(self, model_url):
+        super().__init__()
+        self.model_url = model_url
+
     def process(self, content):
-        url = "http://dll-10gpu3.ufal.hide.ms.mff.cuni.cz:8989/generate/"
         data = {
             "input_text" : content,
             "beam_size" : 3
         }
-        res = requests.post(url, json=data)
+        res = requests.post(self.model_url.rstrip("/") + "/generate/", json=data)
 
         if res.ok:
             out = json.loads(res.text)["out"]

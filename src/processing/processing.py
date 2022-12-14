@@ -37,9 +37,10 @@ class Processor:
 
 
 class Pipeline:
-    def __init__(self):
+    def __init__(self, cfg):
         self.processors = []
         self.cache = {}
+        self.cfg = cfg
 
     def get_from_cache(self, key):
         return self.cache.get(key, None)

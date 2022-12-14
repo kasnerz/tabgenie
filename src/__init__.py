@@ -75,8 +75,11 @@ def initialize_dataset(dataset_name):
     return dataset
 
 
+
 def initialize_pipeline(pipeline_name):
-    pipeline = get_pipeline_class_by_name(pipeline_name)()
+    cfg = app.config["pipeline_cfg"].get(pipeline_name) or {}
+    
+    pipeline = get_pipeline_class_by_name(pipeline_name)(cfg=cfg)
     app.config["pipelines_obj"][pipeline_name] = pipeline
 
     return pipeline
