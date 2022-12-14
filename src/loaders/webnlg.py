@@ -16,6 +16,19 @@ class WebNLG(HFTabularDataset):
         self.hf_extra_config = "en"
         self.name = "WebNLG"
 
+    def _export_triples(self, split, table_idx, cell_ids):
+        table = self.get_table(split, table_idx)
+        triples = []
+        rows = table.get_cells()[1:] # skip headers
+
+        for row in rows:
+            triples.append([x.value for x in row])
+        
+        assert all(len(triple) == 3 for triple in triples)
+
+        return triples
+
+
     def prepare_table(self, split, index):
         entry = self.data[split][index]
         t = Table()

@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 import logging
-import numpy as np
 import os
-import torch
 import json
-import pytorch_lightning as pl
-from nlg.inference import Seq2SeqInferenceModule
 
 from .processing import Processor, Pipeline
 from .linearize import LinearizeProcessor

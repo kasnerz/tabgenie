@@ -2,7 +2,7 @@
 
 import os
 import requests
-import json
+import pyjson5 as json
 import logging
 import argparse
 from .loaders.data import get_dataset_class_by_name

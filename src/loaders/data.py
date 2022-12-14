@@ -220,9 +220,7 @@ class TabularDataset:
         return triples
 
 
-    def export_table(self, split, table_idx, export_format):
-        cell_ids = None # TODO implement
-
+    def export_table(self, split, table_idx, cell_ids, export_format):
         if export_format == "linearize":
             inp = self._export_linear(split, table_idx, cell_ids)
         elif export_format == "triples":
@@ -240,8 +238,8 @@ class TabularDataset:
         #     "out" : out
         # }
     
-    def export(self, split, table_idxs=None, export_format="linearize"):
-        return self.export_table(split, table_idxs[0], export_format)
+    # def export(self, split, table_idxs=None, export_format="linearize"):
+    #     return self.export_table(split, table_idxs[0], export_format)
         # data = {"data" : []}
 
         # if table_idxs is None:
