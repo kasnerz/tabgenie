@@ -44,5 +44,4 @@ class WikiBio(HFTabularDataset):
 
             t.save_row()
 
-        self.tables[split][index] = t
         return t

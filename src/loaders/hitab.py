@@ -50,7 +50,6 @@ class HiTab(HFTabularDataset):
                     else:
                         t.get_cell(i, j).is_dummy = True
 
-        self.tables[split][index] = t
         return t
 
    

@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 import logging
-import os
 import json
 
-from .processing import Processor, Pipeline
-from .linearize import LinearizeProcessor
-
+from ..processing import Processor
 from tinyhtml import h
 import requests
 
@@ -15,20 +12,6 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 logger = logging.getLogger(__name__)
-
-class ModelAPIPipeline(Pipeline):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.processors = [LinearizeProcessor(), ModelAPIProcessor(model_url=self.cfg["model_url"])]
-
-    def to_key(self, content):
-        cells = content.get("cells", None)
-
-        if cells:
-            cells = str(set(cells))
-
-        key = (content["dataset"], content["split"], content["table_idx"], cells)
-        return key
 
 
 class ModelAPIProcessor(Processor):

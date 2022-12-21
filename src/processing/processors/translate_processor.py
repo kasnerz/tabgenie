@@ -1,13 +1,7 @@
-from .processing import Processor, Pipeline
-from tinyhtml import h
+#!/usr/bin/env python3
+
+from ..processing import Processor
 import requests
-
-class TranslatePipeline(Pipeline):
-    # example pipeline demonstrating pipeline capabilities
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.processors = [TranslateProcessor()]
-
 
 
 class TranslateProcessor(Processor):

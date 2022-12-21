@@ -251,7 +251,8 @@ ul {
 
 }
 
-.pipelines-block {
+.pipelines-block,
+.export-block {
     border-radius: 5%;
     border: 1px solid #ddd;
     /* font-size: small; */

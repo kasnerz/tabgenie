@@ -65,5 +65,4 @@ class Logic2Text(HFTabularDataset):
 
             t.save_row()
 
-        self.tables[split][index] = t
         return t

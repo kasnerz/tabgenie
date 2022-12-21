@@ -106,6 +106,5 @@ class SportSettBasketball(HFTabularDataset):
 
                     t.save_row()
 
-        self.tables[split][index] = t
         return t
 

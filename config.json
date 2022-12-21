@@ -13,7 +13,6 @@
         "webnlg",
         "wikibio"
     ],
-    "exp_dir": "/lnet/work/people/kasner/projects/ng-nlg/experiments",
     "default_dataset": "webnlg",
     "max_examples_per_split": 10000,
     "host_prefix": ".",
@@ -22,10 +21,11 @@
         "reference",
         "model_api",
         "graph"
+        // "text_ie"
     ],
     "pipeline_cfg": {
         "model_api": {
-            "model_url": "http://dll-10gpu3.ufal.hide.ms.mff.cuni.cz:8989/"
+            "model_url": "http://dll-10gpu3.ufal.hide.ms.mff.cuni.cz:8980/"
         }
     }
 }

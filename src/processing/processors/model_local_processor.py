@@ -3,14 +3,9 @@ import logging
 import numpy as np
 import os
 import torch
-import pytorch_lightning as pl
 from nlg.inference import Seq2SeqInferenceModule
 
-from .processing import Processor, Pipeline
-from .linearize import LinearizeProcessor
-
-from tinyhtml import h
-import requests
+from ..processing import Processor
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -22,13 +17,6 @@ logger = logging.getLogger(__name__)
 class Dict2Obj:
     def __init__(self, entries):
         self.__dict__.update(entries)
-
-
-class ModelLocalPipeline(Pipeline):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.processors = [LinearizeProcessor(), ModelLocalProcessor()]
-
 
 class ModelLocalProcessor(Processor):
     def __init__(self, *args, **kwargs):

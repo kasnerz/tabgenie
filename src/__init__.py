@@ -66,6 +66,31 @@ def render_table():
     return table_data
 
 
+@app.route('/export_table', methods=['GET', 'POST'])
+def export_table():
+    content = request.json
+    dataset_name = content["dataset"]
+    split = content["split"]
+    table_idx = content["table_idx"]
+    export_format = content["format"]
+
+    src_dir = os.path.dirname(os.path.abspath(__file__))
+    files_dir = os.path.join(src_dir, os.pardir, 'files')
+    os.makedirs(files_dir, exist_ok=True)
+
+    file_to_download = os.path.join(files_dir, "export")
+    dataset = get_dataset(dataset_name, split)
+
+    dataset.export_table(split, table_idx, export_format=export_format, to_file=file_to_download)
+
+    logger.info("Sending file")
+    return send_file(file_to_download,
+                    mimetype='text/plain',
+                    # download_name='export.json',
+                    as_attachment=True)
+
+
+
 def initialize_dataset(dataset_name):
     # dataset_path = app.config["dataset_paths"][dataset_name]
     dataset_path = None # not needed for HF

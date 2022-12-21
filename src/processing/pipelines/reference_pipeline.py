@@ -1,6 +1,7 @@
-from .processing import Processor, Pipeline
-from tinyhtml import h
-import requests
+#!/usr/bin/env python3
+
+from ..processing import Pipeline
+from ..processors.reference_processor import ReferenceProcessor
 
 class ReferencePipeline(Pipeline):
     def __init__(self, *args, **kwargs):
@@ -15,9 +16,3 @@ class ReferencePipeline(Pipeline):
 
         out = next_inp
         return out
-
-
-class ReferenceProcessor(Processor):
-    def process(self, content):
-        table = content["dataset_obj"].get_table(split=content["split"], index=content["table_idx"])
-        return self.text2html(table.ref)

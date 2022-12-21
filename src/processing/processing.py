@@ -10,10 +10,11 @@ def get_pipeline_class_by_name(pipeline_name):
         "reference": "ReferencePipeline",
         "model_local": "ModelLocalPipeline",
         "model_api": "ModelAPIPipeline",
-        "graph" : "GraphPipeline"
+        "graph" : "GraphPipeline",
+        "text_ie" : "TextIEPipeline"
     }
     pipeline_module = __import__(
-        pipeline_name,
+        "pipelines." + pipeline_name + "_pipeline",
         globals=globals(),
         fromlist=[pipeline_mapping[pipeline_name]],
         level=1,

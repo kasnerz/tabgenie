@@ -161,6 +161,7 @@ class TabularDataset:
 
         if not table:
             table = self.prepare_table(split, index)
+            self.tables[split][index] = table
 
         return table
 
@@ -220,53 +221,53 @@ class TabularDataset:
         return triples
 
 
-    def export_table(self, split, table_idx, cell_ids, export_format):
+    def export_table(self, split, table_idx, export_format, cell_ids=None, to_file=None):
         if export_format == "linearize":
             inp = self._export_linear(split, table_idx, cell_ids)
+            # TODO to_file
         elif export_format == "triples":
             inp = self._export_triples(split, table_idx, cell_ids)
+            # TODO to_file
         elif export_format == "html":
             inp = self.get_table_html(split, table_idx)
+            
+            if to_file is not None:
+                with open(to_file, "w") as f:
+                    f.write(inp)
+
+        elif export_format == "csv":
+            inp = self.get_table_df(split, table_idx)
+
+            if to_file is not None:
+                inp.to_csv(to_file, index=False)
+
+        elif export_format == "xlsx":
+            inp = self.get_table_df(split, table_idx)
+
+            if to_file is not None:
+                inp.to_excel(to_file, index=False, engine="xlsxwriter") 
         else:
             raise NotImplementedError(export_format)
 
         return inp
-        # out = self.get_table(split, table_idx).ref
 
-        # return {
-        #     "in" : inp,
-        #     "out" : out
-        # }
     
-    # def export(self, split, table_idxs=None, export_format="linearize"):
-    #     return self.export_table(split, table_idxs[0], export_format)
-        # data = {"data" : []}
+    # def export(self, split, table_idxs=None, export_format="linearize", to_file=None):
+    #     # TODO multiple tables
+    #     export_table = self.export_table(split, table_idxs[0], export_format=export_format, to_file=to_file)
 
-        # if table_idxs is None:
-        #     table_idxs = range(len(self.tables))
-        
-        # for table_idx in table_idxs:
-        #     example = self.export_table(split, table_idx, export_format)
-        #     data["data"].append(example)
+    #     return export_table
 
-        # return data
 
-    def get_table_html(self, split, index):
+    def get_table_df(self, split, index):
         t = self.get_table(split, index)
+        table_el = self._get_main_table_html(t)
+        table_html = table_el.render()
+        df = pd.read_html(table_html)[0]
+        return df
 
-        if t.props:
-            meta_trs = []
-            for key, value in t.props.items():
-                meta_trs.append([h("th")(key), h("td")(value)])
 
-            meta_tbodies = [h("tr")(tds) for tds in meta_trs]
-            meta_tbody_el = h("tbody")(meta_tbodies)
-            meta_table_el = h("table", klass="table table-sm caption-top meta-table")(h("caption")("properties"),meta_tbody_el)
-            
-            # meta_table_el = h("div")(h("h5")("Meta"), meta_table_el)
-        else: 
-            meta_table_el = None
-
+    def _get_main_table_html(self, t):
         trs = []
         for row in t.cells:
             tds = []
@@ -288,6 +289,27 @@ class TabularDataset:
         tbodies = [h("tr")(tds) for tds in trs]
         tbody_el = h("tbody")(tbodies)
         table_el = h("table", klass="table table-sm table-bordered caption-top main-table")(h("caption")("data"), tbody_el)
+
+        return table_el
+
+
+    def get_table_html(self, split, index):
+        t = self.get_table(split, index)
+
+        if t.props:
+            meta_trs = []
+            for key, value in t.props.items():
+                meta_trs.append([h("th")(key), h("td")(value)])
+
+            meta_tbodies = [h("tr")(tds) for tds in meta_trs]
+            meta_tbody_el = h("tbody")(meta_tbodies)
+            meta_table_el = h("table", klass="table table-sm caption-top meta-table")(h("caption")("properties"),meta_tbody_el)
+            
+            # meta_table_el = h("div")(h("h5")("Meta"), meta_table_el)
+        else: 
+            meta_table_el = None
+
+        table_el = self._get_main_table_html(t)
         # table_el = h("div")(h("h5")("Data"), table_el)
         area_el = h("div")(meta_table_el, table_el)
 
@@ -295,6 +317,39 @@ class TabularDataset:
         return lxml.etree.tostring(
             lxml.html.fromstring(html), encoding="unicode", pretty_print=True
         )
+
+
+class FactualTabularDataset(TabularDataset):
+    # TODO finalize
+    def _export_triples(self, split, table_idx, cell_ids):
+        t = self.get_table(split, table_idx)
+        title = t.props.get("title")
+        triples = []
+
+        for i, row in enumerate(t.get_cells()):
+            for j, cell in enumerate(row):
+                if cell.is_header():
+                    continue
+                
+                row_headers = t.get_row_headers(i)
+                col_headers = t.get_col_headers(j)
+
+                if row_headers and col_headers:
+                    subj = row_headers[0].value
+                    pred = col_headers[0].value
+
+                elif row_headers and not col_headers:
+                    subj = title
+                    pred = row_headers[0].value
+                
+                elif col_headers and not row_headers:
+                    subj = title
+                    pred = col_headers[0].value
+
+                obj = cell.value
+                triples.append([subj, pred, obj])
+
+        return triples
 
 
 class HFTabularDataset(TabularDataset):

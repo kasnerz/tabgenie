@@ -152,6 +152,51 @@ function reload_pipelines() {
   }
 }
 
+function postRequestDownload(url, request, filename) {
+  // https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
+  xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function () {
+    var a;
+    if (xhttp.readyState === 4 && xhttp.status === 200) {
+      // Trick for making downloadable link
+      a = document.createElement('a');
+      a.href = window.URL.createObjectURL(xhttp.response);
+      // Give filename you wish to download
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+    }
+  };
+  // Post data to URL which handles post request
+  xhttp.open("POST", `${window.url_prefix}/${url}`);
+  xhttp.setRequestHeader("Content-Type", "application/json");
+  // You should set responseType as blob for binary responses
+  xhttp.responseType = 'blob';
+  xhttp.send(JSON.stringify(request));
+}
+
+
+function export_table(format) {
+  $("#exp-btn").html("Exporting...");
+  $("#exp-btn").addClass('disabled');
+  dataset = $('#dataset-select').val();
+  split = $('#split-select').val();
+
+  var request = {
+    "dataset": dataset,
+    "split": split,
+    "table_idx": table_idx,
+    "format": format
+  };
+  var filename = `${dataset}_${split}_tab_${table_idx}.${format}`;
+
+  postRequestDownload("export_table", request, filename);
+
+  $("#exp-btn").html("Export");
+  $("#exp-btn").removeClass('disabled');
+}
+
 
 function fetch_table(dataset, split, table_idx, export_format) {
   $.get(`${url_prefix}/table`, {

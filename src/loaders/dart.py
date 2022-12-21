@@ -3,6 +3,9 @@ from datasets import load_dataset
 from .data import Cell, Table, TabularDataset, HFTabularDataset
 from ..utils.text import normalize
 
+import logging 
+logger = logging.getLogger(__name__)
+
 
 class DART(HFTabularDataset):
     """
@@ -14,6 +17,19 @@ class DART(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/dart"
         self.name = "DART"
+
+    def _export_triples(self, split, table_idx, cell_ids):
+        table = self.get_table(split, table_idx)
+        triples = []
+        rows = table.get_cells()[1:] # skip headers
+
+        if any(len(x) != 3 for x in rows):
+            logger.warning(f"Some triples do not have exactly 3 components {[x.value for x in row]}")
+
+        for row in rows:
+            triples.append([x.value for x in row])
+        
+        return triples
 
     def prepare_table(self, split, index):
         entry = self.data[split][index]
@@ -35,5 +51,4 @@ class DART(HFTabularDataset):
                 t.add_cell(c)
             t.save_row()
 
-        self.tables[split][index] = t
         return t
