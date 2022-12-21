@@ -9,6 +9,8 @@ The README currently serves as developer guidelines. Note that the information m
 ## Project overview
 TabGenie is a web application for exploring and interacting with **table-to-text generation datasets** and the related **processing pipelines**.
 
+The app demo is running at https://quest.ms.mff.cuni.cz/rel2text/tabgenie.
+
 **Frontend Preview**
 
 ![preview](img/preview.png)
@@ -17,13 +19,13 @@ At the moment, the application provides access to 12 existing **datasets**. Each
 
 Each table in a dataset is displayed in a standard matrix format:
 - each table contains M rows and N columns,
-- cells may be merged and span multiple columns or rows,
+- cells may span multiple columns or rows,
 - cells may be marked as headings (indicated by bold font),
 - cells may be highlighted (indicated by yellow background).
 
-Additionally, each example may contained metadata (such as title, url, etc.) which are displayed next to the main table.
+Additionally, each example may contain metadata (such as title, url, etc.) which are displayed next to the main table as *properties*.
 
-The tables are processed with **pipelines**. The input of each pipeline is the dataset table (with all the associated meta-information) and the output is a HTML snippet. The outputs of pipelines are displayed in the right column.
+The tables are processed with **pipelines**. The input of each pipeline is the dataset table with the associated meta-information and the output is a HTML snippet. The outputs of pipelines are displayed in the right panel.
 
 ## Quickstart
 ### Requirements
@@ -76,7 +78,7 @@ The file `data.py` also contains parent classes for the datasets and auxiliary d
 
 Each dataset should contain the `prepare_table(split, index)` method which instantiates a `Table` object from the raw data saved in `self.data`.
 
-This object is automatically exported to HTML and other formats (methods can be overridden).
+The `Table` object is automatically exported to HTML and other formats (the methods may be overridden).
 
 If a dataset is an instance of `HFTabularDataset` (i.e. is loaded from Huggingface Datasets), it should contain a `self.hf_id` attribute. The attribute is used to automatically load the dataset via `datasets` package.
 
