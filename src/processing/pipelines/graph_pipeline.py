@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class GraphPipeline(Pipeline):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.processors = [TextIEProcessor(), GraphProcessor()]
+        self.processors = [TableTripleProcessor(), GraphProcessor()]
 
     def to_key(self, content):
         cells = content.get("cells", None)

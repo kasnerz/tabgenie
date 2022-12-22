@@ -19,7 +19,7 @@ class WebNLG(HFTabularDataset):
         self.hf_extra_config = "en"
         self.name = "WebNLG"
 
-    def _export_triples(self, split, table_idx, cell_ids):
+    def table_to_triples(self, split, table_idx, cell_ids):
         table = self.get_table(split, table_idx)
         triples = []
         rows = table.get_cells()[1:] # skip headers

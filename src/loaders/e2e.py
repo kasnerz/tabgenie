@@ -16,7 +16,7 @@ class E2E(HFTabularDataset):
         self.hf_id = 'GEM/e2e_nlg'
         self.name = "E2E"
 
-    def _export_triples(self, split, table_idx, cell_ids):
+    def table_to_triples(self, split, table_idx, cell_ids):
         table = self.get_table(split, table_idx)
         triples = []
         rows = table.get_cells()

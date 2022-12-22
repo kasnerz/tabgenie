@@ -136,11 +136,11 @@ def get_dataset(dataset_name, split):
 
 def get_table_data(dataset_name, split, index):
     dataset = get_dataset(dataset_name, split)
-    html = dataset.get_table_html(split=split, index=index)
-    ref = dataset.get_reference(split=split, index=index)
+    html = dataset.export_table(split=split, table_idx=index, export_format="html")
     dataset_info = dataset.get_info()
 
-    return {"html": html, "ref": ref, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info}
+    print("returning table data")
+    return {"html": html, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info}
 
 
 def run_pipeline(pipeline_name, content, cache_only=False):

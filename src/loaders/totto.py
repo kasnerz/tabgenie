@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from datasets import load_dataset
-from .data import Cell, Table, FactualTabularDataset, HFTabularDataset
+from .data import Cell, Table, HFTabularDataset
 
 
-class ToTTo(HFTabularDataset, FactualTabularDataset):
+class ToTTo(HFTabularDataset):
     """
     The ToTTo dataset: https://github.com/google-research-datasets/ToTTo
     Contains tables from English Wikipedia with highlighted cells

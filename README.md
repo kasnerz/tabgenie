@@ -115,5 +115,4 @@ The global configuration is stored in the `config.json` file. The values are ava
 - `pipelines` - pipelines which will be available in the web interface,
 - `pipeline_cfg` - pipeline-specific configurations.
 
-
-
+Note that the config file is parsed using [pyjson5](https://pypi.org/project/pyjson5/) and can thus contain comments.

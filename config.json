@@ -25,7 +25,8 @@
     ],
     "pipeline_cfg": {
         "model_api": {
-            "model_url": "http://dll-10gpu3.ufal.hide.ms.mff.cuni.cz:8980/"
+            // "model_url": "http://dll-10gpu3.ufal.hide.ms.mff.cuni.cz:8980/"
+            "model_url": "http://localhost:8980/"
         }
     }
 }

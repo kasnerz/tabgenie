@@ -18,7 +18,7 @@ class DART(HFTabularDataset):
         self.hf_id = "GEM/dart"
         self.name = "DART"
 
-    def _export_triples(self, split, table_idx, cell_ids):
+    def table_to_triples(self, split, table_idx, cell_ids):
         table = self.get_table(split, table_idx)
         triples = []
         rows = table.get_cells()[1:] # skip headers
