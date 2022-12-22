@@ -2,7 +2,6 @@
 import logging
 
 from ..processing import Pipeline
-from ..processors.text_ie_processor import TextIEProcessor
 from ..processors.graph_processor import GraphProcessor
 from ..processors.table_triple_processor import TableTripleProcessor
 
