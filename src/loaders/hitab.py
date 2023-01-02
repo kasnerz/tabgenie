@@ -23,7 +23,7 @@ class HiTab(HFTabularDataset):
     def prepare_table(self, split, index):
         t = Table()
         entry = self.data[split][index]
-        t.ref = entry["sub_sentence"]
+        t.set_generated_output("reference", entry["sub_sentence"])
         content = ast.literal_eval(entry["table_content"])
         linked_cells = self._get_linked_cells(ast.literal_eval(entry["linked_cells"]))
 

@@ -3,6 +3,7 @@ var total_examples = 1;
 var dataset = window.default_dataset;
 var mode = window.mode;
 var pipelines = window.pipelines;
+var generated_outputs = window.generated_outputs;
 var url_prefix = window.location.href.split('#')[0];
 var split = "dev";
 
@@ -57,10 +58,10 @@ function gotopage(page) {
   $("#page-input").val(table_idx);
 }
 
-function format_info(info) {
-  return ("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
+function set_dataset_info(info) {
+  $("#dataset-info").html("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
     "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +
-    "<h5>Citation:</h5><p><code>" + info.citation + "</code></p>")
+    "<h5>Citation:</h5><p><code>" + info.citation + "</code></p>");
 }
 
 function get_highlighted_cells() {
@@ -209,7 +210,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
     total_examples = data.total_examples;
-    info = format_info(data.dataset_info);
+    info = set_dataset_info(data.dataset_info);
 
     ["th", "td"].forEach(
       function (celltype) {
@@ -222,10 +223,19 @@ function fetch_table(dataset, split, table_idx, export_format) {
         $("#tablearea").addClass("interactive-cell");
       }
     );
-    $("#dataset-info").html(info);
 
     for (var pipeline_out of data.pipeline_outputs) {
       set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
+    }
+    $(".generated-out-checkbox").prop("disabled", true);
+
+    for (var generated_out of data.generated_outputs) {
+      var name = generated_out["name"];
+      $(`#pipeline-checkbox-${name}`).prop("disabled", false);
+
+      if (generated_outputs[name].active == 1) {
+        set_pipeline_output(name, generated_out["out"]);
+      }
     }
 
     for (var pipeline in pipelines) {

@@ -72,7 +72,7 @@ class Table:
     def __init__(self):
         self.props = {}
         self.cells = []
-        self.ref = None
+        self.outputs = {}
         self.url = None
         self.cell_idx = 0
         self.current_row = []
@@ -125,6 +125,15 @@ class Table:
         except Exception as e:
             logger.exception(e)
 
+    def get_generated_output(self, key):
+        return self.outputs.get(key)
+
+    def get_generated_outputs(self):
+        return [{"name" : key, "out" : val} for key, val in self.outputs.items()]
+
+    def set_generated_output(self, key, value):
+        self.outputs[key] = value
+
     def __repr__(self):
         return str(self.__dict__)
 
@@ -149,9 +158,31 @@ class TabularDataset:
         """
         raise NotImplementedError
 
+    def load_outputs(self, split, name):
+        out_fname = os.path.join("outputs", self.name.lower(), split, name + ".out")
+
+        # output does not exist for the dataset
+        if not (os.path.isfile(out_fname)):
+            logger.debug(out_fname + " does not exist")
+            return
+
+        with open(out_fname) as f:
+            outputs = f.readlines()
+
+            if len(outputs) != len(self.data[split]):
+                import pdb; pdb.set_trace();
+                raise AssertionError(f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {len(self.tables[split])}")
+
+            for o in outputs:
+                self.tables.set_output(name, o)
+
     def get_reference(self, split, index):
         t = self.get_table(split, index)
-        return t.ref
+        return t.get_output("reference")
+
+    def get_generated_outputs(self, split, index):
+        t = self.get_table(split, index)
+        return t.get_generated_outputs()
 
     def has_split(self, split):
         return bool(self.data[split])

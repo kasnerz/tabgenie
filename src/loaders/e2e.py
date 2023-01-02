@@ -61,7 +61,7 @@ class E2E(HFTabularDataset):
     def prepare_table(self, split, index):
         entry = self.data[split][index]
         t = Table()
-        t.ref = entry["target"]
+        t.set_generated_output("reference", entry["target"])
         mrs = entry["meaning_representation"].split(", ")
 
         for mr in mrs:

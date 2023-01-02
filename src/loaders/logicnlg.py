@@ -22,7 +22,7 @@ class LogicNLG(HFTabularDataset):
         entry = self.data[split][index]
         t = Table()
 
-        t.ref = entry["ref"]
+        t.set_generated_output("reference", entry["ref"])
         t.props["title"] = entry["title"]
 
         for i, row in enumerate(ast.literal_eval(entry["table"])):
