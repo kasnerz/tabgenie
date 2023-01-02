@@ -3,6 +3,7 @@ var total_examples = 1;
 var dataset = window.default_dataset;
 var mode = window.mode;
 var pipelines = window.pipelines;
+var preloaded_outputs = window.preloaded_outputs;
 var url_prefix = window.location.href.split('#')[0];
 var split = "dev";
 
@@ -226,6 +227,9 @@ function fetch_table(dataset, split, table_idx, export_format) {
 
     for (var pipeline_out of data.pipeline_outputs) {
       set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
+    }
+    for (var generated_out of data.generated_outputs) {
+      set_pipeline_output(generated_out["name"], generated_out["out"]);
     }
 
     for (var pipeline in pipelines) {

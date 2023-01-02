@@ -30,7 +30,7 @@ class SciGen(HFTabularDataset):
         t = Table()
         entry = self.data[split][index]
         caption = entry["table_caption"]
-        t.ref = caption.replace("[CONTINUE]", "\n")
+        t.set_generated_output("reference", caption.replace("[CONTINUE]", "\n"))
         
         t.props["title"] = entry["paper"]
 

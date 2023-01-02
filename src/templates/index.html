@@ -85,6 +85,20 @@
             </select>
           </div>
           <div class="selectarea">
+            <b>outputs</b>
+
+            <div class="pipelines-block">
+              {% for generated_output_name, attrs in generated_outputs.items() %}
+              <div class="form-switch">
+                <input class="form-check-input custom-checkbox pipeline-checkbox" type="checkbox"
+                  id="pipeline-checkbox-{{ generated_output_name }}" {% if attrs.active==1 %} checked {% endif %}>
+                <label class="form-check-label custom-control-label" for="pipeline-checkbox-{{ pipeline_name }}">{{
+                  generated_output_name }}</label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="selectarea">
             <b>pipelines</b>
 
             <div class="pipelines-block">
@@ -163,6 +177,7 @@
   window.url_prefix = "{{ host_prefix }}";
   window.default_dataset = "{{ default_dataset }}";
   window.pipelines = {{ pipelines | safe }};
+  window.generated_outputs = {{ generated_outputs | safe }};
 </script>
 
 <script src="{{ host_prefix }}/static/js/custom.js"></script>

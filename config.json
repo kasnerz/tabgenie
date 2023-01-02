@@ -16,16 +16,18 @@
     "default_dataset": "webnlg",
     "max_examples_per_split": 10000,
     "host_prefix": ".",
-    "preload": false,
+    "cache_dev_splits": false,
     "pipelines": [
-        "reference",
         "model_api",
         "graph"
         // "text_ie"
     ],
+    "generated_outputs": [
+        "reference"
+    ],
     "pipeline_cfg": {
         "model_api": {
-            // "model_url": "http://dll-10gpu3.ufal.hide.ms.mff.cuni.cz:8980/"
+            // "model_url": "dll-10gpu3:8980"
             "model_url": "http://localhost:8980/"
         }
     }

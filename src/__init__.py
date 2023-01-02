@@ -137,10 +137,11 @@ def get_dataset(dataset_name, split):
 def get_table_data(dataset_name, split, index):
     dataset = get_dataset(dataset_name, split)
     html = dataset.export_table(split=split, table_idx=index, export_format="html")
+    generated_outputs = dataset.get_generated_outputs(split=split, index=index)
+
     dataset_info = dataset.get_info()
 
-    print("returning table data")
-    return {"html": html, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info}
+    return {"html": html, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info, "generated_outputs" : generated_outputs}
 
 
 def run_pipeline(pipeline_name, content, cache_only=False):
@@ -161,10 +162,16 @@ def index():
         for pipeline in app.config["pipelines"]
     }
 
+    generated_outputs = {
+        generated_output : {"active" : 1}
+        for generated_output in app.config["generated_outputs"]
+    }
+
     return render_template(
         "index.html",
         datasets=app.config["datasets"],
         pipelines=pipelines,
+        generated_outputs=generated_outputs,
         default_dataset=app.config["default_dataset"],
         host_prefix=app.config["host_prefix"]
     )
@@ -180,7 +187,7 @@ def create_app(*args, **kwargs):
     app.config["pipelines_obj"] = {}
 
     # preload
-    if config["preload"]:
+    if config["cache_dev_splits"]:
         for dataset_name in app.config["datasets"]:
             get_dataset(dataset_name, "dev")
 
