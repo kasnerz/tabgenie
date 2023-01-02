@@ -18,12 +18,13 @@
     "host_prefix": ".",
     "cache_dev_splits": false,
     "pipelines": [
-        "model_api",
+        // "model_api",
         "graph"
         // "text_ie"
     ],
     "generated_outputs": [
         "reference"
+        // "zeroshot_pipeline"
     ],
     "pipeline_cfg": {
         "model_api": {

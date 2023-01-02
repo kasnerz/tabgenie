@@ -131,6 +131,9 @@ def get_dataset(dataset_name, split):
         logger.info(f"Loading {dataset_name} / {split}")
         dataset.load(split=split, max_examples=app.config["max_examples_per_split"])
 
+        for name in app.config["generated_outputs"]:
+            dataset.load_outputs(split=split, name=name)
+
     return dataset
 
 

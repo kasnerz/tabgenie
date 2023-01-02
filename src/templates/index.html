@@ -90,8 +90,9 @@
             <div class="pipelines-block">
               {% for generated_output_name, attrs in generated_outputs.items() %}
               <div class="form-switch">
-                <input class="form-check-input custom-checkbox pipeline-checkbox" type="checkbox"
-                  id="pipeline-checkbox-{{ generated_output_name }}" {% if attrs.active==1 %} checked {% endif %}>
+                <input class="form-check-input custom-checkbox pipeline-checkbox generated-out-checkbox" type="checkbox"
+                  id="pipeline-checkbox-{{ generated_output_name }}" {% if attrs.active==1 %} checked {% endif %}
+                  disabled>
                 <label class="form-check-label custom-control-label" for="pipeline-checkbox-{{ pipeline_name }}">{{
                   generated_output_name }}</label>
               </div>

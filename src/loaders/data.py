@@ -158,6 +158,24 @@ class TabularDataset:
         """
         raise NotImplementedError
 
+    def load_outputs(self, split, name):
+        out_fname = os.path.join("outputs", self.name.lower(), split, name + ".out")
+
+        # output does not exist for the dataset
+        if not (os.path.isfile(out_fname)):
+            logger.debug(out_fname + " does not exist")
+            return
+
+        with open(out_fname) as f:
+            outputs = f.readlines()
+
+            if len(outputs) != len(self.data[split]):
+                import pdb; pdb.set_trace();
+                raise AssertionError(f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {len(self.tables[split])}")
+
+            for o in outputs:
+                self.tables.set_output(name, o)
+
     def get_reference(self, split, index):
         t = self.get_table(split, index)
         return t.get_output("reference")
