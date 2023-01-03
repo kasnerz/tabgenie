@@ -262,3 +262,12 @@ ul {
 #gen-btn {
     margin-top: 10px;
 }
+
+#total-examples {
+    background-color: #F8F9FA;
+    color: grey;
+}
+
+#nav-example-cnt {
+    margin-right: 40px;
+}

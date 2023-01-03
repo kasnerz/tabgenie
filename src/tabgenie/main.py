@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 
 import os
-import click
-import requests
-import pyjson5 as json
+import pyjson5 
+import json
 import logging
-import argparse
+import yaml
 from .loaders.data import get_dataset_class_by_name
 from .processing.processing import get_pipeline_class_by_name
-from collections import defaultdict
 from flask import Flask, render_template, jsonify, request, send_file
-from flask.cli import FlaskGroup
 
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
@@ -96,6 +93,24 @@ def export_table():
                     as_attachment=True)
 
 
+def export_dataset(dataset_name, split, out_file, template_file):
+    with open(template_file) as f:
+        template = yaml.safe_load(f)
+
+    dataset_cfg = template["dataset"]
+    table_cfg = template["table"]
+    dataset_format = dataset_cfg["format"]
+
+    if dataset_format == "json":
+        os.makedirs(os.path.dirname(out_file), exist_ok=True)
+        dataset = get_dataset(dataset_name, split)
+        exported = dataset.export(split, table_cfg)
+
+        with open(out_file, "w") as f:
+            json.dump({dataset_cfg["table_key"] : exported}, f, indent=4, ensure_ascii=False)
+    else:
+        raise NotImplementedError(f"Format '{dataset_format}' is not supported")
+
 
 def initialize_dataset(dataset_name):
     # dataset_path = app.config["dataset_paths"][dataset_name]
@@ -128,6 +143,9 @@ def get_pipeline(pipeline_name):
 
 def get_dataset(dataset_name, split):
     dataset = app.config["datasets_obj"].get(dataset_name)
+    max_examples = app.config.get("max_examples_per_split", None)
+    if max_examples is not None and max_examples < 1:
+        max_examples = None
 
     if not dataset:
         logger.info(f"Initializing {dataset_name}")
@@ -135,7 +153,7 @@ def get_dataset(dataset_name, split):
 
     if not dataset.has_split(split):
         logger.info(f"Loading {dataset_name} / {split}")
-        dataset.load(split=split, max_examples=app.config["max_examples_per_split"])
+        dataset.load(split=split, max_examples=max_examples)
 
         for name in app.config["generated_outputs"]:
             dataset.load_outputs(split=split, name=name)
@@ -188,7 +206,7 @@ def index():
 
 def create_app():
     with open("config.json") as f:
-        config = json.load(f)
+        config = pyjson5.load(f)
 
     app.config.update(config)
     # app.config.from_file("config.json", load=json.load)

@@ -1,0 +1,8 @@
+---
+dataset:
+  format: json
+  table_key: data
+table:
+  fields:
+    in: linearize
+    out: reference

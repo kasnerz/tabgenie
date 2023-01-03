@@ -14,7 +14,7 @@
         "wikibio"
     ],
     "default_dataset": "webnlg",
-    "max_examples_per_split": 10000,
+    // "max_examples_per_split": 10000,
     "host_prefix": ".",
     "cache_dev_splits": false,
     "pipelines": [
