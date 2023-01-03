@@ -1,0 +1,6 @@
+[console_scripts]
+tabgenie = cli:run
+
+[flask.commands]
+export = cli:export
+

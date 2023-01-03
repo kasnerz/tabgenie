@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import click
 import requests
 import pyjson5 as json
 import logging
@@ -9,9 +10,14 @@ from .loaders.data import get_dataset_class_by_name
 from .processing.processing import get_pipeline_class_by_name
 from collections import defaultdict
 from flask import Flask, render_template, jsonify, request, send_file
+from flask.cli import FlaskGroup
 
 
-app = Flask(__name__)
+TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
+
+
+app = Flask("tabgenie", template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 
 logging.basicConfig(
     format="%(levelname)s - %(message)s", level=logging.INFO, datefmt="%H:%M:%S"
@@ -180,7 +186,7 @@ def index():
     )
 
 
-def create_app(*args, **kwargs):
+def create_app():
     with open("config.json") as f:
         config = json.load(f)
 
@@ -195,7 +201,3 @@ def create_app(*args, **kwargs):
             get_dataset(dataset_name, "dev")
 
     return app
-
-
-if __name__ == "__main__":
-    app.run()

@@ -33,17 +33,17 @@ The tables are processed with **pipelines**. The input of each pipeline is the d
 - Flask
 - HuggingFace datasets
 
-See `requirements.txt` for the full list of requirements.
+See `setup.py` for the full list of requirements.
 
 ### Local development
 ```
-pip install -r requirements.txt
-flask run
+pip install -e .
+tabgenie run
 ```
 ### Deployment
 ```
-pip install gunicorn
-gunicorn "src:create_app()" -b localhost:8989
+pip install -e .[deploy]
+gunicorn "src.tabgenie.cli:create_app()"
 ```
 
 ## Datasets
