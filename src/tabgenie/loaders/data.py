@@ -11,6 +11,7 @@ import pandas as pd
 import lxml.etree
 import lxml.html
 import glob
+import jinja2
 
 from collections import defaultdict, namedtuple
 from tinyhtml import h
@@ -178,7 +179,7 @@ class TabularDataset:
 
     def get_reference(self, split, index):
         t = self.get_table(split, index)
-        return t.get_output("reference")
+        return t.get_generated_output("reference")
 
     def get_generated_outputs(self, split, index):
         t = self.get_table(split, index)
@@ -204,33 +205,47 @@ class TabularDataset:
 
     def export_table(self, split, table_idx, export_format, cell_ids=None, to_file=None):
         if export_format == "linearize":
-            inp = self.table_to_linear(split, table_idx, cell_ids)
+            exported = self.table_to_linear(split, table_idx, cell_ids)
             # TODO to_file
         elif export_format == "triples":
-            inp = self.table_to_triples(split, table_idx, cell_ids)
+            exported = self.table_to_triples(split, table_idx, cell_ids)
             # TODO to_file
         elif export_format == "html":
-            inp = self.table_to_html(split, table_idx)
+            exported = self.table_to_html(split, table_idx)
             
             if to_file is not None:
                 with open(to_file, "w") as f:
-                    f.write(inp)
+                    f.write(exported)
                     
         elif export_format == "csv":
-            inp = self.table_to_df(split, table_idx)
+            exported = self.table_to_df(split, table_idx)
 
             if to_file is not None:
-                inp.to_csv(to_file, index=False)
+                exported.to_csv(to_file, index=False)
 
         elif export_format == "xlsx":
-            inp = self.table_to_df(split, table_idx)
+            exported = self.table_to_df(split, table_idx)
 
             if to_file is not None:
-                inp.to_excel(to_file, index=False, engine="xlsxwriter") 
+                exported.to_excel(to_file, index=False, engine="xlsxwriter")
+        elif export_format == "reference":
+            exported = self.get_reference(split, table_idx)
         else:
             raise NotImplementedError(export_format)
 
-        return inp
+        return exported
+
+
+    def export(self, split, table_cfg):
+        exported = []
+        
+        for i in range(len(self.data[split])):
+            obj = {}
+            for key, export_format in table_cfg["fields"].items():
+                obj[key] = self.export_table(split, i, export_format=export_format)                
+            exported.append(obj)
+
+        return exported
 
 
     def table_to_linear(self, split, table_idx, cell_ids):
