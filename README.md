@@ -35,15 +35,23 @@ The tables are processed with **pipelines**. The input of each pipeline is the d
 
 See `setup.py` for the full list of requirements.
 
-### Local development
+### Web app
+#### Local development
 ```
 pip install -e .
-tabgenie run
+tabgenie run [--port=PORT] [--host=HOSTNAME]
 ```
-### Deployment
+#### Deployment
 ```
 pip install -e .[deploy]
 gunicorn "src.tabgenie.cli:create_app()"
+```
+
+### CLI
+#### Dataset export
+```
+pip install -e .
+tabgenie export -d DATASET_NAME -o OUTPUT_FILE [-s SPLIT] [-t TEMPLATE]
 ```
 
 ## Datasets
