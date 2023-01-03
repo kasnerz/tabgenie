@@ -1,0 +1,9 @@
+LICENSE
+README.md
+setup.py
+src/tabgenie.egg-info/PKG-INFO
+src/tabgenie.egg-info/SOURCES.txt
+src/tabgenie.egg-info/dependency_links.txt
+src/tabgenie.egg-info/entry_points.txt
+src/tabgenie.egg-info/requires.txt
+src/tabgenie.egg-info/top_level.txt
