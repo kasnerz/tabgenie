@@ -24,7 +24,10 @@
       </a>
       <div class="navblock">
 
-        <ul class="pagination">
+        <ul class="pagination" id="nav-example-cnt">
+          <li class="page-item">
+            <a class="page-link" href="#" id="start-btn" onclick="startbtn();">«</a>
+          </li>
           <li class="page-item">
             <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">‹</a>
           </li>
@@ -32,21 +35,24 @@
             <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
           </li>
           <li class="page-item">
+            <a class="page-link" href="#" id="total-examples" style="min-height: 30px;"></a>
+          </li>
+          <li class="page-item">
             <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">›</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#" id="end-btn" onclick="endbtn();">»</a>
           </li>
         </ul>
 
-        <ul class="pagination pagination-buttons">
+        <ul class="pagination" id="nav-examples">
           <li class="page-item">
-            <a class="page-link" href="#" id="random-btn" onclick="startbtn();">start</a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" href="#" id="random-btn" onclick="randombtn();">random</a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" href="#" id="random-btn" onclick="endbtn();">end</a>
+            <a class="page-link" href="#" id="random-btn" onclick="randombtn();"><img
+                src="{{ host_prefix }}/static/img/dice.png" width="12px" /> </a>
           </li>
         </ul>
+
+
       </div>
       <div class="navblock">
         <div class="form-switch form-switch-table">
@@ -117,7 +123,7 @@
             </div>
           </div>
           <div class="selectarea">
-            <b>export</b>
+            <b>export example</b>
 
             <div class="export-block">
               <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"

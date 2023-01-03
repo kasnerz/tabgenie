@@ -143,6 +143,9 @@ def get_pipeline(pipeline_name):
 
 def get_dataset(dataset_name, split):
     dataset = app.config["datasets_obj"].get(dataset_name)
+    max_examples = app.config.get("max_examples_per_split", None)
+    if max_examples is not None and max_examples < 1:
+        max_examples = None
 
     if not dataset:
         logger.info(f"Initializing {dataset_name}")
@@ -150,7 +153,7 @@ def get_dataset(dataset_name, split):
 
     if not dataset.has_split(split):
         logger.info(f"Loading {dataset_name} / {split}")
-        dataset.load(split=split, max_examples=app.config["max_examples_per_split"])
+        dataset.load(split=split, max_examples=max_examples)
 
         for name in app.config["generated_outputs"]:
             dataset.load_outputs(split=split, name=name)

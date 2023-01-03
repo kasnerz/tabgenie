@@ -210,6 +210,8 @@ function fetch_table(dataset, split, table_idx, export_format) {
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
     total_examples = data.total_examples;
+
+    $("#total-examples").html(total_examples - 1);
     info = set_dataset_info(data.dataset_info);
 
     ["th", "td"].forEach(
