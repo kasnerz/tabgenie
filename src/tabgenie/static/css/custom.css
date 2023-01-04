@@ -111,9 +111,14 @@ pre {
     margin-bottom: 0;
 }
 
-.interactive-cell {
+.highlightable-cell {
     cursor: pointer;
 }
+
+.editable-cell {
+    cursor: text;
+}
+
 
 .sidepanel-panel {
     overflow: auto;
@@ -270,4 +275,8 @@ ul {
 
 #nav-example-cnt {
     margin-right: 40px;
+}
+
+#page-input {
+    border-radius: 0;
 }

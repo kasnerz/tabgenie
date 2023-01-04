@@ -1,11 +1,11 @@
 var table_idx = 0;
 var total_examples = 1;
 var dataset = window.default_dataset;
-var mode = window.mode;
 var pipelines = window.pipelines;
 var generated_outputs = window.generated_outputs;
 var url_prefix = window.location.href.split('#')[0];
 var split = "dev";
+var mode = "highlight";
 
 
 function update_svg_width() {
@@ -153,6 +153,33 @@ function reload_pipelines() {
   }
 }
 
+function initCellInteractivity() {
+  ["th", "td"].forEach(
+    function (celltype) {
+      var cells = $("#tablearea").find(celltype);
+      cells.off("click");
+      cells.removeAttr("contenteditable");
+
+      if (mode == "highlight") {
+        cells.removeClass("editable-cell");
+        cells.addClass("highlightable-cell");
+        cells.on("click",
+          function () {
+            $(this).toggleClass("table-active");
+          }
+        );
+      } else if (mode == "edit") {
+        cells.removeClass("highlightable-cell");
+        cells.addClass("editable-cell");
+        $(".editable-cell").attr("contenteditable", '');
+      }
+      // $("#tablearea").addClass("interactive-cell");
+    }
+  );
+  // $(".interactive-cell").css("cursor", "text");
+  // 
+}
+
 function postRequestDownload(url, request, filename) {
   // https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
   xhttp = new XMLHttpRequest();
@@ -209,22 +236,12 @@ function fetch_table(dataset, split, table_idx, export_format) {
     reset_pipeline_outputs();
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
-    total_examples = data.total_examples;
 
+    total_examples = data.total_examples;
     $("#total-examples").html(total_examples - 1);
     info = set_dataset_info(data.dataset_info);
 
-    ["th", "td"].forEach(
-      function (celltype) {
-        var cells = $("#tablearea").find(celltype);
-        cells.on("click",
-          function () {
-            $(this).toggleClass("table-active");
-          }
-        );
-        $("#tablearea").addClass("interactive-cell");
-      }
-    );
+    initCellInteractivity();
 
     for (var pipeline_out of data.pipeline_outputs) {
       set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
@@ -325,4 +342,15 @@ $('#page-input').keypress(function (event) {
 $(document).ready(function () {
   $("#dataset-select").val(dataset).change();
   $("#page-input").val(table_idx);
+});
+
+
+$("#option-edit").on("click", function (e) {
+  mode = "edit";
+  initCellInteractivity();
+});
+
+$("#option-hl").on("click", function (e) {
+  mode = "highlight";
+  initCellInteractivity();
 });

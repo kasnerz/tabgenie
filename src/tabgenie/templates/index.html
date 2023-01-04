@@ -47,8 +47,11 @@
 
         <ul class="pagination" id="nav-examples">
           <li class="page-item">
-            <a class="page-link" href="#" id="random-btn" onclick="randombtn();"><img
-                src="{{ host_prefix }}/static/img/dice.png" width="12px" /> </a>
+            <a class="page-link" href="#" id="random-btn" onclick="randombtn();">
+              <!-- <img  src="{{ host_prefix }}/static/img/dice.png" width="12px" />  -->
+              🎲
+            </a>
+
           </li>
         </ul>
 
@@ -91,6 +94,22 @@
             </select>
           </div>
           <div class="selectarea">
+            <b>mode</b>
+
+            <div class="export-block">
+              <div class="form-check">
+                <!-- <input type="radio" class="btn-check" name="options" id="option-br" autocomplete="off" checked>
+              <label class="btn btn-sm" for="option-br">Browse 📖</label> -->
+                <input type="radio" class="form-check-input" name="options-mode" id="option-hl" checked>
+                <label class="form-check-label" for="option-hl">Highlight</label>
+              </div>
+              <div class="form-check">
+                <input type="radio" class="form-check-input" name="options-mode" id="option-edit">
+                <label class="form-check-label" for="option-edit">Edit</label>
+              </div>
+            </div>
+          </div>
+          <div class="selectarea">
             <b>outputs</b>
 
             <div class="pipelines-block">
@@ -118,8 +137,9 @@
               </div>
               {% endfor %}
 
-              <button type="button" id="gen-btn" class="btn btn-secondary btn-sm" onclick="reload_pipelines();">Reload
-                ⟳</button>
+              <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
+                onclick="reload_pipelines();">Run
+                🏃</button>
             </div>
           </div>
           <div class="selectarea">
