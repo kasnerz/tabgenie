@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-import pyjson5 
 import json
 import logging
 import yaml
@@ -231,11 +230,10 @@ def index():
 
 
 def create_app():
-    with open("config.json") as f:
-        config = pyjson5.load(f)
+    with open("config.yml") as f:
+        config = yaml.safe_load(f)
 
     app.config.update(config)
-    # app.config.from_file("config.json", load=json.load)
     app.config["datasets_obj"] = {}
     app.config["pipelines_obj"] = {}
 

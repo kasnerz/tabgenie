@@ -10,7 +10,6 @@ install_requires = [
     "requests==2.28.1",
     "datasets",
     "tinyhtml",
-    "pyjson5",
     "xlsxwriter",
 ]
 

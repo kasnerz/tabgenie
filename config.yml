@@ -1,0 +1,29 @@
+---
+datasets:
+- dart
+- e2e
+- hitab
+- charttotext-s
+- logic2text
+- logicnlg
+- numericnlg
+- scigen
+- sportsett
+- totto
+- webnlg
+- wikibio
+default_dataset: webnlg
+# max_examples_per_split: 10000
+host_prefix: "."
+cache_dev_splits: false
+pipelines:
+- model_api
+- graph
+# - text_ie
+generated_outputs:
+- reference
+# - zeroshot_pipeline
+pipeline_cfg:
+  model_api:
+    model_url: http://localhost:8980/
+    # model_url: dll-10gpu3:8980
