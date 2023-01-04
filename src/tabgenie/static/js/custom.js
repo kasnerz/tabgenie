@@ -7,6 +7,7 @@ var url_prefix = window.location.href.split('#')[0];
 var split = "dev";
 var mode = "highlight";
 var editedCells = {};
+var favourites = {};
 
 
 function update_svg_width() {
@@ -47,9 +48,52 @@ function randombtn() {
   gotopage(randint(total_examples - 1));
 }
 
+function favouritebtn() {
+  favourites[`${dataset}-${split}-${table_idx}`] = { "dataset": dataset, "split": split, "table_idx": table_idx };
+
+  update_favourite_button();
+
+  $("#favourites-area").attr("hidden", false);
+
+  var btn_remove = $("<button></button>")
+    .attr("type", "button")
+    .css("width", "0.5em !important")
+    .addClass("btn")
+    .attr("onclick", `remove_favourite('${dataset}-${split}-${table_idx}');`)
+    .text("✕");
+
+  var span_el = $("<span></span>")
+    .addClass("clickable")
+    .text(`${dataset}-${split}-${table_idx}`)
+    .attr("onclick", `gotoexample('${dataset}', '${split}', '${table_idx}');`);
+
+  span_el.append(btn_remove);
+
+  var li_el = $("<li></li>")
+    .addClass("list-group-item")
+    .attr("id", `fav-${dataset}-${split}-${table_idx}`);
+
+  li_el.append(span_el);
+
+  $("#favourites-box").append(li_el);
+}
+
+function remove_favourite(favourite) {
+  delete favourites[favourite];
+  $(`#fav-${favourite}`).remove();
+  update_favourite_button();
+}
+
 function gotobtn() {
   var n = $("#page-input").val();
   gotopage(n);
+}
+
+function gotoexample(dataset, split, table_idx) {
+  $('#dataset-select').val(dataset);
+  $('#split-select').val(split);
+  change_split();
+  gotopage(table_idx);
 }
 
 function gotopage(page) {
@@ -185,6 +229,22 @@ function init_cell_interactivity() {
   );
 }
 
+function change_dataset() {
+  $("#dataset-spinner").show();
+  dataset = $('#dataset-select').val();
+  table_idx = 0;
+  fetch_table(dataset, split, table_idx);
+  $("#page-input").val(table_idx);
+}
+
+function change_split() {
+  $("#dataset-spinner").show();
+  split = $('#split-select').val();
+  table_idx = 0;
+  fetch_table(dataset, split, table_idx);
+  $("#page-input").val(table_idx);
+}
+
 function postRequestDownload(url, request, filename) {
   // https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
   xhttp = new XMLHttpRequest();
@@ -230,6 +290,13 @@ function export_table(format) {
   $("#exp-btn").removeClass('disabled');
 }
 
+function update_favourite_button() {
+  if (`${dataset}-${split}-${table_idx}` in favourites) {
+    $("#favourite-btn").css("color", "#E1D630");
+  } else {
+    $("#favourite-btn").css("color", "grey");
+  }
+}
 
 function fetch_table(dataset, split, table_idx, export_format) {
   $.get(`${url_prefix}/table`, {
@@ -247,6 +314,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
     info = set_dataset_info(data.dataset_info);
 
     init_cell_interactivity();
+    update_favourite_button();
 
     for (var pipeline_out of data.pipeline_outputs) {
       set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
@@ -334,22 +402,9 @@ $('#panel-checkbox').on('change', function () {
   $('#rightpanel').collapse("toggle");
 });
 
-$("#dataset-select").on("change", function (e) {
-  $("#dataset-spinner").show();
-  dataset = $('#dataset-select').val();
-  table_idx = 0;
-  fetch_table(dataset, split, table_idx);
-  $("#page-input").val(table_idx);
-});
+$("#dataset-select").on("change", change_dataset);
 
-
-$("#split-select").on("change", function (e) {
-  $("#dataset-spinner").show();
-  split = $('#split-select').val();
-  table_idx = 0;
-  fetch_table(dataset, split, table_idx);
-  $("#page-input").val(table_idx);
-});
+$("#split-select").on("change", change_split);
 
 $("#format-select").on("change", function (e) {
   $("#dataset-spinner").show();
