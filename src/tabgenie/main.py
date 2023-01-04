@@ -5,6 +5,7 @@ import pyjson5
 import json
 import logging
 import yaml
+import shutil
 from .loaders.data import get_dataset_class_by_name
 from .processing.processing import get_pipeline_class_by_name
 from flask import Flask, render_template, jsonify, request, send_file
@@ -76,20 +77,45 @@ def export_table():
     split = content["split"]
     table_idx = content["table_idx"]
     export_format = content["format"]
+    export_option = content["export_option"]
+    favourites = content["favourites"]
 
     src_dir = os.path.dirname(os.path.abspath(__file__))
-    files_dir = os.path.join(src_dir, os.pardir, 'files')
-    os.makedirs(files_dir, exist_ok=True)
+    export_dir = os.path.join(src_dir, os.pardir, os.pardir, 'tmp')
 
-    file_to_download = os.path.join(files_dir, "export")
-    dataset = get_dataset(dataset_name, split)
+    if os.path.isdir(export_dir):
+        shutil.rmtree(export_dir)
 
-    dataset.export_table(split, table_idx, export_format=export_format, to_file=file_to_download)
+    os.makedirs(export_dir)
+    os.makedirs(os.path.join(export_dir, "files"))
+
+    examples_to_export = []
+    if export_option == "favourites":
+        favourites = json.loads(favourites)
+
+        for val in favourites.values():
+            examples_to_export.append((val["dataset"], val["split"], val["table_idx"]))
+    else:
+        examples_to_export.append((dataset_name, split, table_idx))
+
+    for example in examples_to_export:
+        dataset_name = example[0]
+        split = example[1]
+        table_idx = example[2]
+
+        export_file = os.path.join(export_dir, "files", f"{dataset_name}-{split}-{table_idx}.{export_format}")
+        dataset = get_dataset(dataset_name, split)
+        dataset.export_table(split, table_idx, export_format=export_format, to_file=export_file)
+
+    if export_option == "favourites":
+        file_to_download = os.path.join(export_dir, "export.zip")
+        shutil.make_archive(file_to_download.rstrip(".zip"), 'zip', os.path.join(export_dir, "files"))
+    else:
+        file_to_download = export_file
 
     logger.info("Sending file")
     return send_file(file_to_download,
                     mimetype='text/plain',
-                    # download_name='export.json',
                     as_attachment=True)
 
 

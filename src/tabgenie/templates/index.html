@@ -112,19 +112,6 @@
               <option value="train">train</option>
             </select>
           </div>
-          <!-- <div class="selectarea">
-            <b>mode</b>
-            <div class="bordered-block">
-              <div class="form-check">
-                <input type="radio" class="form-check-input" name="options-mode" id="option-hl" checked>
-                <label class="form-check-label" for="option-hl">highlight</label>
-              </div>
-              <div class="form-check">
-                <input type="radio" class="form-check-input" name="options-mode" id="option-edit">
-                <label class="form-check-label" for="option-edit">edit</label>
-              </div>
-            </div>
-          </div> -->
           <div class="selectarea">
             <b>outputs</b>
 
@@ -162,7 +149,16 @@
           <div class="selectarea">
             <b>export</b>
             <div class="bordered-block">
-              <p style="margin-bottom: -5px;"><b>table</b></p>
+              <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="options-export" value="example"
+                  id="option-export-table" checked>
+                <label class="form-check-label" for="option-export-table">example</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="options-export" value="favourites"
+                  id="option-export-favourites" disabled>
+                <label class="form-check-label" for="option-export-favourites">favourites</label>
+              </div>
 
               <div class="btn-group btn-group-sm" role="group">
                 <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"

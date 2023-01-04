@@ -60,6 +60,7 @@ function favouritebtn() {
   update_favourite_button();
 
   $("#favourites-area").attr("hidden", false);
+  $("#option-export-favourites").removeAttr("disabled");
 
   var btn_remove = $("<button></button>")
     .attr("type", "button")
@@ -88,8 +89,12 @@ function remove_favourite(favourite) {
   delete favourites[favourite];
   $(`#fav-${favourite}`).remove();
   update_favourite_button();
+
   if ($.isEmptyObject(favourites)) {
     $("#favourites-area").attr("hidden", true);
+    $("#option-export-favourites").prop("disabled", true);
+    $("#option-export-favourites").prop("checked", false);
+    $("#option-export-table").prop("checked", true);
   }
 }
 
@@ -280,18 +285,24 @@ function postRequestDownload(url, request, filename) {
 
 
 function export_table(format) {
-  $("#exp-btn").html("Exporting...");
-  $("#exp-btn").addClass('disabled');
-  dataset = $('#dataset-select').val();
-  split = $('#split-select').val();
+  var dataset = $('#dataset-select').val();
+  var split = $('#split-select').val();
+  var export_option = $('input[name="options-export"]:checked').val();
 
   var request = {
     "dataset": dataset,
     "split": split,
     "table_idx": table_idx,
-    "format": format
+    "format": format,
+    "export_option": export_option,
+    "favourites": JSON.stringify(favourites)
   };
-  var filename = `${dataset}_${split}_tab_${table_idx}.${format}`;
+
+  if (export_option == "favourites") {
+    var filename = "export.zip";
+  } else {
+    var filename = `${dataset}_${split}_tab_${table_idx}.${format}`;
+  }
 
   postRequestDownload("export_table", request, filename);
 
