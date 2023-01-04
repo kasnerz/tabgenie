@@ -6,6 +6,7 @@ var generated_outputs = window.generated_outputs;
 var url_prefix = window.location.href.split('#')[0];
 var split = "dev";
 var mode = "highlight";
+var editedCells = {};
 
 
 function update_svg_width() {
@@ -127,7 +128,8 @@ function run_pipeline(pipeline) {
     "dataset": dataset,
     "split": split,
     "table_idx": table_idx,
-    "cells": cells
+    "cells": cells,
+    "editedCells": editedCells
   };
 
   $.ajax({
@@ -172,12 +174,14 @@ function initCellInteractivity() {
         cells.removeClass("highlightable-cell");
         cells.addClass("editable-cell");
         $(".editable-cell").attr("contenteditable", '');
+        $(".editable-cell").on("input", function (e) {
+          cell_id = $(this).attr("cell-idx");
+          content = $(this).text();
+          editedCells[cell_id] = content;
+        });
       }
-      // $("#tablearea").addClass("interactive-cell");
     }
   );
-  // $(".interactive-cell").css("cursor", "text");
-  // 
 }
 
 function postRequestDownload(url, request, filename) {
