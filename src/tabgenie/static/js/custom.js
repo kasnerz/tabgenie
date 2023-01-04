@@ -1,11 +1,12 @@
 var table_idx = 0;
 var total_examples = 1;
 var dataset = window.default_dataset;
-var mode = window.mode;
 var pipelines = window.pipelines;
 var generated_outputs = window.generated_outputs;
 var url_prefix = window.location.href.split('#')[0];
 var split = "dev";
+var mode = "highlight";
+var editedCells = {};
 
 
 function update_svg_width() {
@@ -127,7 +128,8 @@ function run_pipeline(pipeline) {
     "dataset": dataset,
     "split": split,
     "table_idx": table_idx,
-    "cells": cells
+    "cells": cells,
+    "editedCells": editedCells
   };
 
   $.ajax({
@@ -137,7 +139,6 @@ function run_pipeline(pipeline) {
     data: JSON.stringify(request),
     success: function (data) {
       output = data["out"];
-      // $("#dataset-spinner").hide();
       set_pipeline_output(pipeline, output);
     },
     dataType: "json"
@@ -151,6 +152,36 @@ function reload_pipelines() {
       run_pipeline(pipeline);
     }
   }
+}
+
+function initCellInteractivity() {
+  ["th", "td"].forEach(
+    function (celltype) {
+      var cells = $("#tablearea").find(celltype);
+      cells.off("click");
+      cells.removeAttr("contenteditable");
+
+      if (mode == "highlight") {
+        cells.removeClass("editable-cell");
+        cells.addClass("highlightable-cell");
+        cells.on("click",
+          function () {
+            $(this).toggleClass("table-active");
+          }
+        );
+      } else if (mode == "edit") {
+        cells.removeClass("highlightable-cell");
+        cells.addClass("editable-cell");
+        $(".editable-cell").attr("contenteditable", '');
+        $(".editable-cell").on("input", function (e) {
+          cell_id = $(this).attr("cell-idx");
+          content = $(this).text();
+          editedCells[cell_id] = content;
+          $(this).css("font-style", "italic");
+        });
+      }
+    }
+  );
 }
 
 function postRequestDownload(url, request, filename) {
@@ -209,22 +240,12 @@ function fetch_table(dataset, split, table_idx, export_format) {
     reset_pipeline_outputs();
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
-    total_examples = data.total_examples;
 
+    total_examples = data.total_examples;
     $("#total-examples").html(total_examples - 1);
     info = set_dataset_info(data.dataset_info);
 
-    ["th", "td"].forEach(
-      function (celltype) {
-        var cells = $("#tablearea").find(celltype);
-        cells.on("click",
-          function () {
-            $(this).toggleClass("table-active");
-          }
-        );
-        $("#tablearea").addClass("interactive-cell");
-      }
-    );
+    initCellInteractivity();
 
     for (var pipeline_out of data.pipeline_outputs) {
       set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
@@ -325,4 +346,15 @@ $('#page-input').keypress(function (event) {
 $(document).ready(function () {
   $("#dataset-select").val(dataset).change();
   $("#page-input").val(table_idx);
+});
+
+
+$("#option-edit").on("click", function (e) {
+  mode = "edit";
+  initCellInteractivity();
+});
+
+$("#option-hl").on("click", function (e) {
+  mode = "highlight";
+  initCellInteractivity();
 });
