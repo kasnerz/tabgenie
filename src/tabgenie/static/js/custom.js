@@ -14,6 +14,7 @@ function update_svg_width() {
   svg.attr("width", w);
 }
 
+// the draggable divider between the main area and the right panel 
 var splitInstance = Split(['#centerpanel', '#rightpanel'], {
   sizes: [70, 30], onDragEnd: function () { update_svg_width }, gutterSize: 1
 });
@@ -99,7 +100,7 @@ function get_pipeline_placeholder(pipeline) {
   return $(`#out-${pipeline}-placeholder`);
 }
 
-function remove_pipeline_placeholder(pipeline) {
+function remove_output_placeholder(pipeline) {
   $(`#out-${pipeline}`).remove();
 }
 function set_pipeline_output(pipeline, output) {
@@ -154,7 +155,7 @@ function reload_pipelines() {
   }
 }
 
-function initCellInteractivity() {
+function init_cell_interactivity() {
   ["th", "td"].forEach(
     function (celltype) {
       var cells = $("#tablearea").find(celltype);
@@ -245,7 +246,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
     $("#total-examples").html(total_examples - 1);
     info = set_dataset_info(data.dataset_info);
 
-    initCellInteractivity();
+    init_cell_interactivity();
 
     for (var pipeline_out of data.pipeline_outputs) {
       set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
@@ -269,21 +270,41 @@ function fetch_table(dataset, split, table_idx, export_format) {
   });
 }
 
-$('.pipeline-checkbox').on('change', function () {
-  pipeline_name = $(this)[0].id;
-  var pipeline_name = $(`label[for='${pipeline_name}']`).text();
+// toggling pipelines / outputs
+$('.output-checkbox').on('change', function () {
+  output_id = $(this)[0].id;
 
-  state = pipelines[pipeline_name].active;
+  console.log($(this));
+  console.log($(this)[0]);
+  console.log($(this)[0].id);
 
-  if (state == 1) {
-    remove_pipeline_placeholder(pipeline_name);
-    pipelines[pipeline_name].active = 0
+  var output_name = $(`label[for='${output_id}']`).text();
+
+  console.log($(this));
+  if ($(this).hasClass("pipeline-checkbox")) {
+    // is a pipeline output
+    state = pipelines[output_name].active;
+
+    if (state == 1) {
+      remove_output_placeholder(output_name);
+      pipelines[output_name].active = 0;
+    } else {
+      run_pipeline(output_name);
+      pipelines[output_name].active = 1;
+    }
   } else {
-    run_pipeline(pipeline_name);
-    pipelines[pipeline_name].active = 1;
+    state = generated_outputs[output_name].active;
+    if (state == 1) {
+      $(`#out-${output_name}`).hide();
+      generated_outputs[output_name].active = 0;
+    } else {
+      $(`#out-${output_name}`).show();
+      generated_outputs[output_name].active = 1;
+    }
   }
 });
 
+// showing / hiding table
 $('#table-checkbox').on('change', function () {
   if ($('#centerpanel').hasClass("show")) {
     splitInstance.collapse(0);
@@ -298,6 +319,7 @@ $('#table-checkbox').on('change', function () {
   $('#centerpanel').collapse("toggle");
 });
 
+// showing / hiding panel
 $('#panel-checkbox').on('change', function () {
   if ($('#rightpanel').hasClass("show")) {
     splitInstance.collapse(1);
@@ -351,10 +373,10 @@ $(document).ready(function () {
 
 $("#option-edit").on("click", function (e) {
   mode = "edit";
-  initCellInteractivity();
+  init_cell_interactivity();
 });
 
 $("#option-hl").on("click", function (e) {
   mode = "highlight";
-  initCellInteractivity();
+  init_cell_interactivity();
 });

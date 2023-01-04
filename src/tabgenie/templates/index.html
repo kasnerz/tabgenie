@@ -113,10 +113,11 @@
             <div class="pipelines-block">
               {% for generated_output_name, attrs in generated_outputs.items() %}
               <div class="form-switch">
-                <input class="form-check-input custom-checkbox pipeline-checkbox generated-out-checkbox" type="checkbox"
+                <input class="form-check-input custom-checkbox generated-out-checkbox output-checkbox" type="checkbox"
                   id="pipeline-checkbox-{{ generated_output_name }}" {% if attrs.active==1 %} checked {% endif %}
                   disabled>
-                <label class="form-check-label custom-control-label" for="pipeline-checkbox-{{ pipeline_name }}">{{
+                <label class="form-check-label custom-control-label"
+                  for="pipeline-checkbox-{{ generated_output_name }}">{{
                   generated_output_name }}</label>
               </div>
               {% endfor %}
@@ -128,7 +129,7 @@
             <div class="pipelines-block">
               {% for pipeline_name, attrs in pipelines.items() %}
               <div class="form-switch">
-                <input class="form-check-input custom-checkbox pipeline-checkbox" type="checkbox"
+                <input class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
                   id="pipeline-checkbox-{{ pipeline_name }}" {% if attrs.active==1 %} checked {% endif %}>
                 <label class="form-check-label custom-control-label" for="pipeline-checkbox-{{ pipeline_name }}">{{
                   pipeline_name }}</label>
@@ -141,9 +142,10 @@
             </div>
           </div>
           <div class="selectarea">
-            <b>export table</b>
+            <b>export</b>
 
             <div class="export-block">
+              <p style="margin-bottom: -10px;"><b>table</b></p>
               <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
                 onclick="export_table('csv');">CSV</button>
               <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
