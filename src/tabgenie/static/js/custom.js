@@ -49,7 +49,13 @@ function randombtn() {
 }
 
 function favouritebtn() {
-  favourites[`${dataset}-${split}-${table_idx}`] = { "dataset": dataset, "split": split, "table_idx": table_idx };
+  var favourite_id = `${dataset}-${split}-${table_idx}`;
+
+  if (favourite_id in favourites) {
+    remove_favourite(favourite_id);
+    return;
+  }
+  favourites[favourite_id] = { "dataset": dataset, "split": split, "table_idx": table_idx };
 
   update_favourite_button();
 
@@ -59,19 +65,19 @@ function favouritebtn() {
     .attr("type", "button")
     .css("width", "0.5em !important")
     .addClass("btn")
-    .attr("onclick", `remove_favourite('${dataset}-${split}-${table_idx}');`)
+    .attr("onclick", `remove_favourite('${favourite_id}');`)
     .text("✕");
 
   var span_el = $("<span></span>")
     .addClass("clickable")
-    .text(`${dataset}-${split}-${table_idx}`)
+    .text(`${favourite_id}`)
     .attr("onclick", `gotoexample('${dataset}', '${split}', '${table_idx}');`);
 
   span_el.append(btn_remove);
 
   var li_el = $("<li></li>")
     .addClass("list-group-item")
-    .attr("id", `fav-${dataset}-${split}-${table_idx}`);
+    .attr("id", `fav-${favourite_id}`);
 
   li_el.append(span_el);
 
@@ -292,10 +298,26 @@ function export_table(format) {
 
 function update_favourite_button() {
   if (`${dataset}-${split}-${table_idx}` in favourites) {
-    $("#favourite-btn").css("color", "#E1D630");
+    $("#favourite-btn").css("background-color", "#ffc107");
+    // $("#favourite-btn").css("color", "white");
   } else {
-    $("#favourite-btn").css("color", "grey");
+    $("#favourite-btn").css("background-color", "");
+    // $("#favourite-btn").css("color", "grey");
   }
+}
+
+function toggle_edit() {
+  if (mode == "edit") {
+    $("#edit-btn").css("background-color", "");
+    $("#edit-btn").css("color", "");
+    mode = "highlight";
+  } else {
+    $("#edit-btn").css("background-color", "#0175ac");
+    $("#edit-btn").css("color", "white");
+    mode = "edit";
+  }
+
+  init_cell_interactivity();
 }
 
 function fetch_table(dataset, split, table_idx, export_format) {
@@ -426,12 +448,3 @@ $(document).ready(function () {
 });
 
 
-$("#option-edit").on("click", function (e) {
-  mode = "edit";
-  init_cell_interactivity();
-});
-
-$("#option-hl").on("click", function (e) {
-  mode = "highlight";
-  init_cell_interactivity();
-});
