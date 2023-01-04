@@ -139,7 +139,6 @@ function run_pipeline(pipeline) {
     data: JSON.stringify(request),
     success: function (data) {
       output = data["out"];
-      // $("#dataset-spinner").hide();
       set_pipeline_output(pipeline, output);
     },
     dataType: "json"
@@ -178,6 +177,7 @@ function initCellInteractivity() {
           cell_id = $(this).attr("cell-idx");
           content = $(this).text();
           editedCells[cell_id] = content;
+          $(this).css("font-style", "italic");
         });
       }
     }
