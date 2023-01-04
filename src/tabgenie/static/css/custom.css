@@ -256,8 +256,7 @@ ul {
 
 }
 
-.pipelines-block,
-.export-block {
+.bordered-block {
     border-radius: 5%;
     border: 1px solid #ddd;
     /* font-size: small; */
@@ -279,4 +278,21 @@ ul {
 
 #page-input {
     border-radius: 0;
+}
+
+#favourite-btn {
+    color: grey;
+}
+
+#favourites-box {
+    font-size: small;
+}
+
+#favourites-box .list-group-item {
+    padding: 0px;
+}
+
+.clickable {
+    text-decoration: underline;
+    cursor: pointer;
 }

@@ -53,6 +53,11 @@
             </a>
 
           </li>
+          <li class="page-item">
+            <a class="page-link" href="#" id="favourite-btn" onclick="favouritebtn();">
+              ★
+            </a>
+          </li>
         </ul>
 
 
@@ -95,8 +100,7 @@
           </div>
           <div class="selectarea">
             <b>mode</b>
-
-            <div class="export-block">
+            <div class="bordered-block">
               <div class="form-check">
                 <input type="radio" class="form-check-input" name="options-mode" id="option-hl" checked>
                 <label class="form-check-label" for="option-hl">highlight</label>
@@ -110,7 +114,7 @@
           <div class="selectarea">
             <b>outputs</b>
 
-            <div class="pipelines-block">
+            <div class="bordered-block">
               {% for generated_output_name, attrs in generated_outputs.items() %}
               <div class="form-switch">
                 <input class="form-check-input custom-checkbox generated-out-checkbox output-checkbox" type="checkbox"
@@ -126,7 +130,7 @@
           <div class="selectarea">
             <b>pipelines</b>
 
-            <div class="pipelines-block">
+            <div class="bordered-block">
               {% for pipeline_name, attrs in pipelines.items() %}
               <div class="form-switch">
                 <input class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
@@ -143,15 +147,21 @@
           </div>
           <div class="selectarea">
             <b>export</b>
-
-            <div class="export-block">
-              <p style="margin-bottom: -10px;"><b>table</b></p>
+            <div class="bordered-block">
+              <p style="margin-bottom: -5px;"><b>table</b></p>
               <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
                 onclick="export_table('csv');">CSV</button>
               <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
                 onclick="export_table('xlsx');">XLSX</button>
               <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
                 onclick="export_table('html');">HTML</button>
+            </div>
+          </div>
+
+          <div class="selectarea" id="favourites-area" hidden>
+            <b>favourites</b>
+            <div class="bordered-block">
+              <ul class="list-group list-group-flush" id="favourites-box"></ul>
             </div>
           </div>
         </div>
