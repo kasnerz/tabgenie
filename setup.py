@@ -17,7 +17,7 @@ install_requires = [
 setup(
     name="tabgenie",
     version="0.0.1",
-    python_requires=">=3.8.11",
+    python_requires=">=3.8",
     description="Tabgenie: ",
     author="Zdenek Kasner, Ondrej Dusek",
     author_email="kasner@ufal.mff.cuni.cz",
