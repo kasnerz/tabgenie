@@ -88,6 +88,9 @@ function remove_favourite(favourite) {
   delete favourites[favourite];
   $(`#fav-${favourite}`).remove();
   update_favourite_button();
+  if ($.isEmptyObject(favourites)) {
+    $("#favourites-area").attr("hidden", true);
+  }
 }
 
 function gotobtn() {
@@ -363,14 +366,8 @@ function fetch_table(dataset, split, table_idx, export_format) {
 // toggling pipelines / outputs
 $('.output-checkbox').on('change', function () {
   output_id = $(this)[0].id;
-
-  console.log($(this));
-  console.log($(this)[0]);
-  console.log($(this)[0].id);
-
   var output_name = $(`label[for='${output_id}']`).text();
 
-  console.log($(this));
   if ($(this).hasClass("pipeline-checkbox")) {
     // is a pipeline output
     state = pipelines[output_name].active;
@@ -430,7 +427,6 @@ $("#split-select").on("change", change_split);
 
 $("#format-select").on("change", function (e) {
   $("#dataset-spinner").show();
-  console.log("on format select");
   fetch_table(dataset, split, table_idx);
 });
 
@@ -445,6 +441,10 @@ $('#page-input').keypress(function (event) {
 $(document).ready(function () {
   $("#dataset-select").val(dataset).change();
   $("#page-input").val(table_idx);
+
+  // enable tooltips
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 });
 
 

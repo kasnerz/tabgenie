@@ -296,3 +296,7 @@ ul {
     text-decoration: underline;
     cursor: pointer;
 }
+
+.page-link {
+    cursor: pointer;
+}

@@ -26,41 +26,50 @@
 
         <ul class="pagination" id="nav-example-cnt">
           <li class="page-item">
-            <a class="page-link" href="#" id="start-btn" onclick="startbtn();">«</a>
+            <a class="page-link" id="start-btn" onclick="startbtn();">«</a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="#" id="prev-btn" onclick="prevbtn();">‹</a>
+            <a class="page-link" id="prev-btn" onclick="prevbtn();">‹</a>
           </li>
           <li class="page-item">
             <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="#" id="total-examples" style="min-height: 30px;"></a>
+            <a class="page-link" id="total-examples" style="min-height: 30px;"></a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="#" id="next-btn" onclick="nextbtn();">›</a>
+            <a class="page-link" id="next-btn" onclick="nextbtn();">›</a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="#" id="end-btn" onclick="endbtn();">»</a>
+            <a class="page-link" id="end-btn" onclick="endbtn();">»</a>
           </li>
         </ul>
 
         <ul class="pagination" id="nav-examples">
           <li class="page-item">
-            <a class="page-link" href="#" id="random-btn" onclick="randombtn();">
+            <a class="page-link" id="random-btn" onclick="randombtn();" data-bs-toggle="tooltip"
+              data-bs-placement="bottom" title="Random example">
               <!-- <img  src="{{ host_prefix }}/static/img/dice.png" width="12px" />  -->
               ⚄
             </a>
 
           </li>
           <li class="page-item">
-            <a class="page-link" href="#" id="favourite-btn" onclick="favouritebtn();">
+            <a class="page-link" id="favourite-btn" onclick="favouritebtn();" data-bs-toggle="tooltip"
+              data-bs-placement="bottom" title="Add to favourites">
               ★
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="#" id="edit-btn" onclick="toggle_edit();">
+            <a class="page-link" id="edit-btn" onclick="toggle_edit();" data-bs-toggle="tooltip"
+              data-bs-placement="bottom" title="Toggle cell edit mode">
               ✎
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" id="edit-btn" onclick="reload_pipelines()" data-bs-toggle="tooltip"
+              data-bs-placement="bottom" title="Reload pipelines">
+              ⟳
             </a>
           </li>
         </ul>
@@ -145,21 +154,24 @@
               </div>
               {% endfor %}
 
-              <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
+              <!-- <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
                 onclick="reload_pipelines();">Run
-                🏃</button>
+                🏃</button> -->
             </div>
           </div>
           <div class="selectarea">
             <b>export</b>
             <div class="bordered-block">
               <p style="margin-bottom: -5px;"><b>table</b></p>
-              <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
-                onclick="export_table('csv');">CSV</button>
-              <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
-                onclick="export_table('xlsx');">XLSX</button>
-              <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
-                onclick="export_table('html');">HTML</button>
+
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
+                  onclick="export_table('csv');">CSV</button>
+                <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
+                  onclick="export_table('xlsx');">XLSX</button>
+                <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
+                  onclick="export_table('html');">HTML</button>
+              </div>
             </div>
           </div>
 
