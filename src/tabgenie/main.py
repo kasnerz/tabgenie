@@ -32,8 +32,11 @@ def get_pipeline_output():
     content = request.json
     logger.info(f"Incoming content: {content}")
 
+    if content.get("editedCells"):
+        content["editedCells"] = json.loads(content["editedCells"])
+
     pipeline_name = content["pipeline"]
-    out = run_pipeline(pipeline_name, content)
+    out = run_pipeline(pipeline_name, content, force=bool(content["editedCells"]))
 
     return {"out": out}
 
@@ -78,6 +81,7 @@ def export_table():
     export_format = content["format"]
     export_option = content["export_option"]
     favourites = content["favourites"]
+    edited_cells = json.loads(content.get("editedCells") or {})
 
     src_dir = os.path.dirname(os.path.abspath(__file__))
     export_dir = os.path.join(src_dir, os.pardir, os.pardir, 'tmp')
@@ -104,7 +108,9 @@ def export_table():
 
         export_file = os.path.join(export_dir, "files", f"{dataset_name}-{split}-{table_idx}.{export_format}")
         dataset = get_dataset(dataset_name, split)
-        dataset.export_table(split, table_idx, export_format=export_format, to_file=export_file)
+        table = dataset.get_table(split=split, table_idx=table_idx, edited_cells=edited_cells)
+
+        dataset.export_table(table, export_format=export_format, to_file=export_file)
 
     if export_option == "favourites":
         file_to_download = os.path.join(export_dir, "export.zip")
@@ -146,7 +152,6 @@ def initialize_dataset(dataset_name):
     return dataset
 
 
-
 def initialize_pipeline(pipeline_name):
     cfg = app.config["pipeline_cfg"].get(pipeline_name) or {}
     
@@ -154,6 +159,14 @@ def initialize_pipeline(pipeline_name):
     app.config["pipelines_obj"][pipeline_name] = pipeline
 
     return pipeline
+
+def run_pipeline(pipeline_name, content, cache_only=False, force=False):
+    pipeline = get_pipeline(pipeline_name)
+    dataset_obj = get_dataset(dataset_name=content["dataset"], split=content["split"])
+
+    content["dataset_obj"] = dataset_obj
+    out = pipeline.run(content, cache_only=cache_only, force=force)
+    return out
 
 
 def get_pipeline(pipeline_name):
@@ -186,23 +199,15 @@ def get_dataset(dataset_name, split):
     return dataset
 
 
-def get_table_data(dataset_name, split, index):
-    dataset = get_dataset(dataset_name, split)
-    html = dataset.export_table(split=split, table_idx=index, export_format="html")
-    generated_outputs = dataset.get_generated_outputs(split=split, index=index)
-
+def get_table_data(dataset_name, split, table_idx):
+    dataset = get_dataset(dataset_name=dataset_name, split=split)
+    table = dataset.get_table(split=split, table_idx=table_idx)
+    html = dataset.export_table(table=table, export_format="html")
+    generated_outputs = dataset.get_generated_outputs(table=table)
     dataset_info = dataset.get_info()
 
     return {"html": html, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info, "generated_outputs" : generated_outputs}
 
-
-def run_pipeline(pipeline_name, content, cache_only=False):
-    pipeline = get_pipeline(pipeline_name)
-    dataset_obj = get_dataset(dataset_name=content["dataset"], split=content["split"])
-
-    content["dataset_obj"] = dataset_obj
-    out = pipeline.run(content, cache_only)
-    return out
 
 
 @app.route("/", methods=["GET", "POST"])

@@ -84,7 +84,7 @@ For adding a new dataset:
 
 The file `data.py` also contains parent classes for the datasets and auxiliary data structures. 
 
-Each dataset should contain the `prepare_table(split, index)` method which instantiates a `Table` object from the raw data saved in `self.data`.
+Each dataset should contain the `prepare_table(split, table_idx)` method which instantiates a `Table` object from the raw data saved in `self.data`.
 
 The `Table` object is automatically exported to HTML and other formats (the methods may be overridden).
 

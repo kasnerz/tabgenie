@@ -4,7 +4,7 @@ from ..processing import Processor
 
 class LinearizeProcessor(Processor):
      def process(self, content):
-        table = content["dataset_obj"].get_table(split=content["split"], index=content["table_idx"])
+        table = content["dataset_obj"].get_table(split=content["split"], table_idx=content["table_idx"], edited_cells=content.get("editedCells"))
         title = table.props.get("title")
         cells = [table.get_cell_by_id(int(cell_id)).value for cell_id in content["cells"]]
 

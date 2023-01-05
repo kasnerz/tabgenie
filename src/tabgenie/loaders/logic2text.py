@@ -16,7 +16,7 @@ class Logic2Text(HFTabularDataset):
         self.hf_id = "kasnerz/logic2text"
         self.name = "Logic2Text"
 
-    def prepare_table(self, split, index):
+    def prepare_table(self, split, table_idx):
         def is_highlighted(i, j):
             # TODO: add other cases in the dataset such as "col_superlative" and "row_superlative" or subsets
             if all(
@@ -39,7 +39,7 @@ class Logic2Text(HFTabularDataset):
             else:
                 return False
 
-        entry = self.data[split][index]
+        entry = self.data[split][table_idx]
         entry["annotation"] = ast.literal_eval(entry["annotation"])
         t = Table()
         t.set_generated_output("reference", entry["sent"])

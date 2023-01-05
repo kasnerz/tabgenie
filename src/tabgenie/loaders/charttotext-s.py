@@ -31,9 +31,9 @@ class ChartToTextS(HFTabularDataset):
         self.hf_id = "kasnerz/charttotext-s"
         self.name = "Chart-to-Text (Statista subset)"
 
-    def prepare_table(self, split, index):
+    def prepare_table(self, split, table_idx):
         t = Table()
-        entry = self.data[split][index]
+        entry = self.data[split][table_idx]
 
         t.set_generated_output("reference", entry["ref"])
         t.props["title"] = entry["title"]

@@ -61,6 +61,7 @@ class Pipeline:
             return cache_out
 
         next_inp = content
+
         for p in self.processors:
             next_inp = p.process(next_inp)
 

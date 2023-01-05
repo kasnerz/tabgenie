@@ -5,6 +5,9 @@ from ..processing import Processor
 class TableTripleProcessor(Processor):
     def process(self, content):
         dataset = content["dataset_obj"]
-        triples = dataset.export_table(split=content["split"], table_idx=content["table_idx"], cell_ids=content["cells"], export_format="triples")
+
+        table = dataset.get_table(split=content["split"], table_idx=content["table_idx"], edited_cells=content.get("editedCells"))
+        
+        triples = dataset.export_table(table=table, cell_ids=content["cells"], export_format="triples")
 
         return triples

@@ -177,6 +177,10 @@ function reset_pipeline_outputs() {
   }
 }
 
+function reset_edited_cells() {
+  editedCells = {};
+}
+
 function run_pipeline(pipeline) {
   cells = get_highlighted_cells();
   dataset = $('#dataset-select').val();
@@ -188,7 +192,7 @@ function run_pipeline(pipeline) {
     "split": split,
     "table_idx": table_idx,
     "cells": cells,
-    "editedCells": editedCells
+    "editedCells": JSON.stringify(editedCells)
   };
 
   $.ajax({
@@ -295,7 +299,8 @@ function export_table(format) {
     "table_idx": table_idx,
     "format": format,
     "export_option": export_option,
-    "favourites": JSON.stringify(favourites)
+    "favourites": JSON.stringify(favourites),
+    "editedCells": JSON.stringify(editedCells)
   };
 
   if (export_option == "favourites") {
@@ -342,6 +347,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
     "pipelines": JSON.stringify(pipelines)
   }, function (data) {
     reset_pipeline_outputs();
+    reset_edited_cells();
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
 

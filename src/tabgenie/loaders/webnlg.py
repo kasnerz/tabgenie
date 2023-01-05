@@ -19,8 +19,7 @@ class WebNLG(HFTabularDataset):
         self.hf_extra_config = "en"
         self.name = "WebNLG"
 
-    def table_to_triples(self, split, table_idx, cell_ids):
-        table = self.get_table(split, table_idx)
+    def table_to_triples(self, table, cell_ids):
         triples = []
         rows = table.get_cells()[1:] # skip headers
 
@@ -33,8 +32,8 @@ class WebNLG(HFTabularDataset):
         return triples
 
 
-    def prepare_table(self, split, index):
-        entry = self.data[split][index]
+    def prepare_table(self, split, table_idx):
+        entry = self.data[split][table_idx]
         t = Table()
         t.set_generated_output("reference", entry["target"])
 

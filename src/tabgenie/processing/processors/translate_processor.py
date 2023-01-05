@@ -17,7 +17,7 @@ class TranslateProcessor(Processor):
 
     
     def process(self, content):
-        table = content["dataset_obj"].get_table(split=content["split"], index=content["table_idx"])
+        table = content["dataset_obj"].get_table(split=content["split"], table_idx=content["table_idx"])
         try:
             title = table.props["title"]
         except ValueError:

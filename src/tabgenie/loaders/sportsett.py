@@ -14,8 +14,8 @@ class SportSettBasketball(HFTabularDataset):
         self.hf_id = "GEM/sportsett_basketball"
         self.name = "SportSett Basketball"
 
-    def prepare_table(self, split, index):
-        entry = self.data[split][index]
+    def prepare_table(self, split, table_idx):
+        entry = self.data[split][table_idx]
         t = Table()
         t.set_generated_output("reference", entry["target"])
         game_id = entry['sportsett_id']

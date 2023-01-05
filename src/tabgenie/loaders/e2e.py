@@ -16,8 +16,7 @@ class E2E(HFTabularDataset):
         self.hf_id = 'GEM/e2e_nlg'
         self.name = "E2E"
 
-    def table_to_triples(self, split, table_idx, cell_ids):
-        table = self.get_table(split, table_idx)
+    def table_to_triples(self, table, cell_ids):
         triples = []
         rows = table.get_cells()
 
@@ -58,8 +57,8 @@ class E2E(HFTabularDataset):
         return triples
 
 
-    def prepare_table(self, split, index):
-        entry = self.data[split][index]
+    def prepare_table(self, split, table_idx):
+        entry = self.data[split][table_idx]
         t = Table()
         t.set_generated_output("reference", entry["target"])
         mrs = entry["meaning_representation"].split(", ")

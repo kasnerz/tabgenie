@@ -12,6 +12,7 @@ import lxml.etree
 import lxml.html
 import glob
 import jinja2
+import copy
 
 from collections import defaultdict, namedtuple
 from tinyhtml import h
@@ -77,6 +78,7 @@ class Table:
         self.url = None
         self.cell_idx = 0
         self.current_row = []
+        self.cell_by_ids = {}
 
     def save_row(self):
         if self.current_row:
@@ -86,8 +88,9 @@ class Table:
     def add_cell(self, cell):
         cell.idx = self.cell_idx
         self.current_row.append(cell)
+        self.cell_by_ids[self.cell_idx] = cell
         self.cell_idx += 1
-
+        
     def set_cell(self, i, j, c):
         self.cells[i][j] = c
 
@@ -98,13 +101,7 @@ class Table:
             return None
 
     def get_cell_by_id(self, idx):
-        # TODO improve
-        for row in self.cells:
-            for c in row:
-                if c.idx == idx:
-                    return c
-
-        return None
+        return self.cell_by_ids[idx]
 
     def get_flat_cells(self):
         return [x for row in self.cells for x in row]
@@ -171,65 +168,71 @@ class TabularDataset:
             outputs = f.readlines()
 
             if len(outputs) != len(self.data[split]):
-                import pdb; pdb.set_trace();
                 raise AssertionError(f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {len(self.tables[split])}")
 
             for o in outputs:
                 self.tables.set_output(name, o)
 
-    def get_reference(self, split, index):
-        t = self.get_table(split, index)
-        return t.get_generated_output("reference")
+    def get_reference(self, table):
+        return table.get_generated_output("reference")
 
-    def get_generated_outputs(self, split, index):
-        t = self.get_table(split, index)
-        return t.get_generated_outputs()
+    def get_generated_outputs(self, table):
+        return table.get_generated_outputs()
 
     def has_split(self, split):
         return bool(self.data[split])
 
-    def get_table(self, split, index):
-        table = self.tables[split].get(index)
+    def get_table(self, split, table_idx, edited_cells=None):
+        table = self.tables[split].get(table_idx)
 
         if not table:
-            table = self.prepare_table(split, index)
-            self.tables[split][index] = table
+            table = self.prepare_table(split, table_idx)
+            self.tables[split][table_idx] = table
+
+        if edited_cells:
+            table_modif = copy.deepcopy(table)
+            
+            for cell_id, val in edited_cells.items():
+                cell = table_modif.get_cell_by_id(int(cell_id))
+                cell.value = val
+
+            table = table_modif
 
         return table
 
-    def prepare_table(self, split, index):
+    def prepare_table(self, split, table_idx):
         return NotImplementedError
 
     def get_info(self):
         return self.dataset_info
 
-    def export_table(self, split, table_idx, export_format, cell_ids=None, to_file=None):
+    def export_table(self, table, export_format, cell_ids=None, to_file=None):
         if export_format == "linearize":
-            exported = self.table_to_linear(split, table_idx, cell_ids)
+            exported = self.table_to_linear(table, cell_ids)
             # TODO to_file
         elif export_format == "triples":
-            exported = self.table_to_triples(split, table_idx, cell_ids)
+            exported = self.table_to_triples(table, cell_ids)
             # TODO to_file
         elif export_format == "html":
-            exported = self.table_to_html(split, table_idx)
+            exported = self.table_to_html(table)
             
             if to_file is not None:
                 with open(to_file, "w") as f:
                     f.write(exported)
                     
         elif export_format == "csv":
-            exported = self.table_to_df(split, table_idx)
+            exported = self.table_to_df(table)
 
             if to_file is not None:
                 exported.to_csv(to_file, index=False)
 
         elif export_format == "xlsx":
-            exported = self.table_to_df(split, table_idx)
+            exported = self.table_to_df(table)
 
             if to_file is not None:
                 exported.to_excel(to_file, index=False, engine="xlsxwriter")
         elif export_format == "reference":
-            exported = self.get_reference(split, table_idx)
+            exported = self.get_reference(table)
         else:
             raise NotImplementedError(export_format)
 
@@ -248,17 +251,15 @@ class TabularDataset:
         return exported
 
 
-    def table_to_linear(self, split, table_idx, cell_ids):
-        t = self.get_table(split, table_idx)
-
+    def table_to_linear(self, table, cell_ids):
         if cell_ids:
-            cells = [t.get_cell_by_id(int(idx)) for idx in cell_ids]
+            cells = [table.get_cell_by_id(int(idx)) for idx in cell_ids]
         else:
-            cells = t.get_flat_cells()
+            cells = table.get_flat_cells()
 
         gen_input = []
 
-        for key, value in t.props.items():
+        for key, value in table.props.items():
             gen_input.append(f"[{key}] {value}")
 
         for c in cells:
@@ -266,19 +267,18 @@ class TabularDataset:
 
         return " ".join(gen_input)
 
-    def table_to_triples(self, split, table_idx, cell_ids):
+    def table_to_triples(self, table, cell_ids):
         # default method (dataset-agnostic)
-        t = self.get_table(split, table_idx)
-        title = t.props.get("title")
+        title = table.props.get("title")
         triples = []
 
-        for i, row in enumerate(t.get_cells()):
+        for i, row in enumerate(table.get_cells()):
             for j, cell in enumerate(row):
                 if cell.is_header():
                     continue
                 
-                row_headers = t.get_row_headers(i)
-                col_headers = t.get_col_headers(j)
+                row_headers = table.get_row_headers(i)
+                col_headers = table.get_col_headers(j)
 
                 if row_headers and col_headers:
                     subj = row_headers[0].value
@@ -298,17 +298,36 @@ class TabularDataset:
         return triples
 
 
-    def table_to_df(self, split, index):
-        t = self.get_table(split, index)
-        table_el = self._get_main_table_html(t)
+    def table_to_df(self, table):
+        table_el = self._get_main_table_html(table)
         table_html = table_el.render()
         df = pd.read_html(table_html)[0]
         return df
 
+    def table_to_html(self, table):
+        if table.props:
+            meta_trs = []
+            for key, value in table.props.items():
+                meta_trs.append([h("th")(key), h("td")(value)])
 
-    def _get_main_table_html(self, t):
+            meta_tbodies = [h("tr")(tds) for tds in meta_trs]
+            meta_tbody_el = h("tbody")(meta_tbodies)
+            meta_table_el = h("table", klass="table table-sm caption-top meta-table")(h("caption")("properties"),meta_tbody_el)
+        else: 
+            meta_table_el = None
+
+        table_el = self._get_main_table_html(table)
+        area_el = h("div")(meta_table_el, table_el)
+
+        html = area_el.render()
+        return lxml.etree.tostring(
+            lxml.html.fromstring(html), encoding="unicode", pretty_print=True
+        )
+
+
+    def _get_main_table_html(self, table):
         trs = []
-        for row in t.cells:
+        for row in table.cells:
             tds = []
             for c in row:
                 if c.is_dummy:
@@ -332,27 +351,7 @@ class TabularDataset:
         return table_el
 
 
-    def table_to_html(self, split, index):
-        t = self.get_table(split, index)
-
-        if t.props:
-            meta_trs = []
-            for key, value in t.props.items():
-                meta_trs.append([h("th")(key), h("td")(value)])
-
-            meta_tbodies = [h("tr")(tds) for tds in meta_trs]
-            meta_tbody_el = h("tbody")(meta_tbodies)
-            meta_table_el = h("table", klass="table table-sm caption-top meta-table")(h("caption")("properties"),meta_tbody_el)
-        else: 
-            meta_table_el = None
-
-        table_el = self._get_main_table_html(t)
-        area_el = h("div")(meta_table_el, table_el)
-
-        html = area_el.render()
-        return lxml.etree.tostring(
-            lxml.html.fromstring(html), encoding="unicode", pretty_print=True
-        )
+    
 
 
 class HFTabularDataset(TabularDataset):

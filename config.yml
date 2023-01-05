@@ -26,4 +26,3 @@ generated_outputs:
 pipeline_cfg:
   model_api:
     model_url: http://localhost:8980/
-    # model_url: dll-10gpu3:8980

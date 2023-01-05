@@ -26,9 +26,9 @@ class SciGen(HFTabularDataset):
 
         return s
 
-    def prepare_table(self, split, index):
+    def prepare_table(self, split, table_idx):
         t = Table()
-        entry = self.data[split][index]
+        entry = self.data[split][table_idx]
         caption = entry["table_caption"]
         t.set_generated_output("reference", caption.replace("[CONTINUE]", "\n"))
         
