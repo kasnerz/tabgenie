@@ -11,7 +11,8 @@ def get_pipeline_class_by_name(pipeline_name):
         "model_local": "ModelLocalPipeline",
         "model_api": "ModelAPIPipeline",
         "graph" : "GraphPipeline",
-        "text_ie" : "TextIEPipeline"
+        "text_ie" : "TextIEPipeline",
+        "export" : "ExportPipeline"
     }
     pipeline_module = __import__(
         "pipelines." + pipeline_name + "_pipeline",
@@ -49,18 +50,18 @@ class Pipeline:
     def save_to_cache(self, key, out):
         self.cache[key] = out
 
-    def to_key(self, content):
-        key = (content["dataset"], content["split"], content["table_idx"])
+    def to_key(self, pipeline_args):
+        key = (pipeline_args["dataset"], pipeline_args["split"], pipeline_args["table_idx"])
         return key
 
-    def run(self, content, cache_only=False, force=False):
-        key = self.to_key(content)
+    def run(self, pipeline_args, cache_only=False, force=False):
+        key = self.to_key(pipeline_args)
         cache_out = self.get_from_cache(key)
 
         if cache_only or (not force and cache_out):
             return cache_out
 
-        next_inp = content
+        next_inp = pipeline_args
 
         for p in self.processors:
             next_inp = p.process(next_inp)

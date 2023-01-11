@@ -15,6 +15,7 @@ import jinja2
 import copy
 
 from collections import defaultdict, namedtuple
+from tabgenie.utils.text import format_prompt
 from tinyhtml import h
 
 logger = logging.getLogger(__name__)
@@ -103,8 +104,8 @@ class Table:
     def get_cell_by_id(self, idx):
         return self.cell_by_ids[idx]
 
-    def get_flat_cells(self):
-        return [x for row in self.cells for x in row]
+    def get_flat_cells(self, highlighted_only=False):
+        return [x for row in self.cells for x in row if (x.is_highlighted or not highlighted_only)]
 
     def get_cells(self):
         return self.cells
@@ -167,8 +168,8 @@ class TabularDataset:
         with open(out_fname) as f:
             outputs = f.readlines()
 
-            if len(outputs) != len(self.data[split]):
-                raise AssertionError(f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {len(self.tables[split])}")
+            if len(outputs) != self.get_example_count(split):
+                raise AssertionError(f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {self.get_example_count(split)}")
 
             for o in outputs:
                 self.tables.set_output(name, o)
@@ -178,6 +179,9 @@ class TabularDataset:
 
     def get_generated_outputs(self, table):
         return table.get_generated_outputs()
+
+    def get_example_count(self, split):
+        return len(self.data[split])
 
     def has_split(self, split):
         return bool(self.data[split])
@@ -206,31 +210,20 @@ class TabularDataset:
     def get_info(self):
         return self.dataset_info
 
-    def export_table(self, table, export_format, cell_ids=None, to_file=None):
-        if export_format == "linearize":
+    def export_table(self, table, export_format, cell_ids=None):
+        if export_format == "txt":
             exported = self.table_to_linear(table, cell_ids)
-            # TODO to_file
         elif export_format == "triples":
             exported = self.table_to_triples(table, cell_ids)
-            # TODO to_file
+        elif export_format == "instruct":
+            exported = self.table_to_instruct(table, cell_ids)
+            exported = format_prompt(prompt=exported, table=table, dataset=self)
         elif export_format == "html":
             exported = self.table_to_html(table)
-            
-            if to_file is not None:
-                with open(to_file, "w") as f:
-                    f.write(exported)
-                    
         elif export_format == "csv":
-            exported = self.table_to_df(table)
-
-            if to_file is not None:
-                exported.to_csv(to_file, index=False)
-
+            exported = self.table_to_csv(table)
         elif export_format == "xlsx":
             exported = self.table_to_df(table)
-
-            if to_file is not None:
-                exported.to_excel(to_file, index=False, engine="xlsxwriter")
         elif export_format == "reference":
             exported = self.get_reference(table)
         else:
@@ -242,16 +235,17 @@ class TabularDataset:
     def export(self, split, table_cfg):
         exported = []
         
-        for i in range(len(self.data[split])):
+        for i in range(self.get_example_count(split)):
             obj = {}
             for key, export_format in table_cfg["fields"].items():
-                obj[key] = self.export_table(split, i, export_format=export_format)                
+                table = self.get_table(split, i)
+                obj[key] = self.export_table(table, export_format=export_format)                
             exported.append(obj)
 
         return exported
 
 
-    def table_to_linear(self, table, cell_ids):
+    def table_to_linear(self, table, cell_ids=None):
         if cell_ids:
             cells = [table.get_cell_by_id(int(idx)) for idx in cell_ids]
         else:
@@ -296,7 +290,66 @@ class TabularDataset:
                 triples.append([subj, pred, obj])
 
         return triples
+    
 
+    def get_task_definition(self):
+        # TODO implement for individual datasets
+        return "Write a short description of the linearized table cells."
+
+    def get_positive_examples(self):
+        # TODO implement for individual datasets
+        # TODO fix - split may not be loaded
+        table_ex_1 = self.get_table("dev", 0)
+        table_ex_2 = self.get_table("dev", 1)
+
+        return [
+            {
+                "in" : self.table_to_linear(table_ex_1),
+                "out" : self.get_reference(table_ex_1),
+            },
+            {
+                "in" : self.table_to_linear(table_ex_2),
+                "out" : self.get_reference(table_ex_2),
+            }
+        ]
+
+    def get_prompt(self, key):
+        prompts = {
+            "tk-def-pos": "Definition: {definition}\n\nPositive Example 1 -\nInput:\n{{ex_1_in}} Output:\n{{ex_1_out}}\nPositive Example 2 -\nInput:\n{{ex_2_in}}\nOutput:\n{{ex_2_out}}\nNow complete the following example - \nInput:\n%table_txt%\nOutput:\n",
+            "tk-def": "Definition: {definition}\n\nNow complete the following example - \nInput:\n%table_txt%\nOutput:\n",
+            "totto" : "%table_txt%"
+        }
+
+        prompt = prompts[key]
+
+        if "def" in key:
+            definition = self.get_task_definition()
+            prompt = prompt.format(definition=definition)
+
+        if "pos" in key:
+            ex = self.get_positive_examples()
+            ex_1_in, ex_1_out, ex_2_in, ex_2_out = ex[0]["in"].strip(), ex[0]["out"].strip(), ex[1]["in"].strip(), ex[1]["out"].strip()
+            prompt = prompt.format(ex_1_in=ex_1_in, ex_1_out=ex_1_out, ex_2_in=ex_2_in, ex_2_out=ex_2_out)
+
+        return prompt
+
+
+    def table_to_instruct(self, table, cell_ids):
+        prompt = self.get_prompts()["tk-def-pos"]
+
+
+        import pdb; pdb.set_trace();
+        if "%table_csv%" in prompt:
+            df = self.table_to_df(table)
+            table_csv = df.to_csv(index=False)
+
+        return prompt.format(table_csv)
+    
+
+    def table_to_csv(self, table):
+        df = self.table_to_df(table)
+        table_csv = df.to_csv(index=False)
+        return table_csv
 
     def table_to_df(self, table):
         table_el = self._get_main_table_html(table)

@@ -145,12 +145,17 @@ function is_pipeline_active(pipeline) {
 }
 
 function has_pipeline_content(pipeline) {
-  return get_pipeline_placeholder(pipeline).text() !== "";
+  return get_pipeline_placeholder(pipeline, "pipeline").text() !== "";
 }
 
-function get_pipeline_placeholder(pipeline) {
+function get_pipeline_placeholder(pipeline, type) {
+  var area = (type == "pipeline") ? $("#pipelinearea") : $("#outputarea");
+  var cls = (type == "pipeline") ? $("#pipeline-output-box") : $("#generated-output-box");
+
   if (!is_pipeline_active(pipeline)) {
-    $("#outputarea").append(`<div class="pipeline-output" id="out-${pipeline}">
+    console.log(area);
+    console.log(cls);
+    area.append(`<div class="output-box ${cls}" id="out-${pipeline}">
     <label>${pipeline}</label>
     <div id="out-${pipeline}-placeholder" class="font-mono"></div>
     </div>`);
@@ -161,13 +166,13 @@ function get_pipeline_placeholder(pipeline) {
 function remove_output_placeholder(pipeline) {
   $(`#out-${pipeline}`).remove();
 }
-function set_pipeline_output(pipeline, output) {
-  var placeholder = get_pipeline_placeholder(pipeline);
+function set_pipeline_output(pipeline, output, type) {
+  var placeholder = get_pipeline_placeholder(pipeline, type);
   placeholder.html(output);
 }
 function erase_pipeline_output(pipeline) {
   if (is_pipeline_active(pipeline)) {
-    set_pipeline_output(pipeline, "");
+    set_pipeline_output(pipeline, "", "pipeline");
   }
 }
 
@@ -185,6 +190,7 @@ function run_pipeline(pipeline) {
   cells = get_highlighted_cells();
   dataset = $('#dataset-select').val();
   split = $('#split-select').val();
+  custom_input = $('#model-api-textarea').val();
 
   var request = {
     "pipeline": pipeline,
@@ -192,7 +198,8 @@ function run_pipeline(pipeline) {
     "split": split,
     "table_idx": table_idx,
     "cells": cells,
-    "editedCells": JSON.stringify(editedCells)
+    "edited_cells": JSON.stringify(editedCells),
+    "custom_input": custom_input
   };
 
   $.ajax({
@@ -289,30 +296,36 @@ function postRequestDownload(url, request, filename) {
 
 
 function export_table(format) {
-  var dataset = $('#dataset-select').val();
-  var split = $('#split-select').val();
   var export_option = $('input[name="options-export"]:checked').val();
-
-  var request = {
-    "dataset": dataset,
-    "split": split,
-    "table_idx": table_idx,
-    "format": format,
-    "export_option": export_option,
-    "favourites": JSON.stringify(favourites),
-    "editedCells": JSON.stringify(editedCells)
-  };
-
   if (export_option == "favourites") {
     var filename = "export.zip";
+    var export_examples = JSON.stringify(favourites);
   } else {
+    var dataset = $('#dataset-select').val();
+    var split = $('#split-select').val();
     var filename = `${dataset}_${split}_tab_${table_idx}.${format}`;
+    var export_examples = JSON.stringify([{
+      "dataset": dataset,
+      "split": split,
+      "table_idx": table_idx
+    }]);
   }
+  var request = {
+    "export_format": format,
+    "export_option": export_option,
+    "export_examples": export_examples,
+    "edited_cells": JSON.stringify(editedCells)
+  };
 
-  postRequestDownload("export_table", request, filename);
+  postRequestDownload("export_to_file", request, filename);
 
   $("#exp-btn").html("Export");
   $("#exp-btn").removeClass('disabled');
+}
+
+function insert_text(input_text) {
+  var textarea = $("#model-api-textarea");
+  textarea.val(textarea.val() + input_text);
 }
 
 function update_favourite_button() {
@@ -351,6 +364,8 @@ function fetch_table(dataset, split, table_idx, export_format) {
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
 
+    $("#model-api-textarea").val(data.prompt);
+
     total_examples = data.total_examples;
     $("#total-examples").html(total_examples - 1);
     info = set_dataset_info(data.dataset_info);
@@ -359,7 +374,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
     update_favourite_button();
 
     for (var pipeline_out of data.pipeline_outputs) {
-      set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
+      set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"], "pipeline");
     }
     $(".generated-out-checkbox").prop("disabled", true);
 
@@ -368,7 +383,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
       $(`#pipeline-checkbox-${name}`).prop("disabled", false);
 
       if (generated_outputs[name].active == 1) {
-        set_pipeline_output(name, generated_out["out"]);
+        set_pipeline_output(name, generated_out["out"], "generated_output", "output");
       }
     }
 

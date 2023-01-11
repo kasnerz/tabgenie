@@ -43,3 +43,19 @@ class ToTTo(HFTabularDataset):
             t.save_row()
 
         return t
+
+    def table_to_linear(self, table, cell_ids=None):
+        if cell_ids:
+            cells = [table.get_cell_by_id(int(idx)) for idx in cell_ids]
+        else:
+            cells = table.get_flat_cells(highlighted_only=True)
+
+        gen_input = []
+
+        for key, value in table.props.items():
+            gen_input.append(f"[{key}] {value}")
+
+        for c in cells:
+            gen_input.append("[cell] " + c.value)
+
+        return " ".join(gen_input)
