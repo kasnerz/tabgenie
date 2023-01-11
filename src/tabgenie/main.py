@@ -6,6 +6,7 @@ import logging
 from pkgutil import get_data
 import yaml
 import shutil
+import pandas as pd
 from .loaders.data import get_dataset_class_by_name
 from .processing.processing import get_pipeline_class_by_name
 from flask import Flask, render_template, jsonify, request, send_file
@@ -114,7 +115,7 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, expor
         "json_template" : json_template,
         "dataset_objs" : {dataset_name : get_dataset(dataset_name, split) for dataset_name, split in map(lambda x: (x["dataset"], x["split"]), examples_to_export)}
     }
-    os.makedirs(export_dir, exist_ok=True);
+    os.makedirs(export_dir, exist_ok=True)
     exported = run_pipeline("export", pipeline_args, force=True)
 
     if export_format == "json":
@@ -129,7 +130,14 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, expor
             out_filename = f"{e['dataset']}_{e['split']}_tab_{e['table_idx']}.{export_format}"
 
             if export_format == "xlsx":
-                exported_table.to_excel(os.path.join(export_dir, out_filename), index=False, engine="xlsxwriter")
+                write_path = os.path.join(export_dir, out_filename)
+                header = exported_table.columns.to_frame(index=False).T  # for hierarchical tables
+                table_wo_header = exported_table.set_axis(range(exported_table.shape[1]), axis=1)
+
+                with pd.ExcelWriter(write_path) as writer:
+                    header.to_excel(writer, header=False, index=False)
+                    table_wo_header.to_excel(writer, header=False, index=False, startrow=header.shape[0])
+
             else:
                 with open(os.path.join(export_dir, out_filename), "w") as f:
                     f.write(exported_table)
