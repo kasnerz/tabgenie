@@ -54,3 +54,7 @@ class WebNLG(HFTabularDataset):
             t.save_row()
 
         return t
+
+    def get_task_definition(self):
+        return "Write a short description of the following RDF triples."
+

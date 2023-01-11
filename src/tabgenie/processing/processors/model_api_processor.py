@@ -23,7 +23,7 @@ class ModelAPIProcessor(Processor):
     def process(self, content):
         data = {
             "input_text" : content,
-            "beam_size" : 3
+            "beam_size" : 1
         }
         res = requests.post(self.model_url.rstrip("/") + "/generate/", json=data)
 

@@ -9,11 +9,11 @@ class TextIEPipeline(Pipeline):
         super().__init__(*args, **kwargs)
         self.processors = [TextIEProcessor(), GraphProcessor()]
         
-    def to_key(self, content):
-        cells = content.get("cells", None)
+    def to_key(self, pipeline_args):
+        cells = pipeline_args.get("cells", None)
 
         if cells:
             cells = str(set(cells))
 
-        key = (content["dataset"], content["split"], content["table_idx"], cells)
+        key = (pipeline_args["dataset"], pipeline_args["split"], pipeline_args["table_idx"], cells)
         return key

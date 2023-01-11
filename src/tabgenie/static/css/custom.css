@@ -138,6 +138,10 @@ pre {
     margin-top: 10px;
 }
 
+#pipelinearea {
+    margin-top: 10px;
+}
+
 .area-content {
     padding: 25px 20px 25px 20px;
 }
@@ -217,7 +221,7 @@ pre {
     border-color: #0175ac;
 }
 
-.pipeline-output {
+.output-box {
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 5%;
@@ -226,7 +230,7 @@ pre {
     font-size: smaller;
 }
 
-.pipeline-output>label {
+.output-box>label {
     position: absolute;
     font-size: smaller;
     top: -8px;
@@ -256,6 +260,22 @@ ul {
 
 }
 
+.accordion {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+.accordion-button {
+    font-size: small;
+
+}
+
+.wildcards {
+    margin-top: 10px;
+}
+
 .bordered-block {
     border-radius: 5%;
     border: 1px solid #ddd;
@@ -263,7 +283,7 @@ ul {
     padding: 15px;
 }
 
-#gen-btn {
+.gen-btn {
     margin-top: 10px;
 }
 
