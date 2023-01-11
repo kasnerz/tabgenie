@@ -51,7 +51,7 @@ gunicorn "src.tabgenie.cli:create_app()"
 #### Dataset export
 ```
 pip install -e .
-tabgenie export -d DATASET_NAME -o OUTPUT_FILE [-s SPLIT] [-t TEMPLATE]
+tabgenie export -d DATASET_NAME -o OUTPUT_FILE -f FORMAT [-s SPLIT] [-t TEMPLATE]
 ```
 
 ## Datasets
