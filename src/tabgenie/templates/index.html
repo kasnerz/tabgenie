@@ -92,6 +92,7 @@
     </div>
   </nav>
 
+
   <div class="large-container container">
     <div class="row">
       <div id="leftpanel" class="col-2">
@@ -112,7 +113,7 @@
               <option value="train">train</option>
             </select>
           </div>
-          <div class="selectarea">
+          <!-- <div class="selectarea">
             <b>outputs</b>
 
             <div class="bordered-block">
@@ -140,12 +141,8 @@
                   pipeline_name }}</label>
               </div>
               {% endfor %}
-
-              <!-- <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
-                onclick="reload_pipelines();">Run
-                🏃</button> -->
-            </div>
-          </div>
+        </div>
+      </div> -->
           <div class="selectarea">
             <b>export</b>
             <div class="bordered-block">
@@ -219,32 +216,45 @@
           </div>
           <div id='sidepanel-content' class="tab-content">
             <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel">
-              <div class="accordion" id="accordionExample">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                      data-bs-target="#collapseOne">
-                      <b>Model API input</b>
-                    </button>
-                  </h2>
-                  <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
-                    data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                      <!-- <label for="model-api-textarea" class="form-label"><b></b></label> -->
-                      <textarea class="form-control" id="model-api-textarea" rows="10"></textarea>
-                      <div class="btn-group btn-group-sm wildcards" role="group">
-                        <button type="button" id="insert-csv-btn" class="btn btn-outline-secondary btn-sm"
-                          onclick="insert_text('%table_csv%');">%table_csv%</button>
-                        <button type="button" id="insert-csv-btn" class="btn btn-outline-secondary btn-sm"
-                          onclick="insert_text('%table_txt%');">%table_txt%</button>
-                      </div>
+              {% for pipeline_name, attrs in pipelines.items() %}
+              <div class="output-box pipeline-box" id=out-{{ pipeline_name }}">
+                <label class="label-name" for="pipeline-checkbox-{{ pipeline_name }}">{{ pipeline_name }}</label>
+                <label class="label-on-off"><input
+                    class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
+                    id="pipeline-checkbox-{{ pipeline_name }}" {% if attrs.active==1 %} checked {% endif %}></label>
 
+                {% if 'config_template' in attrs %}
+                <label class="label-settings" data-bs-toggle="modal" data-bs-target="#{{ pipeline_name }}-modal">
+                  ⚙</label>
+                <div class="modal fade" id="{{ pipeline_name }}-modal" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="{{ pipeline_name }}-modal-label">Settings: {{ pipeline_name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        {{ attrs.config_template|safe }}
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                      </div>
                     </div>
                   </div>
                 </div>
+                {% endif %}
+                <div id="out-{{ pipeline_name }}-placeholder" class="font-mono"></div>
               </div>
+              {% endfor %}
             </div>
-            <div id='outputarea' class="tab-pane sidepanel-panel active" role="tabpanel">
+            <div id='outputarea' class="tab-pane sidepanel-panel" role="tabpanel">
+              {% for generated_output_name, attrs in generated_outputs.items() %}
+              <div class="output-box generated-output-box" id="out-{{ generated_output_name }}">
+                <label class="label-name" for="pipeline-checkbox-{{ generated_output_name }}">{{ generated_output_name
+                  }}</label>
+                <div id="out-{{ generated_output_name }}-placeholder" class="font-mono"></div>
+              </div>
+              {% endfor %}
             </div>
             <div id='infoarea' class="tab-pane sidepanel-panel" role="tabpanel" tabindex="0">
               <div id="dataset-info" class="area-content"></div>

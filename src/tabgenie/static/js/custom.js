@@ -11,8 +11,10 @@ var favourites = {};
 
 
 function update_svg_width() {
-  w = $("#svg-body").width();
-  svg.attr("width", w);
+  if (typeof svg != "undefined") {
+    w = $("#svg-body").width();
+    svg.attr("width", w);
+  }
 }
 
 // the draggable divider between the main area and the right panel 
@@ -140,48 +142,17 @@ function get_highlighted_cells() {
   return activeCells;
 }
 
-function is_pipeline_active(pipeline) {
-  return $(`#out-${pipeline}`).length > 0;
-}
-
-function has_pipeline_content(pipeline) {
-  return get_pipeline_placeholder(pipeline, "pipeline").text() !== "";
-}
-
-function get_pipeline_placeholder(pipeline, type) {
-  var area = (type == "pipeline") ? $("#pipelinearea") : $("#outputarea");
-  var cls = (type == "pipeline") ? $("#pipeline-output-box") : $("#generated-output-box");
-
-  if (!is_pipeline_active(pipeline)) {
-    console.log(area);
-    console.log(cls);
-    area.append(`<div class="output-box ${cls}" id="out-${pipeline}">
-    <label>${pipeline}</label>
-    <div id="out-${pipeline}-placeholder" class="font-mono"></div>
-    </div>`);
-  }
-  return $(`#out-${pipeline}-placeholder`);
-}
-
-function remove_output_placeholder(pipeline) {
-  $(`#out-${pipeline}`).remove();
-}
-function set_pipeline_output(pipeline, output, type) {
-  var placeholder = get_pipeline_placeholder(pipeline, type);
+function set_output(name, output) {
+  // TODO don't set output on disabled outputs
+  var placeholder = $(`#out-${name}-placeholder`);
   placeholder.html(output);
-}
-function erase_pipeline_output(pipeline) {
-  if (is_pipeline_active(pipeline)) {
-    set_pipeline_output(pipeline, "", "pipeline");
-  }
 }
 
 function reset_pipeline_outputs() {
   for (var pipeline in pipelines) {
-    erase_pipeline_output(pipeline);
+    set_output(pipeline, "");
   }
 }
-
 function reset_edited_cells() {
   editedCells = {};
 }
@@ -190,7 +161,7 @@ function run_pipeline(pipeline) {
   cells = get_highlighted_cells();
   dataset = $('#dataset-select').val();
   split = $('#split-select').val();
-  custom_input = $('#model-api-textarea').val();
+  custom_inputs = $(`.${pipeline}-input`).val();
 
   var request = {
     "pipeline": pipeline,
@@ -199,7 +170,7 @@ function run_pipeline(pipeline) {
     "table_idx": table_idx,
     "cells": cells,
     "edited_cells": JSON.stringify(editedCells),
-    "custom_input": custom_input
+    "custom_input": custom_inputs
   };
 
   $.ajax({
@@ -209,7 +180,7 @@ function run_pipeline(pipeline) {
     data: JSON.stringify(request),
     success: function (data) {
       output = data["out"];
-      set_pipeline_output(pipeline, output);
+      set_output(pipeline, output);
     },
     dataType: "json"
   });
@@ -357,13 +328,12 @@ function fetch_table(dataset, split, table_idx, export_format) {
     "dataset": dataset,
     "table_idx": table_idx,
     "split": split,
-    "pipelines": JSON.stringify(pipelines)
+    // "pipelines": JSON.stringify(pipelines)
   }, function (data) {
     reset_pipeline_outputs();
     reset_edited_cells();
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
-
     $("#model-api-textarea").val(data.prompt);
 
     total_examples = data.total_examples;
@@ -373,22 +343,14 @@ function fetch_table(dataset, split, table_idx, export_format) {
     init_cell_interactivity();
     update_favourite_button();
 
-    for (var pipeline_out of data.pipeline_outputs) {
-      set_pipeline_output(pipeline_out["pipeline_name"], pipeline_out["out"], "pipeline");
-    }
-    $(".generated-out-checkbox").prop("disabled", true);
-
+    // for (var pipeline_out of data.pipeline_outputs) {
+    //   set_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
+    // }
     for (var generated_out of data.generated_outputs) {
-      var name = generated_out["name"];
-      $(`#pipeline-checkbox-${name}`).prop("disabled", false);
-
-      if (generated_outputs[name].active == 1) {
-        set_pipeline_output(name, generated_out["out"], "generated_output", "output");
-      }
+      set_output(generated_out["name"], generated_out["out"]);
     }
-
     for (var pipeline in pipelines) {
-      if (pipelines[pipeline].active && !has_pipeline_content(pipeline)) {
+      if (pipelines[pipeline].active && $(`#out-${pipeline}-placeholder`).text() == "") {
         run_pipeline(pipeline);
       }
     }
@@ -405,7 +367,6 @@ $('.output-checkbox').on('change', function () {
     state = pipelines[output_name].active;
 
     if (state == 1) {
-      remove_output_placeholder(output_name);
       pipelines[output_name].active = 0;
     } else {
       run_pipeline(output_name);
@@ -414,10 +375,10 @@ $('.output-checkbox').on('change', function () {
   } else {
     state = generated_outputs[output_name].active;
     if (state == 1) {
-      $(`#out-${output_name}`).hide();
+      // $(`#out-${output_name}`).hide();
       generated_outputs[output_name].active = 0;
     } else {
-      $(`#out-${output_name}`).show();
+      // $(`#out-${output_name}`).show();
       generated_outputs[output_name].active = 1;
     }
   }
@@ -474,8 +435,6 @@ $(document).keydown(function (event) {
   } else if (key === "ArrowLeft") {
     event.preventDefault();
     prevbtn();
-  } else {
-    console.log(key);
   }
 });
 

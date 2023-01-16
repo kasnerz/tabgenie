@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class ModelAPIPipeline(Pipeline):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.processors = [CustomInputProcessor(), ModelAPIProcessor(model_url=self.cfg["model_url"])]
+        self.processors = [LinearizeProcessor(), ModelAPIProcessor(model_url=self.cfg["model_url"])]
 
     def to_key(self, pipeline_args):
         cells = pipeline_args.get("cells", None)

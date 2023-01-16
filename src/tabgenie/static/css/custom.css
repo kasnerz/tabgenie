@@ -234,10 +234,21 @@ pre {
     position: absolute;
     font-size: smaller;
     top: -8px;
-    left: 20px;
     padding-left: 3px;
     padding-right: 3px;
     background-color: white;
+}
+
+.label-name {
+    left: 20px;
+}
+
+.label-settings {
+    right: 40px;
+}
+
+.label-on-off {
+    right: 20px;
 }
 
 .form-switch-panel {
