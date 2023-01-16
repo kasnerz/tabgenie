@@ -80,7 +80,8 @@ The metadata for each table are displayed as `properties` next to the main table
 ### Adding datasets
 For adding a new dataset:
 - create a file in `src/loaders` containing the dataset class,
-- add the mapping between dataset name and class name to `get_dataset_class_by_name()` in `src/loaders/data.py`. 
+- add the mapping between dataset name and class name to `get_dataset_class_by_name()` in `src/loaders/data.py`, 
+- add dataset name to `config.yml`.
 
 The file `data.py` also contains parent classes for the datasets and auxiliary data structures. 
 
