@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 def get_dataset_class_by_name(dataset_name):
-    # todo kate: what for?
     dataset_mapping = {
         "dart": "DART",
         "e2e": "E2E",
