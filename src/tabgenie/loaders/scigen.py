@@ -3,7 +3,7 @@ import json
 import os
 import re
 import ast
-from .data import Cell, Table, TabularDataset, HFTabularDataset
+from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
 from tinyhtml import h
 
 class SciGen(HFTabularDataset):

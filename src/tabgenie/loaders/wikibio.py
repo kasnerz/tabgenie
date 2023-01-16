@@ -2,7 +2,7 @@
 import json
 import os
 import re
-from .data import Cell, Table, TabularDataset, HFTabularDataset
+from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
 # from ..utils.text import Detokenizer
 
 class WikiBio(HFTabularDataset):

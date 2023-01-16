@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from datasets import load_dataset, ReadInstruction
-from .data import Cell, Table, TabularDataset, HFTabularDataset
+from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
 
 
 class SportSettBasketball(HFTabularDataset):

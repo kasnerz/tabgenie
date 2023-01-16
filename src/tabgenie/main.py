@@ -7,8 +7,8 @@ from pkgutil import get_data
 import yaml
 import shutil
 import pandas as pd
-from .loaders.data import get_dataset_class_by_name
-from .processing.processing import get_pipeline_class_by_name
+from tabgenie.loaders import DATASET_CLASSES
+from tabgenie.processing.processing import get_pipeline_class_by_name
 from flask import Flask, render_template, jsonify, request, send_file
 
 
@@ -165,7 +165,7 @@ def export_dataset(dataset_name, split, out_dir, export_format, json_template=No
 def initialize_dataset(dataset_name):
     # dataset_path = app.config["dataset_paths"][dataset_name]
     dataset_path = None # not needed for HF
-    dataset = get_dataset_class_by_name(dataset_name)(path=dataset_path)
+    dataset = DATASET_CLASSES[dataset_name](path=dataset_path)
     app.config["datasets_obj"][dataset_name] = dataset
 
     return dataset

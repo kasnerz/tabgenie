@@ -4,7 +4,7 @@ import json
 import click
 from flask import Flask
 from flask.cli import FlaskGroup, with_appcontext
-from .main import create_app, app, export_dataset
+from tabgenie.main import create_app, app, export_dataset
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)

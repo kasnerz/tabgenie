@@ -2,7 +2,7 @@
 import json
 import os
 import ast
-from .data import Cell, Table, HFTabularDataset
+from ..structs.data import Cell, Table, HFTabularDataset
 
 
 class WikiSQL(HFTabularDataset):

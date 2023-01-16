@@ -2,7 +2,7 @@
 import json
 import os
 import ast
-from .data import Cell, Table, TabularDataset, HFTabularDataset
+from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
 
 
 class NumericNLG(HFTabularDataset):
