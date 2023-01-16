@@ -79,3 +79,6 @@ class E2E(HFTabularDataset):
         t.save_row()
 
         return t
+
+    def get_task_definition(self):
+        return "Write a short restaurant description."

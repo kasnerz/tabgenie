@@ -13,13 +13,15 @@ datasets:
 - webnlg
 - wikibio
 - wikisql
-default_dataset: webnlg
+default_dataset: totto
 # max_examples_per_split: 10000
 host_prefix: "."
 cache_dev_splits: false
+# default_prompt: tk-def-pos
+default_prompt: totto
 pipelines:
 - model_api
-- graph
+# - graph
 # - text_ie
 generated_outputs:
 - reference

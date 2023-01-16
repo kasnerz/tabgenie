@@ -161,11 +161,17 @@
               </div>
 
               <div class="btn-group btn-group-sm" role="group">
-                <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
+                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                  onclick="export_table('txt');">TXT</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                  onclick="export_table('json');">JSON</button>
+              </div>
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
                   onclick="export_table('csv');">CSV</button>
-                <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
+                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
                   onclick="export_table('xlsx');">XLSX</button>
-                <button type="button" id="gen-btn" class="btn btn-outline-secondary btn-sm"
+                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
                   onclick="export_table('html');">HTML</button>
               </div>
             </div>
@@ -198,8 +204,12 @@
           <div class="topnavs">
             <ul class="nav nav-pills justify-content-center">
               <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#outputarea" type="button"
-                  role="tab">Output</a>
+                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#pipelinearea" type="button"
+                  role="tab">Pipelines</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#outputarea" type="button"
+                  role="tab">Outputs</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link " data-bs-toggle="tab" data-bs-target="#infoarea" type="button" role="tab">Dataset
@@ -208,6 +218,32 @@
             </ul>
           </div>
           <div id='sidepanel-content' class="tab-content">
+            <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel">
+              <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#collapseOne">
+                      <b>Model API input</b>
+                    </button>
+                  </h2>
+                  <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                    data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      <!-- <label for="model-api-textarea" class="form-label"><b></b></label> -->
+                      <textarea class="form-control" id="model-api-textarea" rows="10"></textarea>
+                      <div class="btn-group btn-group-sm wildcards" role="group">
+                        <button type="button" id="insert-csv-btn" class="btn btn-outline-secondary btn-sm"
+                          onclick="insert_text('%table_csv%');">%table_csv%</button>
+                        <button type="button" id="insert-csv-btn" class="btn btn-outline-secondary btn-sm"
+                          onclick="insert_text('%table_txt%');">%table_txt%</button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div id='outputarea' class="tab-pane sidepanel-panel active" role="tabpanel">
             </div>
             <div id='infoarea' class="tab-pane sidepanel-panel" role="tabpanel" tabindex="0">

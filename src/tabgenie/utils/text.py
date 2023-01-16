@@ -33,6 +33,25 @@ def normalize(s,
     return s
 
 
+def format_prompt(prompt, dataset, table, cell_ids=None):
+    wildcards = [
+        r"%table_csv%",
+        r"%table_txt%"
+    ]
+    for wildcard in wildcards:
+        if not wildcard in prompt:
+            continue
+        
+        if wildcard == r"%table_csv%":
+            table_csv = dataset.table_to_csv(table)
+            prompt = re.sub(r"%table_csv%", table_csv, prompt)
+
+        if wildcard == r"%table_txt%":
+            table_txt = dataset.table_to_linear(table, cell_ids=cell_ids)
+            prompt = re.sub(r"%table_txt%", table_txt, prompt)
+
+    return prompt
+
 # class Detokenizer:
 #     def __init__(self):
 #         self.detokenizer = MosesDetokenizer(lang='en')

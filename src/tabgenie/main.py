@@ -3,6 +3,7 @@
 import os
 import json
 import logging
+from pkgutil import get_data
 import yaml
 import shutil
 from .loaders.data import get_dataset_class_by_name
@@ -32,11 +33,11 @@ def get_pipeline_output():
     content = request.json
     logger.info(f"Incoming content: {content}")
 
-    if content.get("editedCells"):
-        content["editedCells"] = json.loads(content["editedCells"])
+    if content.get("edited_cells"):
+        content["edited_cells"] = json.loads(content["edited_cells"])
 
     pipeline_name = content["pipeline"]
-    out = run_pipeline(pipeline_name, content, force=bool(content["editedCells"]))
+    out = run_pipeline(pipeline_name, content, force=bool(content["edited_cells"]))
 
     return {"out": out}
 
@@ -72,51 +73,28 @@ def render_table():
     return table_data
 
 
-@app.route('/export_table', methods=['GET', 'POST'])
-def export_table():
+@app.route('/export_to_file', methods=['GET', 'POST'])
+def export_to_file():
     content = request.json
-    dataset_name = content["dataset"]
-    split = content["split"]
-    table_idx = content["table_idx"]
-    export_format = content["format"]
     export_option = content["export_option"]
-    favourites = content["favourites"]
-    edited_cells = json.loads(content.get("editedCells") or {})
+    export_format = content["export_format"]
+    export_examples = json.loads(content["export_examples"])
+    # TODO export edited cells
+    # edited_cells = json.loads(content.get("edited_cells") or {})
 
-    src_dir = os.path.dirname(os.path.abspath(__file__))
-    export_dir = os.path.join(src_dir, os.pardir, os.pardir, 'tmp')
+    export_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, 'tmp')
 
     if os.path.isdir(export_dir):
         shutil.rmtree(export_dir)
 
-    os.makedirs(export_dir)
+    default_template = "export/json_templates/default.yml"
+
     os.makedirs(os.path.join(export_dir, "files"))
-
-    examples_to_export = []
-    if export_option == "favourites":
-        favourites = json.loads(favourites)
-
-        for val in favourites.values():
-            examples_to_export.append((val["dataset"], val["split"], val["table_idx"]))
-    else:
-        examples_to_export.append((dataset_name, split, table_idx))
-
-    for example in examples_to_export:
-        dataset_name = example[0]
-        split = example[1]
-        table_idx = example[2]
-
-        export_file = os.path.join(export_dir, "files", f"{dataset_name}-{split}-{table_idx}.{export_format}")
-        dataset = get_dataset(dataset_name, split)
-        table = dataset.get_table(split=split, table_idx=table_idx, edited_cells=edited_cells)
-
-        dataset.export_table(table, export_format=export_format, to_file=export_file)
+    file_to_download = export_examples_to_file(export_examples, export_dir=os.path.join(export_dir, "files"), export_format=export_format, json_template=default_template)
 
     if export_option == "favourites":
         file_to_download = os.path.join(export_dir, "export.zip")
         shutil.make_archive(file_to_download.rstrip(".zip"), 'zip', os.path.join(export_dir, "files"))
-    else:
-        file_to_download = export_file
 
     logger.info("Sending file")
     return send_file(file_to_download,
@@ -124,24 +102,57 @@ def export_table():
                     as_attachment=True)
 
 
-def export_dataset(dataset_name, split, out_file, template_file):
-    with open(template_file) as f:
-        template = yaml.safe_load(f)
+def export_examples_to_file(examples_to_export, export_format, export_dir, export_filename=None, json_template=None):
+    
+    if type(examples_to_export) is dict:
+        # TODO look at this in more detail, favourites behaves differently
+        examples_to_export = examples_to_export.values()
 
-    dataset_cfg = template["dataset"]
-    table_cfg = template["table"]
-    dataset_format = dataset_cfg["format"]
+    pipeline_args = {
+        "examples_to_export" : examples_to_export,
+        "export_format" : export_format,
+        "json_template" : json_template,
+        "dataset_objs" : {dataset_name : get_dataset(dataset_name, split) for dataset_name, split in map(lambda x: (x["dataset"], x["split"]), examples_to_export)}
+    }
+    os.makedirs(export_dir, exist_ok=True);
+    exported = run_pipeline("export", pipeline_args, force=True)
 
-    if dataset_format == "json":
-        os.makedirs(os.path.dirname(out_file), exist_ok=True)
-        dataset = get_dataset(dataset_name, split)
-        exported = dataset.export(split, table_cfg)
+    if export_format == "json":
+        # only a single, aggregated output
+        out_filename = export_filename or "out.json"
 
-        with open(out_file, "w") as f:
-            json.dump({dataset_cfg["table_key"] : exported}, f, indent=4, ensure_ascii=False)
+        with open(os.path.join(export_dir, out_filename), "w") as f:
+            json.dump(exported, f, indent=4, ensure_ascii=False)
     else:
-        raise NotImplementedError(f"Format '{dataset_format}' is not supported")
+        # multiple outputs
+        for e, exported_table in zip(examples_to_export, exported):
+            out_filename = f"{e['dataset']}_{e['split']}_tab_{e['table_idx']}.{export_format}"
 
+            if export_format == "xlsx":
+                exported_table.to_excel(os.path.join(export_dir, out_filename), index=False, engine="xlsxwriter")
+            else:
+                with open(os.path.join(export_dir, out_filename), "w") as f:
+                    f.write(exported_table)
+
+    return os.path.join(export_dir, out_filename)
+
+
+
+def export_dataset(dataset_name, split, out_dir, export_format, json_template=None):
+    dataset = get_dataset(dataset_name, split)
+
+    examples_to_export = [{
+      "dataset": dataset_name,
+      "split": split,
+      "table_idx": table_idx
+    } for table_idx in range(dataset.get_example_count(split))]
+
+    # only relevant for JSON
+    export_filename = f"{split}.json"
+
+    export_examples_to_file(examples_to_export, export_format=export_format, export_dir=out_dir, export_filename=export_filename, json_template=json_template)
+  
+    logger.info("Export finished")
 
 def initialize_dataset(dataset_name):
     # dataset_path = app.config["dataset_paths"][dataset_name]
@@ -162,9 +173,11 @@ def initialize_pipeline(pipeline_name):
 
 def run_pipeline(pipeline_name, content, cache_only=False, force=False):
     pipeline = get_pipeline(pipeline_name)
-    dataset_obj = get_dataset(dataset_name=content["dataset"], split=content["split"])
 
-    content["dataset_obj"] = dataset_obj
+    if content.get("dataset") and content.get("split"):
+        dataset_obj = get_dataset(dataset_name=content["dataset"], split=content["split"])
+        content["dataset_obj"] = dataset_obj
+
     out = pipeline.run(content, cache_only=cache_only, force=force)
     return out
 
@@ -204,9 +217,10 @@ def get_table_data(dataset_name, split, table_idx):
     table = dataset.get_table(split=split, table_idx=table_idx)
     html = dataset.export_table(table=table, export_format="html")
     generated_outputs = dataset.get_generated_outputs(table=table)
+    prompt = dataset.get_prompt(app.config.get("default_prompt"))
     dataset_info = dataset.get_info()
 
-    return {"html": html, "total_examples": len(dataset.data[split]), "dataset_info" : dataset_info, "generated_outputs" : generated_outputs}
+    return {"html": html, "total_examples": dataset.get_example_count(split), "dataset_info" : dataset_info, "generated_outputs" : generated_outputs, "prompt" : prompt}
 
 
 
