@@ -19,12 +19,15 @@ cache_dev_splits: false
 # default_prompt: tk-def-pos
 default_prompt: totto
 pipelines:
-- model_api
-# - graph
-# - text_ie
-generated_outputs:
-- reference
-# - zeroshot_pipeline
-pipeline_cfg:
-  model_api:
+  default_model:
+    class: model_api
     model_url: http://localhost:8980/
+    config_snippet: templates/model_api_config.html
+    active: 1
+  rdf_triples:
+    class: graph
+    active: 0
+generated_outputs:
+  reference:
+    active: 1
+# - zeroshot_pipeline
