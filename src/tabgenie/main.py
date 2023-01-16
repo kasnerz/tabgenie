@@ -166,9 +166,14 @@ def initialize_dataset(dataset_name):
 def initialize_pipeline(pipeline_name):
     pipeline_cfg = app.config["pipelines"][pipeline_name]
 
-    if "config_template_file" in pipeline_cfg:
-        with open(os.path.join(TEMPLATES_DIR, pipeline_cfg["config_template_file"])) as f:
-            pipeline_cfg["config_template"] = f.read()
+    with app.app_context():
+        if "config_template_file" in pipeline_cfg:
+            template = render_template(
+                pipeline_cfg["config_template_file"],
+                pipeline_name=pipeline_name,
+                cfg=pipeline_cfg
+            )
+            pipeline_cfg["config_template"] = template
 
     pipeline_obj = get_pipeline_class_by_name(pipeline_cfg["class"])(cfg=pipeline_cfg)
     app.config["pipelines_obj"][pipeline_name] = pipeline_obj

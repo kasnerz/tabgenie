@@ -161,7 +161,7 @@ function run_pipeline(pipeline) {
   cells = get_highlighted_cells();
   dataset = $('#dataset-select').val();
   split = $('#split-select').val();
-  custom_input = $('#model-api-textarea').val();
+  custom_inputs = $(`.${pipeline}-input`).val();
 
   var request = {
     "pipeline": pipeline,
@@ -170,7 +170,7 @@ function run_pipeline(pipeline) {
     "table_idx": table_idx,
     "cells": cells,
     "edited_cells": JSON.stringify(editedCells),
-    "custom_input": custom_input
+    "custom_input": custom_inputs
   };
 
   $.ajax({
