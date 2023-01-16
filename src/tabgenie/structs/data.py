@@ -15,7 +15,7 @@ import jinja2
 import copy
 
 from collections import defaultdict, namedtuple
-from tabgenie.utils.text import format_prompt
+from ..utils.text import format_prompt
 from tinyhtml import h
 
 logger = logging.getLogger(__name__)

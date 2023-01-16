@@ -7,8 +7,8 @@ from pkgutil import get_data
 import yaml
 import shutil
 import pandas as pd
-from tabgenie.loaders import DATASET_CLASSES
-from tabgenie.processing.processing import get_pipeline_class_by_name
+from .loaders import DATASET_CLASSES
+from .processing.processing import get_pipeline_class_by_name
 from flask import Flask, render_template, jsonify, request, send_file
 
 
