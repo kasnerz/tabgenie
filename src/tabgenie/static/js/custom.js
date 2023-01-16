@@ -462,6 +462,22 @@ $("#format-select").on("change", function (e) {
   fetch_table(dataset, split, table_idx);
 });
 
+$(document).keydown(function (event) {
+  const key = event.key;
+
+  if (mode == "edit") {
+    return;
+  }
+  if (key === "ArrowRight") {
+    event.preventDefault();
+    nextbtn();
+  } else if (key === "ArrowLeft") {
+    event.preventDefault();
+    prevbtn();
+  } else {
+    console.log(key);
+  }
+});
 
 $('#page-input').keypress(function (event) {
   // Enter = Go to page
