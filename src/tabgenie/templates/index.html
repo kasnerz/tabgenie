@@ -217,9 +217,9 @@
             <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel">
               {% for pipeline_name, attrs in pipelines.items() %}
               <div class="output-box pipeline-box" id=out-{{ pipeline_name }}">
-                <label class="label-name">{{ pipeline_name }}</label>
+                <label class="label-name" for="pipeline-checkbox-{{ pipeline_name }}">{{ pipeline_name }}</label>
                 <label class="label-on-off"><input
-                    class="form-check-input custom-checkbox generated-out-checkbox output-checkbox" type="checkbox"
+                    class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
                     id="pipeline-checkbox-{{ pipeline_name }}" {% if attrs.active==1 %} checked {% endif %}></label>
                 <label class="label-settings">⚙</label>
                 <div id="out-{{ pipeline_name }}-placeholder" class="font-mono"></div>
@@ -229,12 +229,8 @@
             <div id='outputarea' class="tab-pane sidepanel-panel" role="tabpanel">
               {% for generated_output_name, attrs in generated_outputs.items() %}
               <div class="output-box generated-output-box" id="out-{{ generated_output_name }}">
-                <label class="label-name">{{ generated_output_name }}</label>
-                <label class="label-on-off"><input
-                    class="form-check-input custom-checkbox generated-out-checkbox output-checkbox" type="checkbox"
-                    id="pipeline-checkbox-{{ generated_output_name }}" {% if attrs.active==1 %} checked {% endif
-                    %}></label>
-                <label class="label-settings">⚙</label>
+                <label class="label-name" for="pipeline-checkbox-{{ generated_output_name }}">{{ generated_output_name
+                  }}</label>
                 <div id="out-{{ generated_output_name }}-placeholder" class="font-mono"></div>
               </div>
               {% endfor %}
