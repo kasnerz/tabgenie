@@ -92,6 +92,7 @@
     </div>
   </nav>
 
+
   <div class="large-container container">
     <div class="row">
       <div id="leftpanel" class="col-2">
@@ -221,7 +222,28 @@
                 <label class="label-on-off"><input
                     class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
                     id="pipeline-checkbox-{{ pipeline_name }}" {% if attrs.active==1 %} checked {% endif %}></label>
-                <label class="label-settings">⚙</label>
+
+                {% if 'config_template' in attrs %}
+                <label class="label-settings" data-bs-toggle="modal" data-bs-target="#{{ pipeline_name }}-modal">
+                  ⚙</label>
+                <div class="modal fade" id="{{ pipeline_name }}-modal" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="{{ pipeline_name }}-modal-label">Settings: {{ pipeline_name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        {{ attrs.config_template|safe }}
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
                 <div id="out-{{ pipeline_name }}-placeholder" class="font-mono"></div>
               </div>
               {% endfor %}

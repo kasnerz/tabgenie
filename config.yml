@@ -22,7 +22,7 @@ pipelines:
   default_model:
     class: model_api
     model_url: http://localhost:8980/
-    config_snippet: templates/model_api_config.html
+    config_template_file: model_api_config.html
     active: 1
   rdf_triples:
     class: graph

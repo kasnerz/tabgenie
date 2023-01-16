@@ -165,6 +165,11 @@ def initialize_dataset(dataset_name):
 
 def initialize_pipeline(pipeline_name):
     pipeline_cfg = app.config["pipelines"][pipeline_name]
+
+    if "config_template_file" in pipeline_cfg:
+        with open(os.path.join(TEMPLATES_DIR, pipeline_cfg["config_template_file"])) as f:
+            pipeline_cfg["config_template"] = f.read()
+
     pipeline_obj = get_pipeline_class_by_name(pipeline_cfg["class"])(cfg=pipeline_cfg)
     app.config["pipelines_obj"][pipeline_name] = pipeline_obj
 
@@ -174,9 +179,9 @@ def initialize_pipeline(pipeline_name):
 def run_pipeline(pipeline_name, content, cache_only=False, force=False):
     pipeline = app.config["pipelines_obj"].get(pipeline_name)
 
-    if not pipeline:
-        logger.info(f"Initializing {pipeline_name}")
-        pipeline = initialize_pipeline(pipeline_name)
+    # if not pipeline:
+    #     logger.info(f"Initializing {pipeline_name}")
+    #     pipeline = initialize_pipeline(pipeline_name)
 
     if content.get("dataset") and content.get("split"):
         dataset_obj = get_dataset(dataset_name=content["dataset"], split=content["split"])
@@ -240,6 +245,9 @@ def create_app():
     app.config.update(config)
     app.config["datasets_obj"] = {}
     app.config["pipelines_obj"] = {}
+
+    for pipeline_name in app.config["pipelines"].keys():
+        initialize_pipeline(pipeline_name)
 
     # preload
     if config["cache_dev_splits"]:

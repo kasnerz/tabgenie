@@ -328,7 +328,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
     "dataset": dataset,
     "table_idx": table_idx,
     "split": split,
-    "pipelines": JSON.stringify(pipelines)
+    // "pipelines": JSON.stringify(pipelines)
   }, function (data) {
     reset_pipeline_outputs();
     reset_edited_cells();
