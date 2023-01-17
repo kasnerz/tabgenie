@@ -4,7 +4,7 @@ import os
 import re
 import glob
 import ast
-from .data import Cell, Table, TabularDataset, HFTabularDataset
+from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
 
 
 class HiTab(HFTabularDataset):

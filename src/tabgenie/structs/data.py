@@ -15,36 +15,10 @@ import jinja2
 import copy
 
 from collections import defaultdict, namedtuple
-from tabgenie.utils.text import format_prompt
+from ..utils.text import format_prompt
 from tinyhtml import h
 
 logger = logging.getLogger(__name__)
-
-
-def get_dataset_class_by_name(dataset_name):
-    dataset_mapping = {
-        "dart": "DART",
-        "e2e": "E2E",
-        "hitab": "HiTab",
-        "charttotext-s": "ChartToTextS",
-        "logic2text": "Logic2Text",
-        "logicnlg": "LogicNLG",
-        "numericnlg": "NumericNLG",
-        "scigen": "SciGen",
-        "sportsett": "SportSettBasketball",
-        "webnlg": "WebNLG",
-        "wikibio": "WikiBio",
-        "totto": "ToTTo",
-        "wikisql": "WikiSQL"
-    }
-    dataset_module = __import__(
-        dataset_name,
-        globals=globals(),
-        fromlist=[dataset_mapping[dataset_name]],
-        level=1,
-    )
-    dataset_class = getattr(dataset_module, dataset_mapping[dataset_name])
-    return dataset_class
 
 
 class Cell:
