@@ -255,8 +255,11 @@ def create_app():
     app.config["datasets_obj"] = {}
     app.config["pipelines_obj"] = {}
 
-    for pipeline_name in app.config["pipelines"].keys():
-        initialize_pipeline(pipeline_name)
+    if app.config.get("pipelines"):
+        for pipeline_name in app.config["pipelines"].keys():
+            initialize_pipeline(pipeline_name)
+    else:
+        app.config["pipelines"] = {}
 
     # preload
     if config["cache_dev_splits"]:
