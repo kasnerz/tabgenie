@@ -80,6 +80,7 @@ function favouritebtn() {
 
   var li_el = $("<li></li>")
     .addClass("list-group-item")
+    .addClass("favourite-item")
     .attr("id", `fav-${favourite_id}`);
 
   li_el.append(span_el);
@@ -93,11 +94,17 @@ function remove_favourite(favourite) {
   update_favourite_button();
 
   if ($.isEmptyObject(favourites)) {
-    $("#favourites-area").attr("hidden", true);
+    // $("#favourites-area").attr("hidden", true);
     $("#option-export-favourites").prop("disabled", true);
     $("#option-export-favourites").prop("checked", false);
     $("#option-export-table").prop("checked", true);
   }
+}
+
+function clear_favourites() {
+  favourites = {};
+  $(".favourite-item").remove();
+  update_favourite_button();
 }
 
 function gotobtn() {
@@ -311,12 +318,12 @@ function update_favourite_button() {
 
 function toggle_edit() {
   if (mode == "edit") {
-    $("#edit-btn").css("background-color", "");
-    $("#edit-btn").css("color", "");
+    // $("#edit-btn").css("background-color", "");
+    // $("#edit-btn").css("color", "");
     mode = "highlight";
   } else {
-    $("#edit-btn").css("background-color", "#0175ac");
-    $("#edit-btn").css("color", "white");
+    // $("#edit-btn").css("background-color", "#0175ac");
+    // $("#edit-btn").css("color", "white");
     mode = "edit";
   }
 

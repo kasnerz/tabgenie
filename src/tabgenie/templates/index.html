@@ -23,7 +23,6 @@
         🧞 <b>TabGenie</b>
       </a>
       <div class="navblock">
-
         <ul class="pagination" id="nav-example-cnt">
           <li class="page-item">
             <a class="page-link" id="start-btn" onclick="startbtn();">«</a>
@@ -49,7 +48,6 @@
           <li class="page-item">
             <a class="page-link" id="random-btn" onclick="randombtn();" data-bs-toggle="tooltip"
               data-bs-placement="bottom" title="Random example">
-              <!-- <img  src="{{ host_prefix }}/static/img/dice.png" width="12px" />  -->
               ⚄
             </a>
 
@@ -58,18 +56,6 @@
             <a class="page-link" id="favourite-btn" onclick="favouritebtn();" data-bs-toggle="tooltip"
               data-bs-placement="bottom" title="Add to favourites">
               ★
-            </a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" id="edit-btn" onclick="toggle_edit();" data-bs-toggle="tooltip"
-              data-bs-placement="bottom" title="Toggle cell edit mode">
-              ✎
-            </a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" id="edit-btn" onclick="reload_pipelines()" data-bs-toggle="tooltip"
-              data-bs-placement="bottom" title="Reload pipelines">
-              ⟳
             </a>
           </li>
         </ul>
@@ -97,9 +83,10 @@
     <div class="row">
       <div id="leftpanel" class="col-2">
         <div class="infoarea">
+
           <div class="selectarea">
             <b>dataset</b>
-            <select id="dataset-select" class="form-select">
+            <select id="dataset-select" class="form-select form-select-sm">
               {% for dataset_name in datasets %}
               <option value="{{ dataset_name }}">{{ dataset_name }}</option>
               {% endfor %}
@@ -107,77 +94,33 @@
           </div>
           <div class="selectarea">
             <b>split</b>
-            <select id="split-select" class="form-select">
+            <select id="split-select" class="form-select form-select-sm">
               <option value="dev" selected>dev</option>
               <option value="test">test</option>
               <option value="train">train</option>
             </select>
           </div>
-          <!-- <div class="selectarea">
-            <b>outputs</b>
 
-            <div class="bordered-block">
-              {% for generated_output_name, attrs in generated_outputs.items() %}
-              <div class="form-switch">
-                <input class="form-check-input custom-checkbox generated-out-checkbox output-checkbox" type="checkbox"
-                  id="pipeline-checkbox-{{ generated_output_name }}" {% if attrs.active==1 %} checked {% endif %}
-                  disabled>
-                <label class="form-check-label custom-control-label"
-                  for="pipeline-checkbox-{{ generated_output_name }}">{{
-                  generated_output_name }}</label>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="selectarea">
-            <b>pipelines</b>
-
-            <div class="bordered-block">
-              {% for pipeline_name, attrs in pipelines.items() %}
-              <div class="form-switch">
-                <input class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
-                  id="pipeline-checkbox-{{ pipeline_name }}" {% if attrs.active==1 %} checked {% endif %}>
-                <label class="form-check-label custom-control-label" for="pipeline-checkbox-{{ pipeline_name }}">{{
-                  pipeline_name }}</label>
-              </div>
-              {% endfor %}
-        </div>
-      </div> -->
-          <div class="selectarea">
-            <b>export</b>
-            <div class="bordered-block">
-              <div class="form-check form-check-inline">
-                <input type="radio" class="form-check-input" name="options-export" value="example"
-                  id="option-export-table" checked>
-                <label class="form-check-label" for="option-export-table">example</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input type="radio" class="form-check-input" name="options-export" value="favourites"
-                  id="option-export-favourites" disabled>
-                <label class="form-check-label" for="option-export-favourites">favourites</label>
-              </div>
-
-              <div class="btn-group btn-group-sm" role="group">
-                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-                  onclick="export_table('txt');">TXT</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-                  onclick="export_table('json');">JSON</button>
-              </div>
-              <div class="btn-group btn-group-sm" role="group">
-                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-                  onclick="export_table('csv');">CSV</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-                  onclick="export_table('xlsx');">XLSX</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-                  onclick="export_table('html');">HTML</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="selectarea" id="favourites-area" hidden>
-            <b>favourites</b>
-            <div class="bordered-block">
-              <ul class="list-group list-group-flush" id="favourites-box"></ul>
+          <div class="selectarea" id="actions-area">
+            <div class="d-grid gap-2">
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="reload_pipelines();">
+                ⟳ Reload pipelines
+                </a>
+              </button>
+              <input type="checkbox" class="btn-check" id="edit-btn" onclick="toggle_edit();" autocomplete="off">
+              <label class="btn btn-sm btn-outline-secondary" for="edit-btn">✎ Edit mode</label>
+              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#favourites-modal">
+                ★ Favourites
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#export-modal">
+                🗎 Export
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#info-modal">
+                ⓘ Dataset info
+              </button>
             </div>
           </div>
         </div>
@@ -198,7 +141,7 @@
         </div>
 
         <div id="rightpanel" class="collapse show">
-          <div class="topnavs">
+          <!-- <div class="topnavs">
             <ul class="nav nav-pills justify-content-center">
               <li class="nav-item">
                 <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#pipelinearea" type="button"
@@ -207,13 +150,13 @@
               <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" data-bs-target="#outputarea" type="button"
                   role="tab">Outputs</a>
-              </li>
-              <li class="nav-item">
+              </li> -->
+          <!-- <li class="nav-item">
                 <a class="nav-link " data-bs-toggle="tab" data-bs-target="#infoarea" type="button" role="tab">Dataset
                   info</a>
-              </li>
-            </ul>
-          </div>
+              </li> -->
+          <!-- </ul> -->
+          <!-- </div> -->
           <div id='sidepanel-content' class="tab-content">
             <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel">
               {% for pipeline_name, attrs in pipelines.items() %}
@@ -224,13 +167,14 @@
                     id="pipeline-checkbox-{{ pipeline_name }}" {% if attrs.active==1 %} checked {% endif %}></label>
 
                 {% if 'config_template' in attrs %}
-                <label class="label-settings" data-bs-toggle="modal" data-bs-target="#{{ pipeline_name }}-modal">
-                  ⚙</label>
+                <label class="label-settings" data-bs-toggle="modal" data-bs-target="#{{ pipeline_name }}-modal"><img
+                    src="{{ host_prefix }}/static/img/settings.png" width="12px" /></label>
                 <div class="modal fade" id="{{ pipeline_name }}-modal" tabindex="-1">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h5 class="modal-title" id="{{ pipeline_name }}-modal-label">Settings: {{ pipeline_name }}</h5>
+                        <h5 class="modal-title" id="{{ pipeline_name }}-modal-label">Settings: {{ pipeline_name }}
+                        </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
@@ -246,8 +190,8 @@
                 <div id="out-{{ pipeline_name }}-placeholder" class="font-mono"></div>
               </div>
               {% endfor %}
-            </div>
-            <div id='outputarea' class="tab-pane sidepanel-panel" role="tabpanel">
+              <!-- </div> -->
+              <!-- <div id='outputarea' class="tab-pane sidepanel-panel" role="tabpanel"> -->
               {% for generated_output_name, attrs in generated_outputs.items() %}
               <div class="output-box generated-output-box" id="out-{{ generated_output_name }}">
                 <label class="label-name" for="pipeline-checkbox-{{ generated_output_name }}">{{ generated_output_name
@@ -256,9 +200,89 @@
               </div>
               {% endfor %}
             </div>
-            <div id='infoarea' class="tab-pane sidepanel-panel" role="tabpanel" tabindex="0">
+            <!-- <div id='infoarea' class="tab-pane sidepanel-panel" role="tabpanel" tabindex="0">
               <div id="dataset-info" class="area-content"></div>
-            </div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal windows -->
+  <div class="modal fade" id="export-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="export-modal-label">Export</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h5>Export</h5>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="options-export" value="example" id="option-export-table"
+              checked>
+            <label class="form-check-label" for="option-export-table">current example</label>
+          </div>
+          <div style="margin-bottom: 10px" class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="options-export" value="favourites"
+              id="option-export-favourites" disabled>
+            <label class="form-check-label" for="option-export-favourites">favourites</label>
+          </div>
+          <h5>Format</h5>
+          <div class="btn-group btn-group-sm" role="group">
+            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+              onclick="export_table('csv');">CSV</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+              onclick="export_table('xlsx');">XLSX</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+              onclick="export_table('html');">HTML</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+              onclick="export_table('txt');">TXT</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+              onclick="export_table('json');">JSON</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="info-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="info-modal-label">Dataset info</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id='infoarea' class="tab-pane sidepanel-panel" role="tabpanel" tabindex="0">
+            <div id="dataset-info" class="area-content"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="favourites-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="favourites-modal-label">Favourites</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+
+          <ul class="list-group list-group-flush" id="favourites-box"></ul>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="clear_favourites();">Delete all</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
