@@ -226,6 +226,11 @@ pre {
     color: rgb(69, 69, 69);
 }
 
+.pipeline-checkbox:checked {
+    background-color: #818181 !important;
+    border-color: #818181 !important;
+}
+
 .output-box {
     padding: 20px;
     border: 1px solid #ddd;
@@ -249,11 +254,11 @@ pre {
 }
 
 .label-settings {
-    right: 40px;
+    right: 30px;
 }
 
 .label-on-off {
-    right: 20px;
+    right: 10px;
 }
 
 .form-switch-panel {
