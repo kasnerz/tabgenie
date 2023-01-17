@@ -2,6 +2,9 @@
 
 import lxml.etree
 import lxml.html
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_pipeline_class_by_name(pipeline_name):
@@ -10,9 +13,9 @@ def get_pipeline_class_by_name(pipeline_name):
         "reference": "ReferencePipeline",
         "model_local": "ModelLocalPipeline",
         "model_api": "ModelAPIPipeline",
-        "graph" : "GraphPipeline",
-        "text_ie" : "TextIEPipeline",
-        "export" : "ExportPipeline"
+        "graph": "GraphPipeline",
+        "text_ie": "TextIEPipeline",
+        "export": "ExportPipeline",
     }
     pipeline_module = __import__(
         "pipelines." + pipeline_name + "_pipeline",
@@ -33,15 +36,14 @@ class Processor:
 
     def html_render(self, el):
         html = el.render()
-        return lxml.etree.tostring(
-            lxml.html.fromstring(html), encoding="unicode", pretty_print=True
-        )
+        return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
 
 
 class Pipeline:
-    def __init__(self, cfg):
+    def __init__(self, name, cfg):
         self.processors = []
         self.cache = {}
+        self.name = name
         self.cfg = cfg
 
     def get_from_cache(self, key):
@@ -64,10 +66,12 @@ class Pipeline:
         next_inp = pipeline_args
 
         for p in self.processors:
-            next_inp = p.process(next_inp)
+            try:
+                next_inp = p.process(next_inp)
+            except Exception as e:
+                logger.error(f"Pipeline {self.name} could not process the input.")
+                return ""
 
         out = next_inp
         self.save_to_cache(key, out)
         return out
-
-

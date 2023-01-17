@@ -3,21 +3,16 @@
 import logging
 from ..processing import Processor
 
-logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-    datefmt="%H:%M:%S",
-)
+
 logger = logging.getLogger(__name__)
+
 
 class GraphProcessor(Processor):
     def __init__(self):
         super().__init__()
-        
+
     def process(self, content):
-        triples_str = [
-            f"{{subject: \"{t[0]}\", predicate: \"{t[1]}\", object: \"{t[2]}\"}}" for t in content
-        ]
+        triples_str = [f'{{subject: "{t[0]}", predicate: "{t[1]}", object: "{t[2]}"}}' for t in content]
         triples_str = ",\n".join(triples_str)
 
         html = f"""
@@ -41,4 +36,4 @@ class GraphProcessor(Processor):
 
 
 # .attr("preserveAspectRatio", "xMinYMin meet")
-                            # .attr("viewBox", "0 0 {self.width} {self.height}")
+# .attr("viewBox", "0 0 {self.width} {self.height}")
