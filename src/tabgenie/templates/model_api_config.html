@@ -1,6 +1,7 @@
 <div>
     <h5>Model API input</h5>
-    <textarea class="form-control {{ pipeline_name }}-input" id="model-api-textarea" rows="10"></textarea>
+    <textarea class="form-control {{ pipeline_name }}-input" id="model-api-{{ pipeline_name }}-textarea"
+        rows="10"></textarea>
     <div class="btn-group btn-group-sm wildcards" role="group">
         <button type="button" id="insert-csv-btn" class="btn btn-outline-secondary btn-sm"
             onclick="insert_text('%table_csv%');">%table_csv%</button>

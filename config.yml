@@ -14,17 +14,18 @@ datasets:
 - wikibio
 - wikisql
 default_dataset: totto
+debug: False
 # max_examples_per_split: 10000
 host_prefix: "."
 cache_dev_splits: false
 # default_prompt: tk-def-pos
 default_prompt: totto
 pipelines:
-  totto_model:
-    class: model_api
-    model_url: http://localhost:8980/
-    # config_template_file: model_api_config.html
-    active: 1
+  # totto_model:
+  #   class: model_api
+  #   model_url: http://localhost:8980/
+  #   config_template_file: model_api_config.html
+  #   active: 1
   tk_instruct_model:
     class: model_api
     model_url: http://localhost:8981/

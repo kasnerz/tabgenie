@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import json
 import logging
+import coloredlogs
 from pkgutil import get_data
 import yaml
 import shutil
@@ -18,8 +20,16 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 app = Flask("tabgenie", template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 
-logging.basicConfig(format="%(levelname)s - %(message)s", level=logging.INFO, datefmt="%H:%M:%S")
+file_handler = logging.FileHandler("error.log")
+file_handler.setLevel(logging.ERROR)
+
+logging.basicConfig(
+    format="%(levelname)s - %(message)s",
+    level=logging.INFO,
+    handlers=[file_handler, logging.StreamHandler()],
+)
 logger = logging.getLogger(__name__)
+coloredlogs.install(level="INFO", logger=logger, fmt="%(asctime)s %(levelname)s %(message)s")
 
 
 def success():
@@ -46,29 +56,7 @@ def render_table():
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")
     table_idx = int(request.args.get("table_idx"))
-    # pipelines = json.loads(request.args.get("pipelines"))
-
     table_data = get_table_data(dataset_name, split, table_idx)
-    # table_data["pipeline_outputs"] = []
-
-    # for pipeline, attrs in pipelines.items():
-    #     if not attrs["active"]:
-    #         continue
-
-    #     content = {
-    #         "dataset_obj" : get_dataset(dataset_name, split),
-    #         "dataset": dataset_name,
-    #         "table_idx": table_idx,
-    #         "split": split,
-    #     }
-    #     out = run_pipeline(pipeline, content, cache_only=True)
-
-    #     if out:
-    #         table_data["pipeline_outputs"].append({
-    #             "pipeline_name" : pipeline,
-    #             "out": out
-    #         })
-
     return table_data
 
 
@@ -190,7 +178,7 @@ def initialize_pipeline(pipeline_name):
             )
             pipeline_cfg["config_template"] = template
 
-    pipeline_obj = get_pipeline_class_by_name(pipeline_cfg["class"])(cfg=pipeline_cfg)
+    pipeline_obj = get_pipeline_class_by_name(pipeline_cfg["class"])(name=pipeline_name, cfg=pipeline_cfg)
     app.config["pipelines_obj"][pipeline_name] = pipeline_obj
 
     return pipeline_obj
@@ -198,10 +186,6 @@ def initialize_pipeline(pipeline_name):
 
 def run_pipeline(pipeline_name, content, cache_only=False, force=False):
     pipeline = app.config["pipelines_obj"].get(pipeline_name)
-
-    # if not pipeline:
-    #     logger.info(f"Initializing {pipeline_name}")
-    #     pipeline = initialize_pipeline(pipeline_name)
 
     if content.get("dataset") and content.get("split"):
         dataset_obj = get_dataset(dataset_name=content["dataset"], split=content["split"])
@@ -278,5 +262,10 @@ def create_app():
     if config["cache_dev_splits"]:
         for dataset_name in app.config["datasets"]:
             get_dataset(dataset_name, "dev")
+
+    if config["debug"] is False:
+        logging.getLogger("werkzeug").disabled = True
+
+    logger.info("Application ready")
 
     return app
