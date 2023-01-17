@@ -12,15 +12,13 @@ from .processing.processing import get_pipeline_class_by_name
 from flask import Flask, render_template, jsonify, request, send_file
 
 
-TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
-STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
+TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 
 app = Flask("tabgenie", template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 
-logging.basicConfig(
-    format="%(levelname)s - %(message)s", level=logging.INFO, datefmt="%H:%M:%S"
-)
+logging.basicConfig(format="%(levelname)s - %(message)s", level=logging.INFO, datefmt="%H:%M:%S")
 logger = logging.getLogger(__name__)
 
 
@@ -48,33 +46,33 @@ def render_table():
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")
     table_idx = int(request.args.get("table_idx"))
-    pipelines = json.loads(request.args.get("pipelines"))
+    # pipelines = json.loads(request.args.get("pipelines"))
 
     table_data = get_table_data(dataset_name, split, table_idx)
-    table_data["pipeline_outputs"] = []
+    # table_data["pipeline_outputs"] = []
 
-    for pipeline, attrs in pipelines.items():
-        if not attrs["active"]:
-            continue
+    # for pipeline, attrs in pipelines.items():
+    #     if not attrs["active"]:
+    #         continue
 
-        content = {
-            "dataset_obj" : get_dataset(dataset_name, split),
-            "dataset": dataset_name,
-            "table_idx": table_idx,
-            "split": split,
-        }
-        out = run_pipeline(pipeline, content, cache_only=True)
+    #     content = {
+    #         "dataset_obj" : get_dataset(dataset_name, split),
+    #         "dataset": dataset_name,
+    #         "table_idx": table_idx,
+    #         "split": split,
+    #     }
+    #     out = run_pipeline(pipeline, content, cache_only=True)
 
-        if out:
-            table_data["pipeline_outputs"].append({
-                "pipeline_name" : pipeline,
-                "out": out
-            })
+    #     if out:
+    #         table_data["pipeline_outputs"].append({
+    #             "pipeline_name" : pipeline,
+    #             "out": out
+    #         })
 
     return table_data
 
 
-@app.route('/export_to_file', methods=['GET', 'POST'])
+@app.route("/export_to_file", methods=["GET", "POST"])
 def export_to_file():
     content = request.json
     export_option = content["export_option"]
@@ -83,7 +81,7 @@ def export_to_file():
     # TODO export edited cells
     # edited_cells = json.loads(content.get("edited_cells") or {})
 
-    export_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, 'tmp')
+    export_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, "tmp")
 
     if os.path.isdir(export_dir):
         shutil.rmtree(export_dir)
@@ -91,29 +89,35 @@ def export_to_file():
     default_template = "export/json_templates/default.yml"
 
     os.makedirs(os.path.join(export_dir, "files"))
-    file_to_download = export_examples_to_file(export_examples, export_dir=os.path.join(export_dir, "files"), export_format=export_format, json_template=default_template)
+    file_to_download = export_examples_to_file(
+        export_examples,
+        export_dir=os.path.join(export_dir, "files"),
+        export_format=export_format,
+        json_template=default_template,
+    )
 
     if export_option == "favourites":
         file_to_download = os.path.join(export_dir, "export.zip")
-        shutil.make_archive(file_to_download.rstrip(".zip"), 'zip', os.path.join(export_dir, "files"))
+        shutil.make_archive(file_to_download.rstrip(".zip"), "zip", os.path.join(export_dir, "files"))
 
     logger.info("Sending file")
-    return send_file(file_to_download,
-                    mimetype='text/plain',
-                    as_attachment=True)
+    return send_file(file_to_download, mimetype="text/plain", as_attachment=True)
 
 
 def export_examples_to_file(examples_to_export, export_format, export_dir, export_filename=None, json_template=None):
-    
+
     if type(examples_to_export) is dict:
         # TODO look at this in more detail, favourites behaves differently
         examples_to_export = examples_to_export.values()
 
     pipeline_args = {
-        "examples_to_export" : examples_to_export,
-        "export_format" : export_format,
-        "json_template" : json_template,
-        "dataset_objs" : {dataset_name : get_dataset(dataset_name, split) for dataset_name, split in map(lambda x: (x["dataset"], x["split"]), examples_to_export)}
+        "examples_to_export": examples_to_export,
+        "export_format": export_format,
+        "json_template": json_template,
+        "dataset_objs": {
+            dataset_name: get_dataset(dataset_name, split)
+            for dataset_name, split in map(lambda x: (x["dataset"], x["split"]), examples_to_export)
+        },
     }
     os.makedirs(export_dir, exist_ok=True)
     exported = run_pipeline("export", pipeline_args, force=True)
@@ -145,26 +149,31 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, expor
     return os.path.join(export_dir, out_filename)
 
 
-
 def export_dataset(dataset_name, split, out_dir, export_format, json_template=None):
     dataset = get_dataset(dataset_name, split)
 
-    examples_to_export = [{
-      "dataset": dataset_name,
-      "split": split,
-      "table_idx": table_idx
-    } for table_idx in range(dataset.get_example_count(split))]
+    examples_to_export = [
+        {"dataset": dataset_name, "split": split, "table_idx": table_idx}
+        for table_idx in range(dataset.get_example_count(split))
+    ]
 
     # only relevant for JSON
     export_filename = f"{split}.json"
 
-    export_examples_to_file(examples_to_export, export_format=export_format, export_dir=out_dir, export_filename=export_filename, json_template=json_template)
-  
+    export_examples_to_file(
+        examples_to_export,
+        export_format=export_format,
+        export_dir=out_dir,
+        export_filename=export_filename,
+        json_template=json_template,
+    )
+
     logger.info("Export finished")
+
 
 def initialize_dataset(dataset_name):
     # dataset_path = app.config["dataset_paths"][dataset_name]
-    dataset_path = None # not needed for HF
+    dataset_path = None  # not needed for HF
     dataset = DATASET_CLASSES[dataset_name](path=dataset_path)
     app.config["datasets_obj"][dataset_name] = dataset
 
@@ -172,32 +181,35 @@ def initialize_dataset(dataset_name):
 
 
 def initialize_pipeline(pipeline_name):
-    cfg = app.config["pipeline_cfg"].get(pipeline_name) or {}
-    
-    pipeline = get_pipeline_class_by_name(pipeline_name)(cfg=cfg)
-    app.config["pipelines_obj"][pipeline_name] = pipeline
+    pipeline_cfg = app.config["pipelines"][pipeline_name]
 
-    return pipeline
+    with app.app_context():
+        if "config_template_file" in pipeline_cfg:
+            template = render_template(
+                pipeline_cfg["config_template_file"], pipeline_name=pipeline_name, cfg=pipeline_cfg
+            )
+            pipeline_cfg["config_template"] = template
+
+    pipeline_obj = get_pipeline_class_by_name(pipeline_cfg["class"])(cfg=pipeline_cfg)
+    app.config["pipelines_obj"][pipeline_name] = pipeline_obj
+
+    return pipeline_obj
+
 
 def run_pipeline(pipeline_name, content, cache_only=False, force=False):
-    pipeline = get_pipeline(pipeline_name)
+    pipeline = app.config["pipelines_obj"].get(pipeline_name)
+
+    # if not pipeline:
+    #     logger.info(f"Initializing {pipeline_name}")
+    #     pipeline = initialize_pipeline(pipeline_name)
 
     if content.get("dataset") and content.get("split"):
         dataset_obj = get_dataset(dataset_name=content["dataset"], split=content["split"])
         content["dataset_obj"] = dataset_obj
 
     out = pipeline.run(content, cache_only=cache_only, force=force)
+
     return out
-
-
-def get_pipeline(pipeline_name):
-    pipeline = app.config["pipelines_obj"].get(pipeline_name)
-
-    if not pipeline:
-        logger.info(f"Initializing {pipeline_name}")
-        pipeline = initialize_pipeline(pipeline_name)
-
-    return pipeline
 
 
 def get_dataset(dataset_name, split):
@@ -228,31 +240,26 @@ def get_table_data(dataset_name, split, table_idx):
     prompt = dataset.get_prompt(app.config.get("default_prompt"))
     dataset_info = dataset.get_info()
 
-    return {"html": html, "total_examples": dataset.get_example_count(split), "dataset_info" : dataset_info, "generated_outputs" : generated_outputs, "prompt" : prompt}
-
+    return {
+        "html": html,
+        "total_examples": dataset.get_example_count(split),
+        "dataset_info": dataset_info,
+        "generated_outputs": generated_outputs,
+        "prompt": prompt,
+    }
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     logger.info(f"Page loaded")
 
-    pipelines = {
-        pipeline : {"active" : 1, "auto" : 1}
-        for pipeline in app.config["pipelines"]
-    }
-
-    generated_outputs = {
-        generated_output : {"active" : 1}
-        for generated_output in app.config["generated_outputs"]
-    }
-
     return render_template(
         "index.html",
         datasets=app.config["datasets"],
-        pipelines=pipelines,
-        generated_outputs=generated_outputs,
+        pipelines=app.config["pipelines"],
+        generated_outputs=app.config["generated_outputs"],
         default_dataset=app.config["default_dataset"],
-        host_prefix=app.config["host_prefix"]
+        host_prefix=app.config["host_prefix"],
     )
 
 
@@ -263,6 +270,9 @@ def create_app():
     app.config.update(config)
     app.config["datasets_obj"] = {}
     app.config["pipelines_obj"] = {}
+
+    for pipeline_name in app.config["pipelines"].keys():
+        initialize_pipeline(pipeline_name)
 
     # preload
     if config["cache_dev_splits"]:
