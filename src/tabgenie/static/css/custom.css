@@ -221,6 +221,11 @@ pre {
     border-color: #0175ac;
 }
 
+.btn-outline-secondary {
+    border-color: #c9c7c7;
+    color: rgb(69, 69, 69);
+}
+
 .output-box {
     padding: 20px;
     border: 1px solid #ddd;
@@ -330,4 +335,8 @@ ul {
 
 .page-link {
     cursor: pointer;
+}
+
+.btn-light {
+    color: rgb(56, 56, 56);
 }
