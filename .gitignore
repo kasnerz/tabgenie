@@ -4,3 +4,7 @@ data
 *.egg-info
 export/datasets
 tmp
+.python-version
+.idea
+.DS_Store
+env/

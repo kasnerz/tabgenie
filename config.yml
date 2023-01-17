@@ -12,6 +12,7 @@ datasets:
 - totto
 - webnlg
 - wikibio
+- wikisql
 default_dataset: totto
 # max_examples_per_split: 10000
 host_prefix: "."

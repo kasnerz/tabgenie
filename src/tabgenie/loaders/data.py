@@ -35,6 +35,7 @@ def get_dataset_class_by_name(dataset_name):
         "webnlg": "WebNLG",
         "wikibio": "WikiBio",
         "totto": "ToTTo",
+        "wikisql": "WikiSQL"
     }
     dataset_module = __import__(
         dataset_name,
