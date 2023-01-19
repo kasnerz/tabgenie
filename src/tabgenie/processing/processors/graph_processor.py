@@ -21,9 +21,11 @@ class GraphProcessor(Processor):
                 var triples = [
                         {triples_str}
                     ];
+                var rdf_graph_window_height = 400;
+
                 var svg = d3.select("#svg-body").append("svg")
                             .attr("width", 3000)
-                            .attr("height", 400)
+                            .attr("height", rdf_graph_window_height)
                             .call(d3.zoom().on("zoom", function () {{
                                 svg.attr("transform", d3.event.transform)
                                 }})).append("g")

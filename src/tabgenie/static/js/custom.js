@@ -360,6 +360,16 @@ function fetch_table(dataset, split, table_idx, export_format) {
       set_output(generated_out["name"], generated_out["out"]);
     }
     for (var pipeline in pipelines) {
+
+      if (("datasets" in pipelines[pipeline]) && !(pipelines[pipeline]["datasets"].includes(dataset))) {
+        $(`#out-${pipeline}`).hide();
+        pipelines[pipeline].active = 0;
+      } else {
+        $(`#out-${pipeline}`).show();
+        $(`#pipeline-checkbox-${pipeline}`).prop("checked", true);
+        pipelines[pipeline].active = 1;
+      }
+
       if (pipelines[pipeline].active && $(`#out-${pipeline}-placeholder`).text() == "") {
         run_pipeline(pipeline);
       }

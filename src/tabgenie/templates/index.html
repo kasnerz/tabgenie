@@ -147,7 +147,7 @@
           <div id='sidepanel-content' class="tab-content">
             <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel">
               {% for pipeline_name, attrs in pipelines.items() %}
-              <div class="output-box pipeline-box" id=out-{{ pipeline_name }}">
+              <div class="output-box pipeline-box" id="out-{{ pipeline_name }}">
                 <label class="label-name" for="pipeline-checkbox-{{ pipeline_name }}">{{ pipeline_name }}</label>
                 <label class="label-on-off"><input
                     class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"

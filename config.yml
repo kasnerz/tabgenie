@@ -13,13 +13,11 @@ datasets:
 - webnlg
 - wikibio
 - wikisql
-default_dataset: totto
+default_dataset: webnlg
 debug: False
 # max_examples_per_split: 10000
 host_prefix: "."
 cache_dev_splits: false
-# default_prompt: tk-def-pos
-default_prompt: totto
 pipelines:
   # totto_model:
   #   class: model_api
@@ -32,10 +30,13 @@ pipelines:
     config_template_file: model_api_config.html
     default_prompt: tk-def-pos
     active: 1
-  # rdf_triples:
-  #   class: graph
-  #   active: 0
+  rdf_triples:
+    class: graph
+    active: 0
+    datasets:
+      - webnlg
+      - dart
+      - e2e
 generated_outputs:
   reference:
     active: 1
-# - zeroshot_pipeline
