@@ -2,6 +2,7 @@ var table_idx = 0;
 var total_examples = 1;
 var dataset = window.default_dataset;
 var pipelines = window.pipelines;
+var prompts = window.prompts;
 var generated_outputs = window.generated_outputs;
 var url_prefix = window.location.href.split('#')[0];
 var split = "dev";
@@ -179,6 +180,7 @@ function run_pipeline(pipeline) {
     "edited_cells": JSON.stringify(editedCells),
     "custom_input": custom_inputs
   };
+  $(`#pipeline-${pipeline}-spinner`).show();
 
   $.ajax({
     type: "POST",
@@ -187,6 +189,7 @@ function run_pipeline(pipeline) {
     data: JSON.stringify(request),
     success: function (data) {
       output = data["out"];
+      $(`#pipeline-${pipeline}-spinner`).hide();
       set_output(pipeline, output);
     },
     dataType: "json"
@@ -301,9 +304,10 @@ function export_table(format) {
   $("#exp-btn").removeClass('disabled');
 }
 
-function insert_text(input_text) {
-  var textarea = $("#model-api-textarea");
-  textarea.val(textarea.val() + input_text);
+function insert_prompt(prompt_name, id) {
+  var textarea = $(`#${id}`);
+  textarea.val(prompts[prompt_name]);
+  textarea.highlightWithinTextarea("update");
 }
 
 function update_favourite_button() {
@@ -341,7 +345,6 @@ function fetch_table(dataset, split, table_idx, export_format) {
     reset_edited_cells();
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
-    $("#model-api-textarea").val(data.prompt);
 
     total_examples = data.total_examples;
     $("#total-examples").html(total_examples - 1);
@@ -375,6 +378,7 @@ $('.output-checkbox').on('change', function () {
 
     if (state == 1) {
       pipelines[output_name].active = 0;
+      set_output(output_name, "");
     } else {
       run_pipeline(output_name);
       pipelines[output_name].active = 1;
@@ -428,6 +432,20 @@ $("#split-select").on("change", change_split);
 $("#format-select").on("change", function (e) {
   $("#dataset-spinner").show();
   fetch_table(dataset, split, table_idx);
+});
+
+$(".custom-prompt-input").highlightWithinTextarea({
+  highlight: [
+    {
+      // highlight: /\[PROMPTVAR:[a-z0-9_]*\]/gi,
+      highlight: "[PROMPTVAR:TASK_DEF]",
+      className: 'yellow'
+    },
+    {
+      highlight: /\[PROMPTVAR:[a-z0-9_]*\]/gi,
+      className: 'blue'
+    }
+  ]
 });
 
 $(document).keydown(function (event) {

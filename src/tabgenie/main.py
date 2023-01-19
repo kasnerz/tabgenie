@@ -8,6 +8,7 @@ import coloredlogs
 from pkgutil import get_data
 import yaml
 import shutil
+import glob
 import pandas as pd
 from .loaders import DATASET_CLASSES
 from .processing.processing import get_pipeline_class_by_name
@@ -173,8 +174,12 @@ def initialize_pipeline(pipeline_name):
 
     with app.app_context():
         if "config_template_file" in pipeline_cfg:
+            # TODO make the prompts less hard-coded
             template = render_template(
-                pipeline_cfg["config_template_file"], pipeline_name=pipeline_name, cfg=pipeline_cfg
+                pipeline_cfg["config_template_file"],
+                pipeline_name=pipeline_name,
+                cfg=pipeline_cfg,
+                prompts=app.config["prompts"],
             )
             pipeline_cfg["config_template"] = template
 
@@ -221,7 +226,6 @@ def get_table_data(dataset_name, split, table_idx):
     table = dataset.get_table(split=split, table_idx=table_idx)
     html = dataset.export_table(table=table, export_format="html")
     generated_outputs = dataset.get_generated_outputs(table=table)
-    prompt = dataset.get_prompt(app.config.get("default_prompt"))
     dataset_info = dataset.get_info()
 
     return {
@@ -229,8 +233,22 @@ def get_table_data(dataset_name, split, table_idx):
         "total_examples": dataset.get_example_count(split),
         "dataset_info": dataset_info,
         "generated_outputs": generated_outputs,
-        "prompt": prompt,
     }
+
+
+def load_prompts():
+    prompts_dir = os.path.join(TEMPLATES_DIR, "prompts")
+    prompts = {}
+
+    for file in glob.glob(prompts_dir + "/" + "*.prompt"):
+        prompt_name = os.path.splitext(os.path.basename(file))[0]
+
+        with open(file) as f:
+            prompt = f.read()
+
+        prompts[prompt_name] = prompt
+
+    return prompts
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -242,6 +260,7 @@ def index():
         datasets=app.config["datasets"],
         pipelines=app.config["pipelines"],
         generated_outputs=app.config["generated_outputs"],
+        prompts=app.config["prompts"],
         default_dataset=app.config["default_dataset"],
         host_prefix=app.config["host_prefix"],
     )
@@ -254,6 +273,7 @@ def create_app():
     app.config.update(config)
     app.config["datasets_obj"] = {}
     app.config["pipelines_obj"] = {}
+    app.config["prompts"] = load_prompts()
 
     if app.config.get("pipelines"):
         for pipeline_name in app.config["pipelines"].keys():

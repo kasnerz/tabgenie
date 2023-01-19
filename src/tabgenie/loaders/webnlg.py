@@ -3,7 +3,8 @@ from datasets import load_dataset
 from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
 from ..utils.text import normalize
 
-import logging 
+import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,16 +22,15 @@ class WebNLG(HFTabularDataset):
 
     def table_to_triples(self, table, cell_ids):
         triples = []
-        rows = table.get_cells()[1:] # skip headers
+        rows = table.get_cells()[1:]  # skip headers
 
         if any(len(x) != 3 for x in rows):
             logger.warning(f"Some triples do not have exactly 3 components {[x.value for x in row]}")
 
         for row in rows:
             triples.append([x.value for x in row])
-        
-        return triples
 
+        return triples
 
     def prepare_table(self, split, table_idx):
         entry = self.data[split][table_idx]
@@ -57,4 +57,3 @@ class WebNLG(HFTabularDataset):
 
     def get_task_definition(self):
         return "Write a short description of the following RDF triples."
-

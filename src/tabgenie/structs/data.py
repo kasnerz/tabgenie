@@ -11,11 +11,9 @@ import pandas as pd
 import lxml.etree
 import lxml.html
 import glob
-import jinja2
 import copy
 
 from collections import defaultdict, namedtuple
-from ..utils.text import format_prompt
 from tinyhtml import h
 
 logger = logging.getLogger(__name__)
@@ -47,6 +45,7 @@ class Table:
     """
     Table object
     """
+
     def __init__(self):
         self.props = {}
         self.cells = []
@@ -66,7 +65,7 @@ class Table:
         self.current_row.append(cell)
         self.cell_by_ids[self.cell_idx] = cell
         self.cell_idx += 1
-        
+
     def set_cell(self, i, j, c):
         self.cells[i][j] = c
 
@@ -103,7 +102,7 @@ class Table:
         return self.outputs.get(key)
 
     def get_generated_outputs(self):
-        return [{"name" : key, "out" : val} for key, val in self.outputs.items()]
+        return [{"name": key, "out": val} for key, val in self.outputs.items()]
 
     def set_generated_output(self, key, value):
         self.outputs[key] = value
@@ -144,7 +143,9 @@ class TabularDataset:
             outputs = f.readlines()
 
             if len(outputs) != self.get_example_count(split):
-                raise AssertionError(f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {self.get_example_count(split)}")
+                raise AssertionError(
+                    f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {self.get_example_count(split)}"
+                )
 
             for o in outputs:
                 self.tables.set_output(name, o)
@@ -170,7 +171,7 @@ class TabularDataset:
 
         if edited_cells:
             table_modif = copy.deepcopy(table)
-            
+
             for cell_id, val in edited_cells.items():
                 cell = table_modif.get_cell_by_id(int(cell_id))
                 cell.value = val
@@ -190,9 +191,6 @@ class TabularDataset:
             exported = self.table_to_linear(table, cell_ids)
         elif export_format == "triples":
             exported = self.table_to_triples(table, cell_ids)
-        elif export_format == "instruct":
-            exported = self.table_to_instruct(table, cell_ids)
-            exported = format_prompt(prompt=exported, table=table, dataset=self)
         elif export_format == "html":
             exported = self.table_to_html(table)
         elif export_format == "csv":
@@ -206,19 +204,17 @@ class TabularDataset:
 
         return exported
 
-
     def export(self, split, table_cfg):
         exported = []
-        
+
         for i in range(self.get_example_count(split)):
             obj = {}
             for key, export_format in table_cfg["fields"].items():
                 table = self.get_table(split, i)
-                obj[key] = self.export_table(table, export_format=export_format)                
+                obj[key] = self.export_table(table, export_format=export_format)
             exported.append(obj)
 
         return exported
-
 
     def table_to_linear(self, table, cell_ids=None):
         if cell_ids:
@@ -245,7 +241,7 @@ class TabularDataset:
             for j, cell in enumerate(row):
                 if cell.is_header():
                     continue
-                
+
                 row_headers = table.get_row_headers(i)
                 col_headers = table.get_col_headers(j)
 
@@ -256,7 +252,7 @@ class TabularDataset:
                 elif row_headers and not col_headers:
                     subj = title
                     pred = row_headers[0].value
-                
+
                 elif col_headers and not row_headers:
                     subj = title
                     pred = col_headers[0].value
@@ -265,11 +261,10 @@ class TabularDataset:
                 triples.append([subj, pred, obj])
 
         return triples
-    
 
     def get_task_definition(self):
         # TODO implement for individual datasets
-        return "Write a short description of the linearized table cells."
+        return "Write a short description of the data."
 
     def get_positive_examples(self):
         # TODO implement for individual datasets
@@ -279,47 +274,34 @@ class TabularDataset:
 
         return [
             {
-                "in" : self.table_to_linear(table_ex_1),
-                "out" : self.get_reference(table_ex_1),
+                "in": self.table_to_linear(table_ex_1),
+                "out": self.get_reference(table_ex_1),
             },
             {
-                "in" : self.table_to_linear(table_ex_2),
-                "out" : self.get_reference(table_ex_2),
-            }
+                "in": self.table_to_linear(table_ex_2),
+                "out": self.get_reference(table_ex_2),
+            },
         ]
 
-    def get_prompt(self, key):
-        prompts = {
-            "tk-def-pos": "Definition: {definition}\n\nPositive Example 1 -\nInput:\n{{ex_1_in}} Output:\n{{ex_1_out}}\nPositive Example 2 -\nInput:\n{{ex_2_in}}\nOutput:\n{{ex_2_out}}\nNow complete the following example - \nInput:\n%table_txt%\nOutput:\n",
-            "tk-def": "Definition: {definition}\n\nNow complete the following example - \nInput:\n%table_txt%\nOutput:\n",
-            "totto" : "%table_txt%"
-        }
+    # def get_prompt(self, key):
+    #     breakpoint()
+    #     prompt = prompts[key]
 
-        prompt = prompts[key]
+    #     if "def" in key:
+    #         definition = self.get_task_definition()
+    #         prompt = prompt.format(definition=definition)
 
-        if "def" in key:
-            definition = self.get_task_definition()
-            prompt = prompt.format(definition=definition)
+    #     if "pos" in key:
+    #         ex = self.get_positive_examples()
+    #         ex_1_in, ex_1_out, ex_2_in, ex_2_out = (
+    #             ex[0]["in"].strip(),
+    #             ex[0]["out"].strip(),
+    #             ex[1]["in"].strip(),
+    #             ex[1]["out"].strip(),
+    #         )
+    #         prompt = prompt.format(ex_1_in=ex_1_in, ex_1_out=ex_1_out, ex_2_in=ex_2_in, ex_2_out=ex_2_out)
 
-        if "pos" in key:
-            ex = self.get_positive_examples()
-            ex_1_in, ex_1_out, ex_2_in, ex_2_out = ex[0]["in"].strip(), ex[0]["out"].strip(), ex[1]["in"].strip(), ex[1]["out"].strip()
-            prompt = prompt.format(ex_1_in=ex_1_in, ex_1_out=ex_1_out, ex_2_in=ex_2_in, ex_2_out=ex_2_out)
-
-        return prompt
-
-
-    def table_to_instruct(self, table, cell_ids):
-        prompt = self.get_prompts()["tk-def-pos"]
-
-
-        import pdb; pdb.set_trace();
-        if "%table_csv%" in prompt:
-            df = self.table_to_df(table)
-            table_csv = df.to_csv(index=False)
-
-        return prompt.format(table_csv)
-    
+    #     return prompt
 
     def table_to_csv(self, table):
         df = self.table_to_df(table)
@@ -340,18 +322,17 @@ class TabularDataset:
 
             meta_tbodies = [h("tr")(tds) for tds in meta_trs]
             meta_tbody_el = h("tbody")(meta_tbodies)
-            meta_table_el = h("table", klass="table table-sm caption-top meta-table")(h("caption")("properties"),meta_tbody_el)
-        else: 
+            meta_table_el = h("table", klass="table table-sm caption-top meta-table")(
+                h("caption")("properties"), meta_tbody_el
+            )
+        else:
             meta_table_el = None
 
         table_el = self._get_main_table_html(table)
         area_el = h("div")(meta_table_el, table_el)
 
         html = area_el.render()
-        return lxml.etree.tostring(
-            lxml.html.fromstring(html), encoding="unicode", pretty_print=True
-        )
-
+        return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
 
     def _get_main_table_html(self, table):
         trs = []
@@ -362,9 +343,7 @@ class TabularDataset:
                     continue
 
                 eltype = "th" if c.is_header() else "td"
-                td_el = h(eltype, colspan=c.colspan, rowspan=c.rowspan, cell_idx=c.idx)(
-                    c.value
-                )
+                td_el = h(eltype, colspan=c.colspan, rowspan=c.rowspan, cell_idx=c.idx)(c.value)
 
                 if c.is_highlighted:
                     td_el.tag.attrs["class"] = "table-active"
@@ -374,35 +353,34 @@ class TabularDataset:
 
         tbodies = [h("tr")(tds) for tds in trs]
         tbody_el = h("tbody")(tbodies)
-        table_el = h("table", klass="table table-sm table-bordered caption-top main-table")(h("caption")("data"), tbody_el)
+        table_el = h("table", klass="table table-sm table-bordered caption-top main-table")(
+            h("caption")("data"), tbody_el
+        )
 
         return table_el
-
-
-    
 
 
 class HFTabularDataset(TabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.hf_id = None #TODO set
+        self.hf_id = None  # TODO set
         self.hf_extra_config = None
-        self.split_mapping = {
-            "train" : "train",
-            "dev" : "validation",
-            "test" : "test"
-        }
+        self.split_mapping = {"train": "train", "dev": "validation", "test": "test"}
         self.dataset_info = {}
 
     def load(self, split, max_examples=None):
         hf_split = self.split_mapping[split]
 
         try:
-            dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=datasets.ReadInstruction(hf_split, to=max_examples+1, unit='abs'))
+            dataset = datasets.load_dataset(
+                self.hf_id,
+                name=self.hf_extra_config,
+                split=datasets.ReadInstruction(hf_split, to=max_examples + 1, unit="abs"),
+            )
         except (AssertionError, ValueError, TypeError) as e:
             # max_examples is set higher than the total number of examples in the dataset
             dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=hf_split)
-        
+
         self.dataset_info = dataset.info.__dict__
         self.data[split] = dataset
 

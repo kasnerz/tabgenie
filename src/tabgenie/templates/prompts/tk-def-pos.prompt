@@ -1,0 +1,16 @@
+Definition: [PROMPTVAR:TASK_DEF]
+
+Positive Example 1 -
+Input:
+[PROMPTVAR:RAND1_HL_CELLS]
+Output:
+[PROMPTVAR:RAND1_REF]
+Positive Example 2 -
+Input:
+[PROMPTVAR:RAND2_HL_CELLS]
+Output:
+[PROMPTVAR:RAND2_REF]
+Now complete the following example - 
+Input:
+[PROMPTVAR:HL_CELLS]
+Output:
