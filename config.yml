@@ -32,9 +32,13 @@ pipelines:
     config_template_file: model_api_config.html
     default_prompt: tk-def-pos
     active: 1
-  # rdf_triples:
-  #   class: graph
-  #   active: 0
+  rdf_triples:
+    class: graph
+    active: 0
+    datasets:
+      - webnlg
+      - dart
+      - e2e
 generated_outputs:
   reference:
     active: 1
