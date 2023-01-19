@@ -32,11 +32,15 @@ pipelines:
     active: 1
   rdf_triples:
     class: graph
-    active: 0
+    active: 1
     datasets:
       - webnlg
       - dart
       - e2e
+  export:
+    class: export
+    default_format: json
+    datasets: [] # dummy pipeline
 generated_outputs:
   reference:
     active: 1

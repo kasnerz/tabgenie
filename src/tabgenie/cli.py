@@ -28,7 +28,6 @@ def run():
 @click.option(
     "--json_template",
     "-t",
-    default="export/json_templates/default.yml",
     type=str,
     help="Template used for formatting JSON file",
 )
