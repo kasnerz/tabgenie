@@ -5,12 +5,14 @@
   <link rel="stylesheet" media="screen" href="{{ host_prefix }}/static/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/custom.css">
   <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/d3graphs.css">
+  <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/jquery.highlight-within-textarea.css">
   <link rel="shortcut icon" href="{{ host_prefix }}/static/img/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="{{ host_prefix }}/static/js/jquery.min.js"></script>
   <script src="{{ host_prefix }}/static/js/popper.min.js"></script>
   <script src="{{ host_prefix }}/static/js/bootstrap.min.js"></script>
+  <script src="{{ host_prefix }}/static/js/jquery.highlight-within-textarea.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.3.5/split.min.js"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
@@ -20,7 +22,7 @@
   <nav class="navbar navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">
-        🧞 <b>TabGenie</b>
+        <img src="{{ host_prefix }}/static/img/genie.png" width="25px"> <b>TabGenie</b>
       </a>
       <div class="navblock">
         <ul class="pagination" id="nav-example-cnt">
@@ -103,7 +105,7 @@
 
           <div class="selectarea" id="actions-area">
             <div class="d-grid gap-2">
-              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="reload_pipelines();">
+              <button type="button" class="btn btn-primary btn-sm" onclick="reload_pipelines();">
                 ⟳ Reload pipelines
                 </a>
               </button>
@@ -141,22 +143,7 @@
         </div>
 
         <div id="rightpanel" class="collapse show">
-          <!-- <div class="topnavs">
-            <ul class="nav nav-pills justify-content-center">
-              <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#pipelinearea" type="button"
-                  role="tab">Pipelines</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#outputarea" type="button"
-                  role="tab">Outputs</a>
-              </li> -->
-          <!-- <li class="nav-item">
-                <a class="nav-link " data-bs-toggle="tab" data-bs-target="#infoarea" type="button" role="tab">Dataset
-                  info</a>
-              </li> -->
-          <!-- </ul> -->
-          <!-- </div> -->
+
           <div id='sidepanel-content' class="tab-content">
             <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel">
               {% for pipeline_name, attrs in pipelines.items() %}
@@ -187,11 +174,13 @@
                   </div>
                 </div>
                 {% endif %}
+                <div id="pipeline-{{ pipeline_name }}-spinner" class="spinner-border" role="status"
+                  style="display: none">
+                  <span class="sr-only"></span>
+                </div>
                 <div id="out-{{ pipeline_name }}-placeholder" class="font-mono"></div>
               </div>
               {% endfor %}
-              <!-- </div> -->
-              <!-- <div id='outputarea' class="tab-pane sidepanel-panel" role="tabpanel"> -->
               {% for generated_output_name, attrs in generated_outputs.items() %}
               <div class="output-box generated-output-box" id="out-{{ generated_output_name }}">
                 <label class="label-name" for="pipeline-checkbox-{{ generated_output_name }}">{{ generated_output_name
@@ -200,9 +189,6 @@
               </div>
               {% endfor %}
             </div>
-            <!-- <div id='infoarea' class="tab-pane sidepanel-panel" role="tabpanel" tabindex="0">
-              <div id="dataset-info" class="area-content"></div>
-            </div> -->
           </div>
         </div>
       </div>
@@ -297,6 +283,7 @@
   window.url_prefix = "{{ host_prefix }}";
   window.default_dataset = "{{ default_dataset }}";
   window.pipelines = {{ pipelines | safe }};
+  window.prompts = {{ prompts | safe }};
   window.generated_outputs = {{ generated_outputs | safe }};
 </script>
 

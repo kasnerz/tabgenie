@@ -26,7 +26,7 @@ pre {
     display: inline-block;
 }
 
-.txt-placeholder {
+/* .txt-placeholder {
     background: #ffffff;
     border: 1px solid #ddd;
     page-break-inside: avoid;
@@ -39,7 +39,7 @@ pre {
     padding: 1em 1.5em;
     display: block;
     word-wrap: break-word;
-}
+} */
 
 .nav-link {
     color: #3d3e3e;
@@ -157,6 +157,7 @@ pre {
 
 .navbar-brand {
     padding-left: 20px;
+    font-size: 19px;
 }
 
 .pagination-buttons {
@@ -219,6 +220,44 @@ pre {
 .form-check-input:checked {
     background-color: #0175ac;
     border-color: #0175ac;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #0175ac;
+    border-color: #0175ac;
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #005c88;
+    border-color: #005279;
+}
+
+.btn-primary:focus,
+.btn-primary.focus {
+    box-shadow: 0 0 0 0.2rem rgba(1, 117, 172, 0.5);
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled {
+    color: #fff;
+    background-color: 0175ac;
+    border-color: 0175ac;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active,
+.show>.btn-primary.dropdown-toggle {
+    color: #fff;
+    background-color: #005279;
+    border-color: #00486a;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active:focus,
+.btn-primary:not(:disabled):not(.disabled).active:focus,
+.show>.btn-primary.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(1, 117, 172, 0.5);
 }
 
 .btn-outline-secondary {
@@ -344,4 +383,43 @@ ul {
 
 .btn-light {
     color: rgb(56, 56, 56);
+}
+
+.custom-prompt-input {
+    appearance: auto;
+}
+
+.hwt-container {
+    background-color: #f8f9fa;
+    width: 100%;
+}
+
+.hwt-content {
+    height: 300px;
+    /* padding: 10px; */
+    border: 1px solid #adb5bd !important;
+    color: inherit;
+    font-family: monospace !important;
+    font-size: 13px !important;
+}
+
+.hwt-input:focus {
+    outline-color: #495057;
+}
+
+.hwt-content mark {
+    border-radius: 3px;
+    background-color: #d0bfff;
+}
+
+.hwt-content mark.red {
+    background-color: #ffa7a7;
+}
+
+.hwt-content mark.blue {
+    background-color: #a3daff;
+}
+
+.hwt-content mark.yellow {
+    background-color: #FFF68F;
 }

@@ -1,0 +1,5 @@
+Definition: [PROMPTVAR:TASK_DEF]
+Now complete the following example - 
+Input:
+[PROMPTVAR:HL_CELLS]
+Output:
