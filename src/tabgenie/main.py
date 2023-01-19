@@ -47,9 +47,9 @@ def get_pipeline_output():
         content["edited_cells"] = json.loads(content["edited_cells"])
 
     pipeline_name = content["pipeline"]
-    out = run_pipeline(pipeline_name, content, force=bool(content["edited_cells"]))
+    out = run_pipeline(pipeline_name, pipeline_args=content, force=bool(content["edited_cells"]))
 
-    return {"out": out}
+    return {"out": str(out)}
 
 
 @app.route("/table", methods=["GET", "POST"])
@@ -109,7 +109,7 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, expor
         },
     }
     os.makedirs(export_dir, exist_ok=True)
-    exported = run_pipeline("export", pipeline_args, force=True)
+    exported = run_pipeline("export", pipeline_args=pipeline_args, force=True)
 
     if export_format == "json":
         # only a single, aggregated output
@@ -189,14 +189,15 @@ def initialize_pipeline(pipeline_name):
     return pipeline_obj
 
 
-def run_pipeline(pipeline_name, content, cache_only=False, force=False):
+def run_pipeline(pipeline_name, pipeline_args, cache_only=False, force=False):
     pipeline = app.config["pipelines_obj"].get(pipeline_name)
+    pipeline_args["pipeline_cfg"] = app.config["pipelines"][pipeline_name]
 
-    if content.get("dataset") and content.get("split"):
-        dataset_obj = get_dataset(dataset_name=content["dataset"], split=content["split"])
-        content["dataset_obj"] = dataset_obj
+    if pipeline_args.get("dataset") and pipeline_args.get("split"):
+        dataset_obj = get_dataset(dataset_name=pipeline_args["dataset"], split=pipeline_args["split"])
+        pipeline_args["dataset_obj"] = dataset_obj
 
-    out = pipeline.run(content, cache_only=cache_only, force=force)
+    out = pipeline.run(pipeline_args, cache_only=cache_only, force=force)
 
     return out
 
@@ -251,6 +252,14 @@ def load_prompts():
     return prompts
 
 
+def filter_dummy_pipelines(pipelines):
+    return dict(
+        (pipeline_name, pipeline_cfg)
+        for pipeline_name, pipeline_cfg in app.config["pipelines"].items()
+        if "dummy" not in pipeline_cfg
+    )
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     logger.info(f"Page loaded")
@@ -258,7 +267,7 @@ def index():
     return render_template(
         "index.html",
         datasets=app.config["datasets"],
-        pipelines=app.config["pipelines"],
+        pipelines=filter_dummy_pipelines(app.config["pipelines"]),
         generated_outputs=app.config["generated_outputs"],
         prompts=app.config["prompts"],
         default_dataset=app.config["default_dataset"],

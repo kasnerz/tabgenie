@@ -16,8 +16,14 @@ class ExportPipeline(Pipeline):
         self.processors = [ExportProcessor()]
 
     def run_single(self, pipeline_args, example, export_format):
+
+        if pipeline_args.get("dataset_objs") is not None:
+            dataset_obj = pipeline_args["dataset_objs"][example["dataset"]]
+        else:
+            dataset_obj = pipeline_args["dataset_obj"]
+
         content = {
-            "dataset_obj": pipeline_args["dataset_objs"][example["dataset"]],
+            "dataset_obj": dataset_obj,
             "export_format": export_format,
             "dataset": example["dataset"],
             "split": example["split"],
@@ -28,6 +34,22 @@ class ExportPipeline(Pipeline):
 
     def run(self, pipeline_args, cache_only=False, force=True):
         # no caching
+
+        if pipeline_args["pipeline_cfg"].get("export_format") is None:
+            pipeline_args["export_format"] = pipeline_args["pipeline_cfg"].get("default_format") or "csv"
+
+        if pipeline_args.get("json_template") is None:
+            pipeline_args["json_template"] = "export/json_templates/default.yml"
+
+        if pipeline_args.get("examples_to_export") is None:
+            pipeline_args["examples_to_export"] = [
+                {
+                    "dataset": pipeline_args["dataset"],
+                    "split": pipeline_args["split"],
+                    "table_idx": pipeline_args["table_idx"],
+                }
+            ]
+
         if pipeline_args["export_format"] == "json":
             with open(pipeline_args["json_template"]) as f:
                 template = yaml.safe_load(f)

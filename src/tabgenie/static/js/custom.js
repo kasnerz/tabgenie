@@ -166,10 +166,10 @@ function reset_edited_cells() {
 }
 
 function run_pipeline(pipeline) {
-  cells = get_highlighted_cells();
-  dataset = $('#dataset-select').val();
-  split = $('#split-select').val();
-  custom_inputs = $(`.${pipeline}-input`).val();
+  var cells = get_highlighted_cells();
+  var dataset = $('#dataset-select').val();
+  var split = $('#split-select').val();
+  var custom_inputs = $(`.${pipeline}-input`).val();
 
   var request = {
     "pipeline": pipeline,
