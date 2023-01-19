@@ -21,7 +21,7 @@ class GraphProcessor(Processor):
                 var triples = [
                         {triples_str}
                     ];
-                var rdf_graph_window_height = 250;
+                var rdf_graph_window_height = 300;
 
                 var svg = d3.select("#svg-body").append("svg")
                             .attr("width", 3000)

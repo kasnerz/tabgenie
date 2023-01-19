@@ -252,6 +252,14 @@ def load_prompts():
     return prompts
 
 
+def filter_dummy_pipelines(pipelines):
+    return dict(
+        (pipeline_name, pipeline_cfg)
+        for pipeline_name, pipeline_cfg in app.config["pipelines"].items()
+        if "dummy" not in pipeline_cfg
+    )
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     logger.info(f"Page loaded")
@@ -259,7 +267,7 @@ def index():
     return render_template(
         "index.html",
         datasets=app.config["datasets"],
-        pipelines=app.config["pipelines"],
+        pipelines=filter_dummy_pipelines(app.config["pipelines"]),
         generated_outputs=app.config["generated_outputs"],
         prompts=app.config["prompts"],
         default_dataset=app.config["default_dataset"],
