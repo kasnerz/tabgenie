@@ -48,7 +48,7 @@ gunicorn "src.tabgenie.cli:create_app([app parameters])"
 ```
 
 #### App parameters:
-* `disable_pipelines`: disable all pipelines and show data only.
+* `disable_pipelines`: disable all pipelines and show data only. Default: `False`.
 
 ### CLI
 #### Dataset export
