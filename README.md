@@ -72,6 +72,7 @@ See `src/loaders/data.py` for an up-to-date list of available datasets.
 - **ToTTo** - https://github.com/google-research-datasets/ToTTo
 - **WebNLG** - https://gitlab.com/shimorina/webnlg-dataset/-/tree/master/release_v3.0
 - **WikiBio** - https://github.com/DavidGrangier/wikipedia-biography-dataset
+- **WikiSQL** - https://github.com/salesforce/WikiSQL, also [HuggingFace](https://huggingface.co/datasets/wikisql) (more processing included)
 
 
 The datasets are all loaded from [HuggingFace datasets](https://huggingface.co/datasets) instead of their original repositories. This allows to use preprocessed datasets and a single unified loader.
