@@ -13,6 +13,7 @@ import pandas as pd
 from .loaders import DATASET_CLASSES
 from .processing.processing import get_pipeline_class_by_name
 from flask import Flask, render_template, jsonify, request, send_file
+from click import get_current_context
 
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
@@ -275,7 +276,15 @@ def index():
     )
 
 
-def create_app():
+def create_app(**kwargs):
+    ctx = get_current_context(silent=True)
+    if ctx:
+        disable_pipelines = ctx.obj.disable_pipelines
+    else:
+        # Production server, e.g., gunincorn
+        # We don't have access to the current context, so must read kwargs instead.
+        disable_pipelines = kwargs.get('disable_pipelines', False)
+
     with open("config.yml") as f:
         config = yaml.safe_load(f)
 
@@ -284,7 +293,7 @@ def create_app():
     app.config["pipelines_obj"] = {}
     app.config["prompts"] = load_prompts()
 
-    if app.config.get("pipelines"):
+    if app.config.get("pipelines") and not disable_pipelines:
         for pipeline_name in app.config["pipelines"].keys():
             initialize_pipeline(pipeline_name)
     else:

@@ -39,13 +39,16 @@ See `setup.py` for the full list of requirements.
 #### Local development
 ```
 pip install -e .
-tabgenie run [--port=PORT] [--host=HOSTNAME]
+tabgenie [app parameters] run [--port=PORT] [--host=HOSTNAME]
 ```
 #### Deployment
 ```
 pip install -e .[deploy]
-gunicorn "src.tabgenie.cli:create_app()"
+gunicorn "src.tabgenie.cli:create_app([app parameters])"
 ```
+
+#### App parameters:
+* `disable_pipelines`: disable all pipelines and show data only.
 
 ### CLI
 #### Dataset export
