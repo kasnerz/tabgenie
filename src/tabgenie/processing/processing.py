@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
+import logging
 
 import lxml.etree
 import lxml.html
-import logging
+
 
 logger = logging.getLogger(__name__)
 

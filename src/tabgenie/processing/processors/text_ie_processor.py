@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+from openie import StanfordOpenIE
 
 from ..processing import Processor
-from openie import StanfordOpenIE
 
 
 class TextIEProcessor(Processor):

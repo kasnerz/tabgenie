@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-import json
-import os
 import re
-import glob
 import ast
-from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
+
+from ..structs.data import Cell, Table, HFTabularDataset
 
 
 class HiTab(HFTabularDataset):

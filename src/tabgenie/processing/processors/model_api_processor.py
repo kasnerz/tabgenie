@@ -2,9 +2,10 @@
 import logging
 import json
 
-from ..processing import Processor
-from tinyhtml import h
 import requests
+from tinyhtml import h
+
+from ..processing import Processor
 
 
 logger = logging.getLogger(__name__)

@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-from datasets import load_dataset
 from ..structs.data import Cell, Table, HFTabularDataset
-
-from tinyhtml import h
 
 
 class E2E(HFTabularDataset):

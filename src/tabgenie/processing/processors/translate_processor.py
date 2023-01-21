@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+import requests
 
 from ..processing import Processor
-import requests
 
 
 class TranslateProcessor(Processor):
@@ -14,7 +14,6 @@ class TranslateProcessor(Processor):
         }
         res = requests.post(url, data=data)
         return res.text.strip()
-
     
     def process(self, content):
         table = content["dataset_obj"].get_table(split=content["split"], table_idx=content["table_idx"])

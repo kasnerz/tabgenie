@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import logging
-import pip
+
 import yaml
 
 from ..processing import Pipeline

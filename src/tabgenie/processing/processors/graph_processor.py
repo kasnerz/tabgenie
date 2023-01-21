@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-
 import logging
+
 from ..processing import Processor
 
 

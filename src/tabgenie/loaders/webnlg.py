@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from datasets import load_dataset
-from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
+from ..structs.data import Cell, Table, HFTabularDataset
 from ..utils.text import normalize
 
 import logging

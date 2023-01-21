@@ -1,20 +1,15 @@
 #!/usr/bin/env python3
-
-import json
-import csv
 import os
+import copy
 import logging
-import re
-import random
+
 import datasets
 import pandas as pd
 import lxml.etree
 import lxml.html
-import glob
-import copy
 
-from collections import defaultdict, namedtuple
 from tinyhtml import h
+
 
 logger = logging.getLogger(__name__)
 

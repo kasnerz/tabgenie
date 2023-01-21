@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-
-from ..processing import Processor
 import re
 import random
+
+from ..processing import Processor
 
 
 class CustomInputProcessor(Processor):

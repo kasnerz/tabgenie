@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-
 from ..processing import Pipeline
 from ..processors.graph_processor import GraphProcessor
 from ..processors.text_ie_processor import TextIEProcessor
+
 
 class TextIEPipeline(Pipeline):
     def __init__(self, *args, **kwargs):

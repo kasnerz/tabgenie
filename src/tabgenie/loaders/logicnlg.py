@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-import json
-import os
 import ast
+
 from ..structs.data import Cell, Table, HFTabularDataset
 
 

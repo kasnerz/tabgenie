@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-
 from ..processing import Processor
+
 
 class LinearizeProcessor(Processor):
      def process(self, content):
