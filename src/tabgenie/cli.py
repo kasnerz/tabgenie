@@ -5,13 +5,15 @@ import os
 import logging
 import click
 from flask import Flask
-from flask.cli import FlaskGroup, with_appcontext
+from flask.cli import FlaskGroup, with_appcontext, pass_script_info
 from .main import create_app, app, export_dataset
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)
-def run():
-    pass
+@click.option("--disable_pipelines", type=bool, is_flag=True, default=False)
+@pass_script_info
+def run(script_info, disable_pipelines):
+    script_info.disable_pipelines = disable_pipelines
 
 
 @click.command()
