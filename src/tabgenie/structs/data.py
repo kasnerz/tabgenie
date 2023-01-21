@@ -145,10 +145,12 @@ class TabularDataset:
             for o in outputs:
                 self.tables.set_output(name, o)
 
-    def get_reference(self, table):
+    @staticmethod
+    def get_reference(table):
         return table.get_generated_output("reference")
 
-    def get_generated_outputs(self, table):
+    @staticmethod
+    def get_generated_outputs(table):
         return table.get_generated_outputs()
 
     def get_example_count(self, split):
@@ -329,7 +331,8 @@ class TabularDataset:
         html = area_el.render()
         return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
 
-    def _get_main_table_html(self, table):
+    @staticmethod
+    def _get_main_table_html(table):
         trs = []
         for row in table.cells:
             tds = []

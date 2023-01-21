@@ -5,12 +5,14 @@ from ..processing import Processor
 
 
 class TranslateProcessor(Processor):
-    def translate(self, s):
+
+    @staticmethod
+    def translate(s):
         url = "https://lindat.mff.cuni.cz/services/translation/api/v2/languages/"
         data = {
-            "src" : "en",
-            "tgt" : "cs",
-            "input_text" : s
+            "src": "en",
+            "tgt": "cs",
+            "input_text": s
         }
         res = requests.post(url, data=data)
         return res.text.strip()

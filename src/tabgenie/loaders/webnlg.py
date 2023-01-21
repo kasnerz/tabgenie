@@ -24,6 +24,7 @@ class WebNLG(HFTabularDataset):
         rows = table.get_cells()[1:]  # skip headers
 
         if any(len(x) != 3 for x in rows):
+            # TODO: `row` is not defined
             logger.warning(f"Some triples do not have exactly 3 components {[x.value for x in row]}")
 
         for row in rows:

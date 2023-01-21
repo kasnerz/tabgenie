@@ -14,7 +14,6 @@ class TextIEProcessor(Processor):
         }
         self.client = StanfordOpenIE(properties=self.openie_properties)
 
-
     def process(self, content):
         table = content["dataset_obj"].get_table(split=content["split"], table_idx=content["table_idx"])
         triples = self.client.annotate(table.ref)

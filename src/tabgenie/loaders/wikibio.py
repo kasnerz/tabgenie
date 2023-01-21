@@ -19,7 +19,8 @@ class WikiBio(HFTabularDataset):
             "test" : "test"
         }
 
-    def normalize(self, s):
+    @staticmethod
+    def normalize(s):
         return s.replace("-lrb-", "(").replace("-rrb-", ")")
 
     def prepare_table(self, split, table_idx):
@@ -32,7 +33,7 @@ class WikiBio(HFTabularDataset):
 
         for key, val in zip(table["column_header"], table["content"]):
             # if val == "<none>":
-                # continue
+            #     continue
             c = Cell(self.normalize(key))
             c.is_row_header = True
             t.add_cell(c)

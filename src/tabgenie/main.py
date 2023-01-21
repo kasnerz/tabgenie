@@ -255,7 +255,7 @@ def load_prompts():
 def filter_dummy_pipelines(pipelines):
     return dict(
         (pipeline_name, pipeline_cfg)
-        for pipeline_name, pipeline_cfg in app.config["pipelines"].items()
+        for pipeline_name, pipeline_cfg in app.config["pipelines"].items()  # TODO: should it be `pipelines`?
         if "dummy" not in pipeline_cfg
     )
 
