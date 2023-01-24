@@ -1,23 +1,7 @@
 #!/usr/bin/env python3
-import json
-import csv
-import os
-import logging
-import re
-import random
-import datasets
-import pandas as pd
-import lxml.etree
-import lxml.html
-import glob
 import ast
 
-from collections import defaultdict, namedtuple
-from datasets import load_dataset
 from ..structs.data import Cell, Table, HFTabularDataset
-from ..utils.text import normalize
-
-from tinyhtml import h
 
 
 class ChartToTextS(HFTabularDataset):

@@ -8,3 +8,4 @@ tmp
 .idea
 .DS_Store
 env/
+*.log

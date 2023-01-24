@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-import json
-import os
 import ast
-from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
+
+from ..structs.data import Cell, Table, HFTabularDataset
 
 
 class NumericNLG(HFTabularDataset):

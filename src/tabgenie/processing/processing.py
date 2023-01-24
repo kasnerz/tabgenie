@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
+import logging
 
 import lxml.etree
 import lxml.html
-import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +32,12 @@ class Processor:
     def process(self, content):
         raise NotImplementedError
 
-    def text2html(self, text):
+    @staticmethod
+    def text2html(text):
         return f"<div> {text} </div>"
 
-    def html_render(self, el):
+    @staticmethod
+    def html_render(el):
         html = el.render()
         return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
 

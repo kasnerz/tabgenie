@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+import re
 
 # from sacremoses import MosesDetokenizer
-import re
 
 
 def normalize(

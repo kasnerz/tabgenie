@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+from openie import StanfordOpenIE
 
 from ..processing import Processor
-from openie import StanfordOpenIE
 
 
 class TextIEProcessor(Processor):
@@ -13,7 +13,6 @@ class TextIEProcessor(Processor):
             'openie.triple.strict' : True
         }
         self.client = StanfordOpenIE(properties=self.openie_properties)
-
 
     def process(self, content):
         table = content["dataset_obj"].get_table(split=content["split"], table_idx=content["table_idx"])

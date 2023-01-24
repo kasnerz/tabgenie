@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-import json
-import os
-import re
-from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
+from ..structs.data import Cell, Table, HFTabularDataset
 # from ..utils.text import Detokenizer
+
 
 class WikiBio(HFTabularDataset):
     """
@@ -21,7 +19,8 @@ class WikiBio(HFTabularDataset):
             "test" : "test"
         }
 
-    def normalize(self, s):
+    @staticmethod
+    def normalize(s):
         return s.replace("-lrb-", "(").replace("-rrb-", ")")
 
     def prepare_table(self, split, table_idx):
@@ -34,7 +33,7 @@ class WikiBio(HFTabularDataset):
 
         for key, val in zip(table["column_header"], table["content"]):
             # if val == "<none>":
-                # continue
+            #     continue
             c = Cell(self.normalize(key))
             c.is_row_header = True
             t.add_cell(c)
