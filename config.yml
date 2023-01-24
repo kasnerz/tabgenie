@@ -13,34 +13,34 @@ datasets:
 - webnlg
 - wikibio
 - wikisql
-default_dataset: webnlg
+default_dataset: wikibio
 debug: false
 # max_examples_per_split: 10000
 host_prefix: "."
 cache_dev_splits: false
 pipelines:
-  # totto_model:
-  #   class: model_api
-  #   model_url: http://localhost:8980/
-  #   config_template_file: model_api_config.html
-  #   active: 1
-  tk_instruct_model:
+  totto_model:
     class: model_api
+    interactive: false
+    model_url: http://localhost:8980/
+    config_template_file: model_api_config.html
+  tk_instruct_model:
+    pipeline: model_api
+    interactive: false
     model_url: http://localhost:8981/
     config_template_file: model_api_config.html
     default_prompt: tk-def-pos
-    active: 1
   rdf_triples:
-    class: graph
-    active: 1
+    pipeline: graph
+    interactive: true
     datasets:
       - webnlg
       - dart
       - e2e
   export:
-    class: export
+    pipeline: export
+    interactive: false
     default_format: json
-    dummy: true
 generated_outputs:
   reference:
     active: 1

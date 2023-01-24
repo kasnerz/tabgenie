@@ -10,7 +10,6 @@ var mode = "highlight";
 var editedCells = {};
 var favourites = {};
 
-
 function update_svg_width() {
   if (typeof svg != "undefined") {
     w = $("#svg-body").width();
@@ -361,7 +360,11 @@ function fetch_table(dataset, split, table_idx, export_format) {
     }
     for (var pipeline in pipelines) {
 
-      if (("datasets" in pipelines[pipeline]) && !(pipelines[pipeline]["datasets"].includes(dataset))) {
+      if ( // pipeline should not be active for the dataset
+        (("datasets" in pipelines[pipeline]) && !(pipelines[pipeline]["datasets"].includes(dataset)))
+        // pipeline is not interactive
+        || !pipelines[pipeline].interactive
+      ) {
         $(`#out-${pipeline}`).hide();
         pipelines[pipeline].active = 0;
       } else {
@@ -392,15 +395,6 @@ $('.output-checkbox').on('change', function () {
     } else {
       run_pipeline(output_name);
       pipelines[output_name].active = 1;
-    }
-  } else {
-    state = generated_outputs[output_name].active;
-    if (state == 1) {
-      // $(`#out-${output_name}`).hide();
-      generated_outputs[output_name].active = 0;
-    } else {
-      // $(`#out-${output_name}`).show();
-      generated_outputs[output_name].active = 1;
     }
   }
 });

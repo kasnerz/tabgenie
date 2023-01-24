@@ -147,12 +147,12 @@
 
           <div id='sidepanel-content' class="tab-content">
             <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel">
-              {% for pipeline_name, attrs in pipelines.items() %}
+              {% for pipeline_name, attrs in pipelines.items() if attrs.interactive %}
               <div class="output-box pipeline-box" id="out-{{ pipeline_name }}">
                 <label class="label-name" for="pipeline-checkbox-{{ pipeline_name }}">{{ pipeline_name }}</label>
                 <label class="label-on-off"><input
                     class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
-                    id="pipeline-checkbox-{{ pipeline_name }}" {% if attrs.active==1 %} checked {% endif %}></label>
+                    id="pipeline-checkbox-{{ pipeline_name }}" checked></label>
 
                 {% if 'config_template' in attrs %}
                 <label class="label-settings" data-bs-toggle="modal" data-bs-target="#{{ pipeline_name }}-modal"><img
@@ -174,6 +174,8 @@
                     </div>
                   </div>
                 </div>
+                <!-- remove the template from pipeline attributes -->
+                {% set _dummy=attrs.pop('config_template') %}
                 {% endif %}
                 <div id="pipeline-{{ pipeline_name }}-spinner" class="spinner-border" role="status"
                   style="display: none">
@@ -283,9 +285,9 @@
   // variable to be used in custom.js
   window.url_prefix = "{{ host_prefix }}";
   window.default_dataset = "{{ default_dataset }}";
-  window.pipelines = {{ pipelines | safe }};
-  window.prompts = {{ prompts | safe }};
-  window.generated_outputs = {{ generated_outputs | safe }};
+  window.pipelines = {{ pipelines | tojson | safe }};
+  window.prompts = {{ prompts | tojson | safe }};
+  window.generated_outputs = {{ generated_outputs | tojson | safe }};
 </script>
 
 <script src="{{ host_prefix }}/static/js/custom.js"></script>
