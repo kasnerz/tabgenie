@@ -8,31 +8,74 @@ class SportSettBasketball(HFTabularDataset):
     A dataset for generating basketball reports.
     Following up on and overriding the Rotowire dataset.
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/sportsett_basketball"
         self.name = "SportSett Basketball"
 
+    def _next_game_to_str(self, ng):
+        if not ng:
+            return ""
+
+        return f"{ng['dayname']} {ng['day']} {ng['month']} {ng['year']}, {ng['opponent_place']} {ng['opponent_name']}, {ng['stadium']}, {ng['city']}"
+
     def prepare_table(self, split, table_idx):
         entry = self.data[split][table_idx]
         t = Table()
         t.set_generated_output("reference", entry["target"])
-        game_id = entry['sportsett_id']  # TODO: variable not used
 
         ht = entry["teams"]["home"]
         vt = entry["teams"]["vis"]
 
-        t.props["home_team_name"] = ht['name']
-        t.props["home_team_place"] = ht['place']
-        t.props["visiting_team_name"] = vt['name']
-        t.props["visiting_team_place"] = vt['place']
+        t.props["game_id"] = entry["sportsett_id"]
+        t.props["ht_name"] = ht.get("name", "")
+        t.props["ht_place"] = ht.get("place", "")
+        t.props["ht_conference"] = ht.get("conference", "")
+        t.props["ht_conference_standing"] = ht.get("conference_standing", "")
+        t.props["ht_division"] = ht.get("division", "")
+        t.props["ht_game_number"] = ht.get("game_number", "")
+        t.props["ht_losses"] = ht.get("losses", "")
+        t.props["ht_wins"] = ht.get("wins", "")
+        t.props["ht_next_game_id"] = (ht.get("next_game_id", ""),)
+        t.props["ht_next_game"] = self._next_game_to_str(ht.get("next_game", ""))
+        t.props["vt_name"] = vt.get("name", "")
+        t.props["vt_place"] = vt.get("place", "")
+        t.props["vt_conference"] = vt.get("conference", "")
+        t.props["vt_conference_standing"] = vt.get("conference_standing", "")
+        t.props["vt_division"] = vt.get("division", "")
+        t.props["vt_game_number"] = vt.get("game_number", "")
+        t.props["vt_losses"] = vt.get("losses", "")
+        t.props["vt_wins"] = vt.get("wins", "")
+        t.props["vt_next_game_id"] = (vt.get("next_game_id", ""),)
+        t.props["vt_next_game"] = self._next_game_to_str(vt.get("next_game", ""))
 
         for key, val in entry["game"].items():
             t.props[key] = val
-            
-        # TODO next games
 
-        stat_headers = ["AST", "BLK", "DOUBLE", "DREB", "FG3A", "FG3M", "FG3_PCT", "FGA", "FGM", "FG_PCT", "FTA", "FTM", "FT_PCT", "MIN", "OREB", "PF", "PTS", "STL", "TOV", "TREB", "+/-"]
+        stat_headers = [
+            "AST",
+            "BLK",
+            "DOUBLE",
+            "DREB",
+            "FG3A",
+            "FG3M",
+            "FG3_PCT",
+            "FGA",
+            "FGM",
+            "FG_PCT",
+            "FTA",
+            "FTM",
+            "FT_PCT",
+            "MIN",
+            "OREB",
+            "PF",
+            "PTS",
+            "STL",
+            "TOV",
+            "TREB",
+            "+/-",
+        ]
 
         c = Cell("team")
         c.is_col_header = True
@@ -106,4 +149,3 @@ class SportSettBasketball(HFTabularDataset):
                     t.save_row()
 
         return t
-
