@@ -9,3 +9,5 @@ tmp
 .DS_Store
 env/
 *.log
+.venv
+.vscode
