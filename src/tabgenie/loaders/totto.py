@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from datasets import load_dataset
 from ..structs.data import Cell, Table, HFTabularDataset
 
 

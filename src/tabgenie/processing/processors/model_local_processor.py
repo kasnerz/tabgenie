@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import logging
-import numpy as np
 import os
+
+import numpy as np
 import torch
 from nlg.inference import Seq2SeqInferenceModule
 
 from ..processing import Processor
+
 
 logger = logging.getLogger(__name__)
 

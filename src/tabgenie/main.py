@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
-
 import os
-import sys
 import json
-import logging
-import coloredlogs
-from pkgutil import get_data
-import yaml
-import shutil
 import glob
+import shutil
+import logging
+
+import yaml
+import coloredlogs
 import pandas as pd
-from .loaders import DATASET_CLASSES
-from .processing.processing import get_pipeline_class_by_name
 from flask import Flask, render_template, jsonify, request, send_file
 from click import get_current_context
+
+from .loaders import DATASET_CLASSES
+from .processing.processing import get_pipeline_class_by_name
 
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
@@ -256,7 +255,7 @@ def load_prompts():
 def filter_dummy_pipelines(pipelines):
     return dict(
         (pipeline_name, pipeline_cfg)
-        for pipeline_name, pipeline_cfg in app.config["pipelines"].items()
+        for pipeline_name, pipeline_cfg in app.config["pipelines"].items()  # TODO: should it be `pipelines`?
         if "dummy" not in pipeline_cfg
     )
 

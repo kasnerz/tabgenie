@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-import json
-import os
 import re
 import ast
-from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
+
 from tinyhtml import h
+
+from ..structs.data import Cell, Table, HFTabularDataset
+
 
 class SciGen(HFTabularDataset):
     def __init__(self, *args, **kwargs):

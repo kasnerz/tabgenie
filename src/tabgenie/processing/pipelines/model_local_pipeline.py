@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 
-from ..processing import Processor, Pipeline
+from ..processing import Pipeline
 from ..processors.linearize_processor import LinearizeProcessor
 from ..processors.model_local_processor import ModelLocalProcessor
 

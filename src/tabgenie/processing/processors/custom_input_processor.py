@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-
-from ..processing import Processor
 import re
 import random
 
+from ..processing import Processor
+
 
 class CustomInputProcessor(Processor):
-    def format_prompt(self, prompt, table, dataset, cell_ids):
+
+    @staticmethod
+    def format_prompt(prompt, table, dataset, cell_ids):
         random.seed(42)
         rand_ex_split = "dev"
         prompt_vars = re.findall(r"\[PROMPTVAR:([\w]+)\]", prompt)

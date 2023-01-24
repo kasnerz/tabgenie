@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from datasets import load_dataset, ReadInstruction
-from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
+from ..structs.data import Cell, Table, HFTabularDataset
 
 
 class SportSettBasketball(HFTabularDataset):
@@ -18,7 +17,7 @@ class SportSettBasketball(HFTabularDataset):
         entry = self.data[split][table_idx]
         t = Table()
         t.set_generated_output("reference", entry["target"])
-        game_id = entry['sportsett_id']
+        game_id = entry['sportsett_id']  # TODO: variable not used
 
         ht = entry["teams"]["home"]
         vt = entry["teams"]["vis"]

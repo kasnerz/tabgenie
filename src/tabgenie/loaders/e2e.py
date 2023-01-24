@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-from datasets import load_dataset
 from ..structs.data import Cell, Table, HFTabularDataset
-
-from tinyhtml import h
 
 
 class E2E(HFTabularDataset):
@@ -17,7 +14,6 @@ class E2E(HFTabularDataset):
         self.name = "E2E"
 
     def table_to_triples(self, table, cell_ids):
-        triples = []
         rows = table.get_cells()
 
         keys = [x.value for x in rows[0]]
@@ -45,7 +41,7 @@ class E2E(HFTabularDataset):
             del keys[eatType_idx]
             del vals[eatType_idx]
         # still in some cases, there is not even an eatType 
-        #-> hotfix so that we do not lose data
+        # -> hotfix so that we do not lose data
         else:
             # logger.warning(f"Cannot recognize subject in mr: {mr}")
             subj = "restaurant"
@@ -55,7 +51,6 @@ class E2E(HFTabularDataset):
 
         # will be used as a key in a dictionary
         return triples
-
 
     def prepare_table(self, split, table_idx):
         entry = self.data[split][table_idx]

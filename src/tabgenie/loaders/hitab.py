@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-import json
-import os
 import re
-import glob
 import ast
-from ..structs.data import Cell, Table, TabularDataset, HFTabularDataset
+
+from ..structs.data import Cell, Table, HFTabularDataset
 
 
 class HiTab(HFTabularDataset):
@@ -13,7 +11,8 @@ class HiTab(HFTabularDataset):
         self.hf_id = 'kasnerz/hitab'
         self.name = "HiTab"
 
-    def _get_linked_cells(self, linked_cells):
+    @staticmethod
+    def _get_linked_cells(linked_cells):
         # the design of the `linked_cells` dictionary is very unintuitive
         # extract the highlighted cells the quick and dirty way
         s = str(linked_cells)

@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-
-import json
-import os
-import logging
 import click
-from flask import Flask
 from flask.cli import FlaskGroup, with_appcontext, pass_script_info
-from .main import create_app, app, export_dataset
+
+from .main import create_app, export_dataset
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)
