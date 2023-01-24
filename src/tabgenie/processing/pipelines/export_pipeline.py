@@ -35,7 +35,7 @@ class ExportPipeline(Pipeline):
     def run(self, pipeline_args, cache_only=False, force=True):
         # no caching
 
-        if pipeline_args["pipeline_cfg"].get("export_format") is None:
+        if pipeline_args.get("export_format") is None:
             pipeline_args["export_format"] = pipeline_args["pipeline_cfg"].get("default_format") or "csv"
 
         if pipeline_args.get("json_template") is None:

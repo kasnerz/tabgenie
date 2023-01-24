@@ -96,8 +96,8 @@ class Table:
     def get_generated_output(self, key):
         return self.outputs.get(key)
 
-    def get_generated_outputs(self):
-        return [{"name": key, "out": val} for key, val in self.outputs.items()]
+    # def get_generated_outputs(self):
+    # return [{"name": key, "out": val} for key, val in self.outputs.items()]
 
     def set_generated_output(self, key, value):
         self.outputs[key] = value
@@ -126,32 +126,34 @@ class TabularDataset:
         """
         raise NotImplementedError
 
-    def load_outputs(self, split, name):
-        out_fname = os.path.join("outputs", self.name.lower(), split, name + ".out")
+    # def load_generated_outputs(self, split):
+    #     raise NotImplementedError
 
-        # output does not exist for the dataset
-        if not (os.path.isfile(out_fname)):
-            logger.debug(out_fname + " does not exist")
-            return
+    #     out_fname = os.path.join("outputs", self.name.lower(), split, name + ".out")
 
-        with open(out_fname) as f:
-            outputs = f.readlines()
+    #     # output does not exist for the dataset
+    #     if not (os.path.isfile(out_fname)):
+    #         logger.debug(out_fname + " does not exist")
+    #         return
 
-            if len(outputs) != self.get_example_count(split):
-                raise AssertionError(
-                    f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {self.get_example_count(split)}"
-                )
+    #     with open(out_fname) as f:
+    #         outputs = f.readlines()
 
-            for o in outputs:
-                self.tables.set_output(name, o)
+    #         if len(outputs) != self.get_example_count(split):
+    #             raise AssertionError(
+    #                 f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {self.get_example_count(split)}"
+    #             )
+
+    #         for o in outputs:
+    #             self.tables.set_output(name, o)
 
     @staticmethod
     def get_reference(table):
         return table.get_generated_output("reference")
 
-    @staticmethod
-    def get_generated_outputs(table):
-        return table.get_generated_outputs()
+    # @staticmethod
+    # def get_generated_outputs(split, output_idx):
+    # return table.get_generated_outputs()
 
     def get_example_count(self, split):
         return len(self.data[split])

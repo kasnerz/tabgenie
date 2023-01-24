@@ -4,6 +4,7 @@ import json
 import glob
 import shutil
 import logging
+import linecache
 
 import yaml
 import coloredlogs
@@ -70,7 +71,7 @@ def export_to_file():
     # TODO export edited cells
     # edited_cells = json.loads(content.get("edited_cells") or {})
 
-    export_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, "tmp")
+    export_dir = os.path.join(app.config["root_dir"], "tmp")
 
     if os.path.isdir(export_dir):
         shutil.rmtree(export_dir)
@@ -78,6 +79,7 @@ def export_to_file():
     default_template = "export/json_templates/default.yml"
 
     os.makedirs(os.path.join(export_dir, "files"))
+
     file_to_download = export_examples_to_file(
         export_examples,
         export_dir=os.path.join(export_dir, "files"),
@@ -94,7 +96,6 @@ def export_to_file():
 
 
 def export_examples_to_file(examples_to_export, export_format, export_dir, export_filename=None, json_template=None):
-
     if type(examples_to_export) is dict:
         # TODO look at this in more detail, favourites behaves differently
         examples_to_export = examples_to_export.values()
@@ -183,7 +184,7 @@ def initialize_pipeline(pipeline_name):
             )
             pipeline_cfg["config_template"] = template
 
-    pipeline_obj = get_pipeline_class_by_name(pipeline_cfg["class"])(name=pipeline_name, cfg=pipeline_cfg)
+    pipeline_obj = get_pipeline_class_by_name(pipeline_cfg["pipeline"])(name=pipeline_name, cfg=pipeline_cfg)
     app.config["pipelines_obj"][pipeline_name] = pipeline_obj
 
     return pipeline_obj
@@ -215,18 +216,35 @@ def get_dataset(dataset_name, split):
     if not dataset.has_split(split):
         logger.info(f"Loading {dataset_name} / {split}")
         dataset.load(split=split, max_examples=max_examples)
-
-        for name in app.config["generated_outputs"]:
-            dataset.load_outputs(split=split, name=name)
+        # dataset.load_generated_outputs(split=split)
 
     return dataset
+
+
+def get_generated_outputs(dataset_name, split, table, output_idx):
+    dataset = get_dataset(dataset_name=dataset_name, split=split)
+    out_dir = os.path.join(app.config["root_dir"], app.config["generated_outputs_dir"], dataset_name, split)
+
+    # TODO: think of a better way than to consider reference as one of the generated outputs
+    outputs = {"reference": {"out": [dataset.get_reference(table)]}}
+
+    if not os.path.isdir(out_dir):
+        return outputs
+
+    for filename in glob.glob(out_dir + "/" + "*.jsonl"):
+        line = linecache.getline(filename, output_idx + 1)  # 1-based indexing
+        j = json.loads(line)
+        model_name = os.path.basename(filename).rstrip(".jsonl")
+        outputs[model_name] = j
+
+    return outputs
 
 
 def get_table_data(dataset_name, split, table_idx):
     dataset = get_dataset(dataset_name=dataset_name, split=split)
     table = dataset.get_table(split=split, table_idx=table_idx)
     html = dataset.export_table(table=table, export_format="html")
-    generated_outputs = dataset.get_generated_outputs(table=table)
+    generated_outputs = get_generated_outputs(dataset_name=dataset_name, split=split, table=table, output_idx=table_idx)
     dataset_info = dataset.get_info()
 
     return {
@@ -252,14 +270,6 @@ def load_prompts():
     return prompts
 
 
-def filter_dummy_pipelines(pipelines):
-    return dict(
-        (pipeline_name, pipeline_cfg)
-        for pipeline_name, pipeline_cfg in pipelines.items()
-        if "dummy" not in pipeline_cfg
-    )
-
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     logger.info(f"Page loaded")
@@ -267,8 +277,7 @@ def index():
     return render_template(
         "index.html",
         datasets=app.config["datasets"],
-        pipelines=filter_dummy_pipelines(app.config["pipelines"]),
-        generated_outputs=app.config["generated_outputs"],
+        pipelines=app.config["pipelines"],
         prompts=app.config["prompts"],
         default_dataset=app.config["default_dataset"],
         host_prefix=app.config["host_prefix"],
@@ -288,6 +297,7 @@ def create_app(**kwargs):
         config = yaml.safe_load(f)
 
     app.config.update(config)
+    app.config["root_dir"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir)
     app.config["datasets_obj"] = {}
     app.config["pipelines_obj"] = {}
     app.config["prompts"] = load_prompts()
