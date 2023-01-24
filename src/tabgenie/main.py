@@ -255,7 +255,7 @@ def load_prompts():
 def filter_dummy_pipelines(pipelines):
     return dict(
         (pipeline_name, pipeline_cfg)
-        for pipeline_name, pipeline_cfg in app.config["pipelines"].items()  # TODO: should it be `pipelines`?
+        for pipeline_name, pipeline_cfg in pipelines.items()
         if "dummy" not in pipeline_cfg
     )
 
@@ -282,7 +282,7 @@ def create_app(**kwargs):
     else:
         # Production server, e.g., gunincorn
         # We don't have access to the current context, so must read kwargs instead.
-        disable_pipelines = kwargs.get('disable_pipelines', False)
+        disable_pipelines = kwargs.get("disable_pipelines", False)
 
     with open("config.yml") as f:
         config = yaml.safe_load(f)
