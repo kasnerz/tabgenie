@@ -78,6 +78,7 @@ def export_to_file():
     default_template = "export/json_templates/default.yml"
 
     os.makedirs(os.path.join(export_dir, "files"))
+
     file_to_download = export_examples_to_file(
         export_examples,
         export_dir=os.path.join(export_dir, "files"),
@@ -94,7 +95,6 @@ def export_to_file():
 
 
 def export_examples_to_file(examples_to_export, export_format, export_dir, export_filename=None, json_template=None):
-
     if type(examples_to_export) is dict:
         # TODO look at this in more detail, favourites behaves differently
         examples_to_export = examples_to_export.values()
