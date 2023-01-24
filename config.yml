@@ -18,6 +18,7 @@ debug: false
 # max_examples_per_split: 10000
 host_prefix: "."
 cache_dev_splits: false
+generated_outputs_dir: outputs
 pipelines:
   totto_model:
     pipeline: model_api
@@ -41,6 +42,3 @@ pipelines:
     pipeline: export
     interactive: false
     default_format: json
-generated_outputs:
-  reference:
-    active: 1

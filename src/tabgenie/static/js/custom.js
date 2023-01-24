@@ -150,7 +150,6 @@ function get_highlighted_cells() {
 }
 
 function set_output(name, output) {
-  // TODO don't set output on disabled outputs
   var placeholder = $(`#out-${name}-placeholder`);
   placeholder.html(output);
 }
@@ -312,25 +311,66 @@ function insert_prompt(prompt_name, id) {
 function update_favourite_button() {
   if (`${dataset}-${split}-${table_idx}` in favourites) {
     $("#favourite-btn").css("background-color", "#ffc107");
-    // $("#favourite-btn").css("color", "white");
   } else {
     $("#favourite-btn").css("background-color", "");
-    // $("#favourite-btn").css("color", "grey");
   }
 }
 
 function toggle_edit() {
   if (mode == "edit") {
-    // $("#edit-btn").css("background-color", "");
-    // $("#edit-btn").css("color", "");
     mode = "highlight";
   } else {
-    // $("#edit-btn").css("background-color", "#0175ac");
-    // $("#edit-btn").css("color", "white");
     mode = "edit";
   }
-
   init_cell_interactivity();
+}
+
+function refresh_pipelines(dataset) {
+  for (var pipeline in pipelines) {
+    if ( // pipeline should not be active for the dataset
+      (("datasets" in pipelines[pipeline]) && !(pipelines[pipeline]["datasets"].includes(dataset)))
+      // pipeline is not interactive
+      || !pipelines[pipeline].interactive
+    ) {
+      $(`#out-${pipeline}`).hide();
+      pipelines[pipeline].active = 0;
+    } else {
+      // activate the pipeline
+      $(`#out-${pipeline}`).show();
+      $(`#pipeline-checkbox-${pipeline}`).prop("checked", true);
+      pipelines[pipeline].active = 1;
+    }
+    // run the active pipelines
+    if (pipelines[pipeline].active && $(`#out-${pipeline}-placeholder`).text() == "") {
+      run_pipeline(pipeline);
+    }
+  }
+}
+
+function show_generated_outputs(generated_outputs) {
+  $(".generated-output-box").remove();
+
+  for (const [name, out_obj] of Object.entries(generated_outputs)) {
+    var placeholder = $('<div>', { id: `out-${name}-placeholder`, class: "font-mono" });
+    var label = $('<label>', { class: "label-name" }).text(name);
+    var out_list = out_obj.out;
+
+    if (out_list.length > 1) {
+      // list element for every hypothesis (e.g. from beam search)
+      var content = $('<ul>', { class: "out-list" }).append(
+        out_list.map(x =>
+          $("<li>").append($("<a>").text(x))
+        )
+      );
+    } else {
+      var content = out_list[0];
+    }
+    placeholder.html(content);
+    $('<div>', {
+      id: `out-${name}`,
+      class: 'output-box generated-output-box',
+    }).append(label).append(placeholder).appendTo('#pipelinearea');
+  }
 }
 
 function fetch_table(dataset, split, table_idx, export_format) {
@@ -351,51 +391,23 @@ function fetch_table(dataset, split, table_idx, export_format) {
 
     init_cell_interactivity();
     update_favourite_button();
-
-    // for (var pipeline_out of data.pipeline_outputs) {
-    //   set_output(pipeline_out["pipeline_name"], pipeline_out["out"]);
-    // }
-    for (var generated_out of data.generated_outputs) {
-      set_output(generated_out["name"], generated_out["out"]);
-    }
-    for (var pipeline in pipelines) {
-
-      if ( // pipeline should not be active for the dataset
-        (("datasets" in pipelines[pipeline]) && !(pipelines[pipeline]["datasets"].includes(dataset)))
-        // pipeline is not interactive
-        || !pipelines[pipeline].interactive
-      ) {
-        $(`#out-${pipeline}`).hide();
-        pipelines[pipeline].active = 0;
-      } else {
-        $(`#out-${pipeline}`).show();
-        $(`#pipeline-checkbox-${pipeline}`).prop("checked", true);
-        pipelines[pipeline].active = 1;
-      }
-
-      if (pipelines[pipeline].active && $(`#out-${pipeline}-placeholder`).text() == "") {
-        run_pipeline(pipeline);
-      }
-    }
+    show_generated_outputs(data.generated_outputs);
+    refresh_pipelines(dataset);
   });
 }
 
-// toggling pipelines / outputs
+// toggling pipelines
 $('.output-checkbox').on('change', function () {
   output_id = $(this)[0].id;
   var output_name = $(`label[for='${output_id}']`).text();
+  state = pipelines[output_name].active;
 
-  if ($(this).hasClass("pipeline-checkbox")) {
-    // is a pipeline output
-    state = pipelines[output_name].active;
-
-    if (state == 1) {
-      pipelines[output_name].active = 0;
-      set_output(output_name, "");
-    } else {
-      run_pipeline(output_name);
-      pipelines[output_name].active = 1;
-    }
+  if (state == 1) {
+    pipelines[output_name].active = 0;
+    set_output(output_name, "");
+  } else {
+    run_pipeline(output_name);
+    pipelines[output_name].active = 1;
   }
 });
 

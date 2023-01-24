@@ -4,6 +4,7 @@ import json
 import glob
 import shutil
 import logging
+import linecache
 
 import yaml
 import coloredlogs
@@ -70,7 +71,7 @@ def export_to_file():
     # TODO export edited cells
     # edited_cells = json.loads(content.get("edited_cells") or {})
 
-    export_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, "tmp")
+    export_dir = os.path.join(app.config["root_dir"], "tmp")
 
     if os.path.isdir(export_dir):
         shutil.rmtree(export_dir)
@@ -215,18 +216,35 @@ def get_dataset(dataset_name, split):
     if not dataset.has_split(split):
         logger.info(f"Loading {dataset_name} / {split}")
         dataset.load(split=split, max_examples=max_examples)
-
-        for name in app.config["generated_outputs"]:
-            dataset.load_outputs(split=split, name=name)
+        # dataset.load_generated_outputs(split=split)
 
     return dataset
+
+
+def get_generated_outputs(dataset_name, split, table, output_idx):
+    dataset = get_dataset(dataset_name=dataset_name, split=split)
+    out_dir = os.path.join(app.config["root_dir"], app.config["generated_outputs_dir"], dataset_name, split)
+
+    # TODO: think of a better way than to consider reference as one of the generated outputs
+    outputs = {"reference": {"out": [dataset.get_reference(table)]}}
+
+    if not os.path.isdir(out_dir):
+        return outputs
+
+    for filename in glob.glob(out_dir + "/" + "*.jsonl"):
+        line = linecache.getline(filename, output_idx + 1)  # 1-based indexing
+        j = json.loads(line)
+        model_name = os.path.basename(filename).rstrip(".jsonl")
+        outputs[model_name] = j
+
+    return outputs
 
 
 def get_table_data(dataset_name, split, table_idx):
     dataset = get_dataset(dataset_name=dataset_name, split=split)
     table = dataset.get_table(split=split, table_idx=table_idx)
     html = dataset.export_table(table=table, export_format="html")
-    generated_outputs = dataset.get_generated_outputs(table=table)
+    generated_outputs = get_generated_outputs(dataset_name=dataset_name, split=split, table=table, output_idx=table_idx)
     dataset_info = dataset.get_info()
 
     return {
@@ -260,7 +278,6 @@ def index():
         "index.html",
         datasets=app.config["datasets"],
         pipelines=app.config["pipelines"],
-        generated_outputs=app.config["generated_outputs"],
         prompts=app.config["prompts"],
         default_dataset=app.config["default_dataset"],
         host_prefix=app.config["host_prefix"],
@@ -280,6 +297,7 @@ def create_app(**kwargs):
         config = yaml.safe_load(f)
 
     app.config.update(config)
+    app.config["root_dir"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir)
     app.config["datasets_obj"] = {}
     app.config["pipelines_obj"] = {}
     app.config["prompts"] = load_prompts()

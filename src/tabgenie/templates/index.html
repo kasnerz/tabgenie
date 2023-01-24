@@ -184,13 +184,6 @@
                 <div id="out-{{ pipeline_name }}-placeholder" class="font-mono"></div>
               </div>
               {% endfor %}
-              {% for generated_output_name, attrs in generated_outputs.items() %}
-              <div class="output-box generated-output-box" id="out-{{ generated_output_name }}">
-                <label class="label-name" for="pipeline-checkbox-{{ generated_output_name }}">{{ generated_output_name
-                  }}</label>
-                <div id="out-{{ generated_output_name }}-placeholder" class="font-mono"></div>
-              </div>
-              {% endfor %}
             </div>
           </div>
         </div>
@@ -287,7 +280,6 @@
   window.default_dataset = "{{ default_dataset }}";
   window.pipelines = {{ pipelines | tojson | safe }};
   window.prompts = {{ prompts | tojson | safe }};
-  window.generated_outputs = {{ generated_outputs | tojson | safe }};
 </script>
 
 <script src="{{ host_prefix }}/static/js/custom.js"></script>
