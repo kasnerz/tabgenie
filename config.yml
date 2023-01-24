@@ -20,7 +20,7 @@ host_prefix: "."
 cache_dev_splits: false
 pipelines:
   totto_model:
-    class: model_api
+    pipeline: model_api
     interactive: false
     model_url: http://localhost:8980/
     config_template_file: model_api_config.html
