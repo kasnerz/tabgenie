@@ -7,7 +7,7 @@ install_requires = [
     "Flask==2.2.2",
     "lxml==4.9.1",
     "requests==2.28.1",
-    "datasets",
+    "datasets>=2.8.0",
     "tinyhtml",
     "xlsxwriter",
     "coloredlogs",

@@ -38,7 +38,7 @@ See `setup.py` for the full list of requirements.
 ### Web app
 #### Local development
 ```
-pip install -e .
+pip install -e .[dev]
 tabgenie [app parameters] run [--port=PORT] [--host=HOSTNAME]
 ```
 #### Deployment
