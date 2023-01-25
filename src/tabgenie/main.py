@@ -6,11 +6,9 @@ import shutil
 import logging
 import linecache
 
-import yaml
 import coloredlogs
 import pandas as pd
 from flask import Flask, render_template, jsonify, request, send_file
-from click import get_current_context
 
 from .loaders import DATASET_CLASSES
 from .processing.processing import get_pipeline_class_by_name
@@ -282,40 +280,3 @@ def index():
         default_dataset=app.config["default_dataset"],
         host_prefix=app.config["host_prefix"],
     )
-
-
-def create_app(**kwargs):
-    ctx = get_current_context(silent=True)
-    if ctx:
-        disable_pipelines = ctx.obj.disable_pipelines
-    else:
-        # Production server, e.g., gunincorn
-        # We don't have access to the current context, so must read kwargs instead.
-        disable_pipelines = kwargs.get("disable_pipelines", False)
-
-    with open("config.yml") as f:
-        config = yaml.safe_load(f)
-
-    app.config.update(config)
-    app.config["root_dir"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir)
-    app.config["datasets_obj"] = {}
-    app.config["pipelines_obj"] = {}
-    app.config["prompts"] = load_prompts()
-
-    if app.config.get("pipelines") and not disable_pipelines:
-        for pipeline_name in app.config["pipelines"].keys():
-            initialize_pipeline(pipeline_name)
-    else:
-        app.config["pipelines"] = {}
-
-    # preload
-    if config["cache_dev_splits"]:
-        for dataset_name in app.config["datasets"]:
-            get_dataset(dataset_name, "dev")
-
-    if config["debug"] is False:
-        logging.getLogger("werkzeug").disabled = True
-
-    logger.info("Application ready")
-
-    return app
