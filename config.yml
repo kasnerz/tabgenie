@@ -13,7 +13,8 @@ datasets:
 - webnlg
 - wikibio
 - wikisql
-default_dataset: wikibio
+- multiwoz22
+default_dataset: multiwoz22
 debug: false
 # max_examples_per_split: 10000
 host_prefix: "."

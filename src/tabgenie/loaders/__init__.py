@@ -4,6 +4,7 @@ from .e2e import E2E
 from .hitab import HiTab
 from .logic2text import Logic2Text
 from .logicnlg import LogicNLG
+from .multiwoz22 import MultiWOZ22
 from .numericnlg import NumericNLG
 from .scigen import SciGen
 from .sportsett import SportSettBasketball
@@ -26,5 +27,6 @@ DATASET_CLASSES = {
     "webnlg": WebNLG,
     "wikibio": WikiBio,
     "totto": ToTTo,
-    "wikisql": WikiSQL
+    "wikisql": WikiSQL,
+    "multiwoz22": MultiWOZ22,
 }
