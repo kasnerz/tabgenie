@@ -1,8 +1,54 @@
 #!/usr/bin/env python3
 import click
+import os
+import logging
 from flask.cli import FlaskGroup, with_appcontext, pass_script_info
 
-from .main import create_app, export_dataset
+logger = logging.getLogger(__name__)
+
+
+def create_app(**kwargs):
+    from click import get_current_context
+    import yaml
+
+    ctx = get_current_context(silent=True)
+    if ctx and hasattr(ctx.obj, "disable_pipelines"):
+        disable_pipelines = ctx.obj.disable_pipelines
+    else:
+        # Production server, e.g., gunincorn
+        # We don't have access to the current context, so must read kwargs instead.
+        disable_pipelines = kwargs.get("disable_pipelines", False)
+
+    with open("config.yml") as f:
+        config = yaml.safe_load(f)
+
+    # Imports from main slow down flask CLI
+    # since main have very time-consuming libraries to import
+    from .main import app, initialize_pipeline, load_prompts
+
+    app.config.update(config)
+    app.config["root_dir"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir)
+    app.config["datasets_obj"] = {}
+    app.config["pipelines_obj"] = {}
+    app.config["prompts"] = load_prompts()
+
+    if app.config.get("pipelines") and not disable_pipelines:
+        for pipeline_name in app.config["pipelines"].keys():
+            initialize_pipeline(pipeline_name)
+    else:
+        app.config["pipelines"] = {}
+
+    # preload
+    if config["cache_dev_splits"]:
+        for dataset_name in app.config["datasets"]:
+            get_dataset(dataset_name, "dev")
+
+    if config["debug"] is False:
+        logging.getLogger("werkzeug").disabled = True
+
+    logger.info("Application ready")
+
+    return app
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)
@@ -31,6 +77,12 @@ def run(script_info, disable_pipelines):
 )
 @with_appcontext
 def export(dataset, split, out_dir, export_format, json_template):
+    from .main import export_dataset
+
     export_dataset(
-        dataset_name=dataset, split=split, out_dir=out_dir, export_format=export_format, json_template=json_template
+        dataset_name=dataset,
+        split=split,
+        out_dir=out_dir,
+        export_format=export_format,
+        json_template=json_template,
     )

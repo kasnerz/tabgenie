@@ -40,6 +40,7 @@ setup(
     extras_require={
         "dev": [
             "wheel",
+            "black",
         ],
         "deploy": [
             "gunicorn",
