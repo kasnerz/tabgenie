@@ -11,7 +11,7 @@ class ToTTo(HFTabularDataset):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.hf_id = 'GEM/totto'
+        self.hf_id = "GEM/totto"
         self.name = "ToTTo"
 
     def prepare_table(self, split, table_idx):
@@ -26,7 +26,7 @@ class ToTTo(HFTabularDataset):
 
         if entry.get("table_section_title"):
             t.props["table_section_title"] = entry["table_section_title"]
-        
+
         t.props["url"] = entry["table_webpage_url"]
 
         for i, row in enumerate(entry["table"]):

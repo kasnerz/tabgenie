@@ -18,20 +18,13 @@ class Logic2Text(HFTabularDataset):
     def prepare_table(self, split, table_idx):
         def is_highlighted(i, j):
             # TODO: add other cases in the dataset such as "col_superlative" and "row_superlative" or subsets
-            if all(
-                x in entry["annotation"] for x in ["row_1", "row_2", "col", "col_other"]
-            ):
-                return (
-                    str(i + 1) == entry["annotation"]["row_1"]
-                    or str(i + 1) == entry["annotation"]["row_2"]
-                ) and (
-                    str(j + 1) == entry["annotation"]["col"]
-                    or str(j + 1) == entry["annotation"]["col_other"]
+            if all(x in entry["annotation"] for x in ["row_1", "row_2", "col", "col_other"]):
+                return (str(i + 1) == entry["annotation"]["row_1"] or str(i + 1) == entry["annotation"]["row_2"]) and (
+                    str(j + 1) == entry["annotation"]["col"] or str(j + 1) == entry["annotation"]["col_other"]
                 )
             elif all(x in entry["annotation"] for x in ["row", "col", "col_other"]):
                 return str(i + 1) == entry["annotation"]["row"] and (
-                    str(j + 1) == entry["annotation"]["col"]
-                    or str(j + 1) == entry["annotation"]["col_other"]
+                    str(j + 1) == entry["annotation"]["col"] or str(j + 1) == entry["annotation"]["col_other"]
                 )
             elif "col" in entry["annotation"]:
                 return str(j + 1) == entry["annotation"]["col"]
