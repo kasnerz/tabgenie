@@ -313,22 +313,39 @@ class TabularDataset:
         df = pd.read_html(table_html)[0]
         return df
 
-    def table_to_html(self, table):
-        if table.props:
-            meta_trs = []
-            for key, value in table.props.items():
-                meta_trs.append([h("th")(key), h("td")(value)])
+    @staticmethod
+    def meta_to_html(props):
+        meta_tbodies = []
+        meta_buttons = []
 
-            meta_tbodies = [h("tr")(tds) for tds in meta_trs]
-            meta_tbody_el = h("tbody")(meta_tbodies)
-            meta_table_el = h("table", klass="table table-sm caption-top meta-table")(
-                h("caption")("properties"), meta_tbody_el
+        for key, value in props.items():
+            cells = [h("th")(key), h("td")(value)]
+            meta_tbodies.append(h("tr", klass="collapse", id_=f'row_{key}')(cells))
+            meta_buttons.append(
+                h(
+                    "button",
+                    type_="button",
+                    klass="prop-btn btn btn-outline-primary btn-sm",
+                    data_bs_toggle="collapse",
+                    data_bs_target=f'#row_{key}',
+                    aria_expanded="false",
+                    aria_controls=f'row_{key}'
+                )(key)
             )
-        else:
-            meta_table_el = None
 
+        meta_tbody_el = h("tbody")(meta_tbodies)
+        caption = h("caption")("properties")
+        meta_table_el = h("table", klass="table table-sm caption-top meta-table")(
+            caption, meta_tbody_el
+        )
+
+        meta_el = h("div")(meta_buttons, meta_table_el)
+        return meta_el
+
+    def table_to_html(self, table):
+        meta_el = self.meta_to_html(table.props) if table.props else None
         table_el = self._get_main_table_html(table)
-        area_el = h("div")(meta_table_el, table_el)
+        area_el = h("div")(meta_el, table_el)
 
         html = area_el.render()
         return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
