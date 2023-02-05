@@ -328,15 +328,21 @@ class TabularDataset:
             meta_row_cls = "collapse show" if key in displayed_props else "collapse"
             aria_expanded = "true" if key in displayed_props else "false"
 
-            cells = [h("th")(key), h("td")(value)]
-            meta_tbodies.append(h("tr", klass=meta_row_cls, id_=f'row_{key}')(cells))
+            # two wrappers around text required for collapsing
+            wrapper = h('div', klass=[meta_row_cls, f'row_{key}', 'collapsible'])
+            cells = [
+                h("th")(wrapper(h('div')(key))),
+                h("td")(wrapper(h('div')(value)))
+            ]
+
+            meta_tbodies.append(h("tr")(cells))
             meta_buttons.append(
                 h(
                     "button",
                     type_="button",
                     klass="prop-btn btn btn-outline-primary btn-sm",
                     data_bs_toggle="collapse",
-                    data_bs_target=f'#row_{key}',
+                    data_bs_target=f'.row_{key}',
                     aria_expanded=aria_expanded,
                     aria_controls=f'row_{key}'
                 )(key)
@@ -345,7 +351,7 @@ class TabularDataset:
         prop_caption = h("div", id_="prop-caption")("properties")
         meta_buttons_div = h("div", klass="prop-buttons")(meta_buttons)
         meta_tbody_el = h("tbody")(meta_tbodies)
-        meta_table_el = h("table", klass="table table-sm caption-top meta-table")(meta_tbody_el)
+        meta_table_el = h("table", klass="table table-sm table-borderless caption-top meta-table")(meta_tbody_el)
         meta_el = h("div")(prop_caption, meta_buttons_div, meta_table_el)
         return meta_el
 
