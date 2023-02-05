@@ -56,7 +56,8 @@ def render_table():
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")
     table_idx = int(request.args.get("table_idx"))
-    table_data = get_table_data(dataset_name, split, table_idx)
+    displayed_props = json.loads(request.args.get("displayed_props"))
+    table_data = get_table_data(dataset_name, split, table_idx, displayed_props)
     return table_data
 
 
@@ -238,10 +239,10 @@ def get_generated_outputs(dataset_name, split, table, output_idx):
     return outputs
 
 
-def get_table_data(dataset_name, split, table_idx):
+def get_table_data(dataset_name, split, table_idx, displayed_props):
     dataset = get_dataset(dataset_name=dataset_name, split=split)
     table = dataset.get_table(split=split, table_idx=table_idx)
-    html = dataset.export_table(table=table, export_format="html")
+    html = dataset.export_table(table=table, export_format="html", displayed_props=displayed_props)
     generated_outputs = get_generated_outputs(dataset_name=dataset_name, split=split, table=table, output_idx=table_idx)
     dataset_info = dataset.get_info()
 

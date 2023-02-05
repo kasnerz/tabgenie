@@ -185,13 +185,19 @@ class TabularDataset:
     def get_info(self):
         return self.dataset_info
 
-    def export_table(self, table, export_format, cell_ids=None):
+    def export_table(
+            self,
+            table,
+            export_format,
+            cell_ids=None,
+            displayed_props=None
+    ):
         if export_format == "txt":
             exported = self.table_to_linear(table, cell_ids)
         elif export_format == "triples":
             exported = self.table_to_triples(table, cell_ids)
         elif export_format == "html":
-            exported = self.table_to_html(table)
+            exported = self.table_to_html(table, displayed_props)
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
@@ -314,13 +320,16 @@ class TabularDataset:
         return df
 
     @staticmethod
-    def meta_to_html(props):
+    def meta_to_html(props, displayed_props):
         meta_tbodies = []
         meta_buttons = []
 
         for key, value in props.items():
+            meta_row_cls = "collapse show" if key in displayed_props else "collapse"
+            aria_expanded = "true" if key in displayed_props else "false"
+
             cells = [h("th")(key), h("td")(value)]
-            meta_tbodies.append(h("tr", klass="collapse", id_=f'row_{key}')(cells))
+            meta_tbodies.append(h("tr", klass=meta_row_cls, id_=f'row_{key}')(cells))
             meta_buttons.append(
                 h(
                     "button",
@@ -328,7 +337,7 @@ class TabularDataset:
                     klass="prop-btn btn btn-outline-primary btn-sm",
                     data_bs_toggle="collapse",
                     data_bs_target=f'#row_{key}',
-                    aria_expanded="false",
+                    aria_expanded=aria_expanded,
                     aria_controls=f'row_{key}'
                 )(key)
             )
@@ -342,8 +351,8 @@ class TabularDataset:
         meta_el = h("div")(meta_buttons, meta_table_el)
         return meta_el
 
-    def table_to_html(self, table):
-        meta_el = self.meta_to_html(table.props) if table.props else None
+    def table_to_html(self, table, displayed_props):
+        meta_el = self.meta_to_html(table.props, displayed_props) if table.props else None
         table_el = self._get_main_table_html(table)
         area_el = h("div")(meta_el, table_el)
 
