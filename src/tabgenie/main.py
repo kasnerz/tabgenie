@@ -220,13 +220,10 @@ def get_dataset(dataset_name, split):
     return dataset
 
 
-def get_generated_outputs(dataset_name, split, table, output_idx):
-    dataset = get_dataset(dataset_name=dataset_name, split=split)
+def get_generated_outputs(dataset_name, split, output_idx):
+    outputs = {}
+
     out_dir = os.path.join(app.config["root_dir"], app.config["generated_outputs_dir"], dataset_name, split)
-
-    # TODO: think of a better way than to consider reference as one of the generated outputs
-    outputs = {"reference": {"out": [dataset.get_reference(table)]}}
-
     if not os.path.isdir(out_dir):
         return outputs
 
@@ -243,7 +240,7 @@ def get_table_data(dataset_name, split, table_idx, displayed_props):
     dataset = get_dataset(dataset_name=dataset_name, split=split)
     table = dataset.get_table(split=split, table_idx=table_idx)
     html = dataset.export_table(table=table, export_format="html", displayed_props=displayed_props)
-    generated_outputs = get_generated_outputs(dataset_name=dataset_name, split=split, table=table, output_idx=table_idx)
+    generated_outputs = get_generated_outputs(dataset_name=dataset_name, split=split, output_idx=table_idx)
     dataset_info = dataset.get_info()
 
     return {

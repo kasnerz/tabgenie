@@ -34,7 +34,7 @@ class WebNLG(HFTabularDataset):
     def prepare_table(self, split, table_idx):
         entry = self.data[split][table_idx]
         t = Table()
-        t.set_generated_output("reference", entry["target"])
+        t.props["reference"] = entry["target"]
 
         for val in ["subject", "predicate", "object"]:
             c = Cell()

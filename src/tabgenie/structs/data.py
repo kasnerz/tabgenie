@@ -149,7 +149,7 @@ class TabularDataset:
 
     @staticmethod
     def get_reference(table):
-        return table.get_generated_output("reference")
+        return table.props["reference"]
 
     # @staticmethod
     # def get_generated_outputs(split, output_idx):
