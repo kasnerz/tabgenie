@@ -50,14 +50,6 @@ function randombtn() {
   gotopage(randint(total_examples - 1));
 }
 
-function get_pressed_props() {
-  var pressed_props = [];
-  $(".prop-btn[aria-expanded='true']").each( function() {
-    pressed_props.push($(this).text());
-  });
-  return pressed_props;
-}
-
 function favouritebtn() {
   var favourite_id = `${dataset}-${split}-${table_idx}`;
 
@@ -133,6 +125,14 @@ function gotopage(page) {
 
   fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
+}
+
+function get_pressed_props() {
+  var pressed_props = [];
+  $(".prop-btn[aria-expanded='true']").each( function() {
+    pressed_props.push($(this).text());
+  });
+  return pressed_props;
 }
 
 function set_dataset_info(info) {

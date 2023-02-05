@@ -424,6 +424,10 @@ ul {
     background-color: #FFF68F;
 }
 
+.prop-btn {
+    margin-bottom: 5px;
+}
+
 .prop-btn[aria-expanded="false"] {
     background-color: #fff;
     border-color: #0175ac;
@@ -434,4 +438,11 @@ ul {
     color: #fff;
     background-color: #0175ac;
     border-color: #0175ac;
+}
+
+#prop-caption {
+    color: #6c757d;
+    font-size: 14px !important;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 }

@@ -342,13 +342,11 @@ class TabularDataset:
                 )(key)
             )
 
+        prop_caption = h("div", id_="prop-caption")("properties")
+        meta_buttons_div = h("div", klass="prop-buttons")(meta_buttons)
         meta_tbody_el = h("tbody")(meta_tbodies)
-        caption = h("caption")("properties")
-        meta_table_el = h("table", klass="table table-sm caption-top meta-table")(
-            caption, meta_tbody_el
-        )
-
-        meta_el = h("div")(meta_buttons, meta_table_el)
+        meta_table_el = h("table", klass="table table-sm caption-top meta-table")(meta_tbody_el)
+        meta_el = h("div")(prop_caption, meta_buttons_div, meta_table_el)
         return meta_el
 
     def table_to_html(self, table, displayed_props):
