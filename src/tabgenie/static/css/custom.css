@@ -423,3 +423,41 @@ ul {
 .hwt-content mark.yellow {
     background-color: #FFF68F;
 }
+
+.prop-btn {
+    margin-bottom: 5px;
+}
+
+.prop-btn[aria-expanded="false"] {
+    background-color: #fff;
+    border-color: #0175ac;
+    color: #0175ac;
+}
+
+.prop-btn[aria-expanded="true"] {
+    color: #fff;
+    background-color: #0175ac;
+    border-color: #0175ac;
+}
+
+#prop-caption {
+    color: #6c757d;
+    font-size: 14px !important;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.meta-table div.collapsible div {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.meta-table td, .meta-table th {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.meta-table th {
+    width: 1rem; /* hack */
+    padding-right: 1rem;
+}

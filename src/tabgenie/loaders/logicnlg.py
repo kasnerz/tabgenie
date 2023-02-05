@@ -21,7 +21,7 @@ class LogicNLG(HFTabularDataset):
         entry = self.data[split][table_idx]
         t = Table()
 
-        t.set_generated_output("reference", entry["ref"])
+        t.props["reference"] = entry["ref"]
         t.props["title"] = entry["title"]
         t.props["table_id"] = entry["table_id"]
         t.props["template"] = entry["template"]

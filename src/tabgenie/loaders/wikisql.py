@@ -32,7 +32,7 @@ class WikiSQL(HFTabularDataset):
         if title is not None:
             t.props['title'] = entry['table']['caption']
         t.props['sql'] = entry['sql']['human_readable']
-        t.set_generated_output('reference', entry['question'])
+        t.props["reference"] = entry['question']
 
         for header_cell in entry['table']['header']:
             c = Cell()

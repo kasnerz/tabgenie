@@ -41,7 +41,7 @@ class Logic2Text(HFTabularDataset):
         entry = self.data[split][table_idx]
         entry["annotation"] = ast.literal_eval(entry["annotation"])
         t = Table()
-        t.set_generated_output("reference", entry["sent"])
+        t.props["reference"] = entry["sent"]
 
         t.props["title"] = entry["topic"]
         t.props["url"] = entry["url"]

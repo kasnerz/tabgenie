@@ -127,6 +127,14 @@ function gotopage(page) {
   $("#page-input").val(table_idx);
 }
 
+function get_pressed_props() {
+  var pressed_props = [];
+  $(".prop-btn[aria-expanded='true']").each( function() {
+    pressed_props.push($(this).text());
+  });
+  return pressed_props;
+}
+
 function set_dataset_info(info) {
   $("#dataset-info").html("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
     "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +
@@ -374,10 +382,12 @@ function show_generated_outputs(generated_outputs) {
 }
 
 function fetch_table(dataset, split, table_idx, export_format) {
+  var pressed_props = get_pressed_props();
   $.get(`${url_prefix}/table`, {
     "dataset": dataset,
     "table_idx": table_idx,
     "split": split,
+    "displayed_props": JSON.stringify(pressed_props),
     // "pipelines": JSON.stringify(pipelines)
   }, function (data) {
     reset_pipeline_outputs();
