@@ -129,7 +129,7 @@ function gotopage(page) {
 
 function get_pressed_props() {
   var pressed_props = [];
-  $(".prop-btn[aria-expanded='true']").each( function() {
+  $(".prop-btn[aria-expanded='true']").each(function () {
     pressed_props.push($(this).text());
   });
   return pressed_props;
@@ -138,7 +138,7 @@ function get_pressed_props() {
 function set_dataset_info(info) {
   $("#dataset-info").html("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
     "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +
-    "<h5>Citation:</h5><p><code>" + info.citation + "</code></p>");
+    "<h5>Citation:</h5><p><code>" + info.citation.replace(/\n/g, '<br>') + "</code></p>");
 }
 
 function get_highlighted_cells() {
