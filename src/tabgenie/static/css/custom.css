@@ -175,10 +175,10 @@ pre {
 }
 
 .container.large-container {
-    margin-left: 50px;
-    margin-right: 50px;
+    padding-left: 50px;
+    /* margin-right: 50px; */
     max-width: none;
-    padding-right: 50px;
+    /* padding-right: 50px; */
 }
 
 .split {
