@@ -129,10 +129,19 @@ function gotopage(page) {
 
 function get_pressed_props() {
   var pressed_props = [];
-  $(".prop-btn[aria-expanded='true']").each(function () {
+  $(".prop-btn ").each(function () {
     pressed_props.push($(this).text());
   });
   return pressed_props;
+}
+
+function toggle_props() {
+  // first show all, if all is shown then hide all
+  if ($(".prop-btn.collapsed").length != 0) {
+    $(".prop-btn.collapsed").click();
+  } else {
+    $(".prop-btn").click()
+  }
 }
 
 function set_dataset_info(info) {
