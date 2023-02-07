@@ -139,6 +139,9 @@ function set_dataset_info(info) {
   var ex_array = $.map(info.examples, function (num, split) {
     return $("<li/>").append([$("<b/>").text(`${split}: `), $("<span/>").text(num)]);
   });
+  var links_array = $.map(info.links, function (url, page) {
+    return $("<li/>").append([$("<b/>").text(`${page}: `), $("<a/>", { href: url, text: url })]);
+  });
 
   $("#dataset-info").empty();
   $("#dataset-info").append([
@@ -149,12 +152,7 @@ function set_dataset_info(info) {
       $("<ul/>").append(ex_array)),
     $("<h5/>").text("Links"),
     $("<p/>").append(
-      $("<ul/>").append([
-        $("<li/>").append($("<a/>", { href: info.homepage, text: info.homepage })),
-        $("<li/>").append($("<a/>", { href: info.origin, text: info.origin }))
-      ]
-      )
-    ),
+      $("<ul/>").append(links_array)),
     $("<h5/>").text("Version"),
     $("<p/>").text(info.version),
     $("<h5/>").text("License"),

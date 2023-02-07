@@ -13,6 +13,7 @@ class SportSettBasketball(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/sportsett_basketball"
         self.name = "SportSett Basketball"
+        self.extra_info = {"license": "MIT"}
 
     def _next_game_to_str(self, ng):
         if not ng:

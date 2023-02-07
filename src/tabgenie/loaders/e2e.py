@@ -12,6 +12,7 @@ class E2E(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/e2e_nlg"
         self.name = "E2E"
+        self.license = "CC BY-SA 4.0"
 
     def table_to_triples(self, table, cell_ids):
         rows = table.get_cells()

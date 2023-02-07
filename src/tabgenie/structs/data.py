@@ -388,6 +388,7 @@ class HFTabularDataset(TabularDataset):
         self.hf_extra_config = None
         self.split_mapping = {"train": "train", "dev": "validation", "test": "test"}
         self.dataset_info = {}
+        self.extra_info = {}
 
     def load(self, split, max_examples=None):
         hf_split = self.split_mapping[split]
@@ -403,14 +404,12 @@ class HFTabularDataset(TabularDataset):
             dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=hf_split)
 
         self.dataset_info = dataset.info.__dict__
-
         self.data[split] = dataset
 
     def get_info(self):
-        info = {
-            key: self.dataset_info.get(key) for key in ["citation", "description", "homepage", "version", "license"]
-        }
+        info = {key: self.dataset_info.get(key) for key in ["citation", "description", "version", "license"]}
         info["examples"] = {}
+        info["links"] = {}
 
         for split_name, split_info in self.dataset_info.get("splits").items():
             if split_name.startswith("val"):
@@ -424,7 +423,15 @@ class HFTabularDataset(TabularDataset):
         if info["version"] is not None:
             info["version"] = str(info["version"])
 
-        info["origin"] = "https://huggingface.co/datasets/" + self.hf_id
+        if self.dataset_info.get("homepage"):
+            info["links"]["homepage"] = self.dataset_info["homepage"]
+        elif self.extra_info.get("homepage"):
+            info["links"]["homepage"] = self.extra_info["homepage"]
+
+        info["links"]["source"] = "https://huggingface.co/datasets/" + self.hf_id
         info["name"] = self.name
+
+        # some info may not be present on HF, set it manually
+        info.update(self.extra_info)
 
         return info
