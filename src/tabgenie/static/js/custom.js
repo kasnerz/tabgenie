@@ -214,7 +214,7 @@ function reload_pipelines() {
 function init_cell_interactivity() {
   ["th", "td"].forEach(
     function (celltype) {
-      var cells = $("#tablearea").find(celltype);
+      var cells = $("#main-table-body").find(celltype);
       cells.off("click");
       cells.removeAttr("contenteditable");
 

@@ -185,13 +185,7 @@ class TabularDataset:
     def get_info(self):
         return self.dataset_info
 
-    def export_table(
-            self,
-            table,
-            export_format,
-            cell_ids=None,
-            displayed_props=None
-    ):
+    def export_table(self, table, export_format, cell_ids=None, displayed_props=None):
         if export_format == "txt":
             exported = self.table_to_linear(table, cell_ids)
         elif export_format == "triples":
@@ -329,11 +323,8 @@ class TabularDataset:
             aria_expanded = "true" if key in displayed_props else "false"
 
             # two wrappers around text required for collapsing
-            wrapper = h('div', klass=[meta_row_cls, f'row_{key}', 'collapsible'])
-            cells = [
-                h("th")(wrapper(h('div')(key))),
-                h("td")(wrapper(h('div')(value)))
-            ]
+            wrapper = h("div", klass=[meta_row_cls, f"row_{key}", "collapsible"])
+            cells = [h("th")(wrapper(h("div")(key))), h("td")(wrapper(h("div")(value)))]
 
             meta_tbodies.append(h("tr")(cells))
             meta_buttons.append(
@@ -342,9 +333,9 @@ class TabularDataset:
                     type_="button",
                     klass="prop-btn btn btn-outline-primary btn-sm",
                     data_bs_toggle="collapse",
-                    data_bs_target=f'.row_{key}',
+                    data_bs_target=f".row_{key}",
                     aria_expanded=aria_expanded,
-                    aria_controls=f'row_{key}'
+                    aria_controls=f"row_{key}",
                 )(key)
             )
 
@@ -382,7 +373,7 @@ class TabularDataset:
             trs.append(tds)
 
         tbodies = [h("tr")(tds) for tds in trs]
-        tbody_el = h("tbody")(tbodies)
+        tbody_el = h("tbody", id="main-table-body")(tbodies)
         table_el = h("table", klass="table table-sm table-bordered caption-top main-table")(
             h("caption")("data"), tbody_el
         )
