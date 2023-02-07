@@ -30,10 +30,12 @@ class SciGen(HFTabularDataset):
     def prepare_table(self, split, table_idx):
         t = Table()
         entry = self.data[split][table_idx]
+
         caption = entry["table_caption"]
         t.props["reference"] = caption.replace("[CONTINUE]", "\n")
-        
         t.props["title"] = entry["paper"]
+        t.props["text"] = (entry.get("text") or "").replace("[CONTINUE]", "\n")
+        t.props["paper_id"] = entry.get("paper_id")
 
         for col in ast.literal_eval(entry["table_column_names"]):
             c = Cell()
@@ -43,7 +45,7 @@ class SciGen(HFTabularDataset):
 
         t.save_row()
 
-        for row in ast.literal_eval( entry["table_content_values"]):
+        for row in ast.literal_eval(entry["table_content_values"]):
             for col in row:
                 c = Cell()
                 c.value = self.normalize(col)

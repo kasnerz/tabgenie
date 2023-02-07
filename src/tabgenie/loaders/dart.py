@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-from datasets import load_dataset
 import logging
 
 from ..structs.data import Cell, Table, HFTabularDataset
-
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +33,10 @@ class DART(HFTabularDataset):
     def prepare_table(self, split, table_idx):
         entry = self.data[split][table_idx]
         t = Table()
+
         t.props["reference"] = entry["target"]
+        t.props["target_source"] = entry["target_sources"][0]
+        t.props["subtree_was_extended"] = entry["subtree_was_extended"]
 
         for val in ["subject", "predicate", "object"]:
             c = Cell()
