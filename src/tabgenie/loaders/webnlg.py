@@ -36,6 +36,8 @@ class WebNLG(HFTabularDataset):
         entry = self.data[split][table_idx]
         t = Table()
         t.props["reference"] = entry["target"]
+        t.props["category"] = entry["category"]
+        t.props["webnlg_id"] = entry["webnlg_id"]
 
         for val in ["subject", "predicate", "object"]:
             c = Cell()

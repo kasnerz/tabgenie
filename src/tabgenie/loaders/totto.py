@@ -21,13 +21,15 @@ class ToTTo(HFTabularDataset):
         t.props["reference"] = entry["target"]
 
         t.props["title"] = entry["table_page_title"]
-
         if entry.get("table_section_text"):
             t.props["table_section_text"] = entry["table_section_text"]
 
         if entry.get("table_section_title"):
             t.props["table_section_title"] = entry["table_section_title"]
 
+        t.props["references"] = str(entry["references"])
+        t.props["linearized_input"] = entry["linearized_input"]
+        t.props["overlap_subset"] = entry["overlap_subset"]
         t.props["url"] = entry["table_webpage_url"]
 
         for i, row in enumerate(entry["table"]):

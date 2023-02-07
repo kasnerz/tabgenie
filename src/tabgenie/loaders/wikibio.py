@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from ..structs.data import Cell, Table, HFTabularDataset
+
 # from ..utils.text import Detokenizer
 
 
@@ -13,11 +14,7 @@ class WikiBio(HFTabularDataset):
         self.hf_id = "wiki_bio"
         self.name = "WikiBio"
         self.mapping = {}
-        self.split_mapping = {
-            "train": "train",
-            "dev": "val",
-            "test": "test"
-        }
+        self.split_mapping = {"train": "train", "dev": "val", "test": "test"}
 
     @staticmethod
     def normalize(s):
