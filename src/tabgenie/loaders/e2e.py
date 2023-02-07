@@ -10,14 +10,15 @@ class E2E(HFTabularDataset):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.hf_id = 'GEM/e2e_nlg'
+        self.hf_id = "GEM/e2e_nlg"
         self.name = "E2E"
+        self.license = "CC BY-SA 4.0"
 
     def table_to_triples(self, table, cell_ids):
         rows = table.get_cells()
 
-        keys = [x.value for x in rows[0]]
-        vals = [x.value for x in rows[1]]
+        keys = [x[0].value for x in rows]
+        vals = [x[1].value for x in rows]
 
         triples = []
 
@@ -40,7 +41,7 @@ class E2E(HFTabularDataset):
             subj = vals[eatType_idx]
             del keys[eatType_idx]
             del vals[eatType_idx]
-        # still in some cases, there is not even an eatType 
+        # still in some cases, there is not even an eatType
         # -> hotfix so that we do not lose data
         else:
             # logger.warning(f"Cannot recognize subject in mr: {mr}")
@@ -62,16 +63,15 @@ class E2E(HFTabularDataset):
             key = mr.split("[")[0]
             c = Cell()
             c.value = key
-            c.is_col_header = True
+            c.is_row_header = True
             t.add_cell(c)
-        t.save_row()
 
-        for mr in mrs:
-            value = mr.split("[")[1][:-1]
             c = Cell()
+            value = mr.split("[")[1][:-1]
             c.value = value
             t.add_cell(c)
-        t.save_row()
+
+            t.save_row()
 
         return t
 

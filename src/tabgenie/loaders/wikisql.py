@@ -10,17 +10,19 @@ class WikiSQL(HFTabularDataset):
     Contains tables, SQL queries in machine- and human-readable representations,
         and questions based on tables.
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mapping = {}
-        self.hf_id = 'wikisql'
-        self.name = 'WikiSQL'
+        self.hf_id = "wikisql"
+        self.name = "WikiSQL"
+        self.extra_info = {"license": "BSD 3-Clause"}
 
     @staticmethod
     def _get_title(table):
-        keys_to_try = ['caption', 'section_title', 'page_title']
+        keys_to_try = ["caption", "section_title", "page_title"]
         for key in keys_to_try:
-            value = table.get(key, '').strip()
+            value = table.get(key, "").strip()
             if value:
                 return value
 
@@ -28,20 +30,20 @@ class WikiSQL(HFTabularDataset):
         entry = self.data[split][table_idx]
         t = Table()
 
-        title = self._get_title(entry['table'])
+        title = self._get_title(entry["table"])
         if title is not None:
-            t.props['title'] = entry['table']['caption']
-        t.props['sql'] = entry['sql']['human_readable']
-        t.props["reference"] = entry['question']
+            t.props["title"] = entry["table"]["caption"]
+        t.props["sql"] = entry["sql"]["human_readable"]
+        t.props["reference"] = entry["question"]
 
-        for header_cell in entry['table']['header']:
+        for header_cell in entry["table"]["header"]:
             c = Cell()
             c.value = header_cell
             c.is_col_header = True
             t.add_cell(c)
         t.save_row()
 
-        for row in entry['table']['rows']:
+        for row in entry["table"]["rows"]:
             for cell in row:
                 c = Cell()
                 c.value = cell

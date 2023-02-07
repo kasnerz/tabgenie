@@ -143,7 +143,7 @@ pre {
 }
 
 .area-content {
-    padding: 25px 20px 25px 20px;
+    padding: 5px 20px 0px 20px;
 }
 
 #page-input {
@@ -452,12 +452,18 @@ ul {
     padding-bottom: 0.25rem;
 }
 
-.meta-table td, .meta-table th {
+.meta-table td,
+.meta-table th {
     padding-top: 0;
     padding-bottom: 0;
 }
 
 .meta-table th {
-    width: 1rem; /* hack */
+    width: 1rem;
+    /* hack */
     padding-right: 1rem;
+}
+
+.modal-dialog {
+    max-width: 700px;
 }

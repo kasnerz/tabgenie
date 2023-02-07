@@ -18,6 +18,7 @@ class WebNLG(HFTabularDataset):
         self.hf_id = "GEM/web_nlg"
         self.hf_extra_config = "en"
         self.name = "WebNLG"
+        self.extra_info = {"version": "3.0", "license": "CC BY-NC 4.0"}
 
     def table_to_triples(self, table, cell_ids):
         triples = []

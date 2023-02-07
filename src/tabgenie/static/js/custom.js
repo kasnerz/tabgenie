@@ -129,16 +129,38 @@ function gotopage(page) {
 
 function get_pressed_props() {
   var pressed_props = [];
-  $(".prop-btn[aria-expanded='true']").each( function() {
+  $(".prop-btn[aria-expanded='true']").each(function () {
     pressed_props.push($(this).text());
   });
   return pressed_props;
 }
 
 function set_dataset_info(info) {
-  $("#dataset-info").html("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
-    "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +
-    "<h5>Citation:</h5><p><code>" + info.citation + "</code></p>");
+  var ex_array = $.map(info.examples, function (num, split) {
+    return $("<li/>").append([$("<b/>").text(`${split}: `), $("<span/>").text(num)]);
+  });
+  var links_array = $.map(info.links, function (url, page) {
+    return $("<li/>").append([$("<b/>").text(`${page}: `), $("<a/>", { href: url, text: url })]);
+  });
+
+  $("#dataset-info").empty();
+  $("#dataset-info").append([
+    $("<h3/>").text(info.name),
+    $("<p/>").text(info.description),
+    $("<h5/>").text("Number of examples"),
+    $("<p/>").append(
+      $("<ul/>").append(ex_array)),
+    $("<h5/>").text("Links"),
+    $("<p/>").append(
+      $("<ul/>").append(links_array)),
+    $("<h5/>").text("Version"),
+    $("<p/>").text(info.version),
+    $("<h5/>").text("License"),
+    $("<p/>").text(info.license),
+    $("<h5/>").text("Citation"),
+    $("<p/>").append($("<code/>").html(info.citation.replace(/\n/g, '<br>'))),
+  ]
+  );
 }
 
 function get_highlighted_cells() {
@@ -214,7 +236,7 @@ function reload_pipelines() {
 function init_cell_interactivity() {
   ["th", "td"].forEach(
     function (celltype) {
-      var cells = $("#tablearea").find(celltype);
+      var cells = $("#main-table-body").find(celltype);
       cells.off("click");
       cells.removeAttr("contenteditable");
 
