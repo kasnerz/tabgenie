@@ -403,10 +403,28 @@ class HFTabularDataset(TabularDataset):
             dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=hf_split)
 
         self.dataset_info = dataset.info.__dict__
+
         self.data[split] = dataset
 
     def get_info(self):
-        info = {key: self.dataset_info[key] for key in ["citation", "description", "homepage"]}
+        info = {
+            key: self.dataset_info.get(key) for key in ["citation", "description", "homepage", "version", "license"]
+        }
+        info["examples"] = {}
+
+        for split_name, split_info in self.dataset_info.get("splits").items():
+            if split_name.startswith("val"):
+                split_name = "dev"
+
+            if split_name not in ["train", "dev", "test"]:
+                continue
+
+            info["examples"][split_name] = split_info.num_examples
+
+        if info["version"] is not None:
+            info["version"] = str(info["version"])
+
+        info["origin"] = "https://huggingface.co/datasets/" + self.hf_id
         info["name"] = self.name
 
         return info

@@ -136,9 +136,33 @@ function get_pressed_props() {
 }
 
 function set_dataset_info(info) {
-  $("#dataset-info").html("<h3>" + info.name + "</h3><p>" + info.description + "</p>" +
-    "<h5>Homepage</h5><p><a href=\"" + info.homepage + "\">" + info.homepage + "</a></p>" +
-    "<h5>Citation:</h5><p><code>" + info.citation.replace(/\n/g, '<br>') + "</code></p>");
+  var ex_array = $.map(info.examples, function (num, split) {
+    return $("<li/>").append([$("<b/>").text(`${split}: `), $("<span/>").text(num)]);
+  });
+
+  $("#dataset-info").empty();
+  $("#dataset-info").append([
+    $("<h3/>").text(info.name),
+    $("<p/>").text(info.description),
+    $("<h5/>").text("Number of examples"),
+    $("<p/>").append(
+      $("<ul/>").append(ex_array)),
+    $("<h5/>").text("Links"),
+    $("<p/>").append(
+      $("<ul/>").append([
+        $("<li/>").append($("<a/>", { href: info.homepage, text: info.homepage })),
+        $("<li/>").append($("<a/>", { href: info.origin, text: info.origin }))
+      ]
+      )
+    ),
+    $("<h5/>").text("Version"),
+    $("<p/>").text(info.version),
+    $("<h5/>").text("License"),
+    $("<p/>").text(info.license),
+    $("<h5/>").text("Citation"),
+    $("<p/>").append($("<code/>").html(info.citation.replace(/\n/g, '<br>'))),
+  ]
+  );
 }
 
 function get_highlighted_cells() {
