@@ -129,7 +129,7 @@ function gotopage(page) {
 
 function get_pressed_props() {
   var pressed_props = [];
-  $(".prop-btn ").each(function () {
+  $(".prop-btn[aria-expanded='true']").each(function () {
     pressed_props.push($(this).text());
   });
   return pressed_props;
@@ -137,10 +137,10 @@ function get_pressed_props() {
 
 function toggle_props() {
   // first show all, if all is shown then hide all
-  if ($(".prop-btn.collapsed").length != 0) {
-    $(".prop-btn.collapsed").click();
+  if ($(".prop-btn[aria-expanded='false']").length != 0) {
+    $(".prop-btn[aria-expanded='false']").click();
   } else {
-    $(".prop-btn").click()
+    $(".prop-btn").click();
   }
 }
 
