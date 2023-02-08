@@ -41,6 +41,7 @@ pipelines:
       - webnlg
       - dart
       - e2e
+      - eventnarrative
   export:
     pipeline: export
     interactive: false
