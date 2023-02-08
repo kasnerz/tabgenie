@@ -8,7 +8,7 @@ from ..structs.data import Cell, Table, HFTabularDataset
 class HiTab(HFTabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.hf_id = 'kasnerz/hitab'
+        self.hf_id = "kasnerz/hitab"
         self.name = "HiTab"
 
     @staticmethod
@@ -22,11 +22,14 @@ class HiTab(HFTabularDataset):
     def prepare_table(self, split, table_idx):
         t = Table()
         entry = self.data[split][table_idx]
-        t.set_generated_output("reference", entry["sub_sentence"])
+
+        t.props["reference"] = entry["sub_sentence"]
         content = ast.literal_eval(entry["table_content"])
         linked_cells = self._get_linked_cells(ast.literal_eval(entry["linked_cells"]))
 
-        t.props["title"] = content["title"]
+        t.props["title"] = content.get("title")
+        t.props["table_id"] = entry.get("table_id")
+        t.props["table_source"] = entry.get("table_source")
 
         for i, row in enumerate(content["texts"]):
             for j, col in enumerate(row):
@@ -43,12 +46,8 @@ class HiTab(HFTabularDataset):
                 for j in range(r["first_column"], r["last_column"] + 1):
                     if i == r["first_row"] and j == r["first_column"]:
                         t.get_cell(i, j).rowspan = r["last_row"] - r["first_row"] + 1
-                        t.get_cell(i, j).colspan = (
-                            r["last_column"] - r["first_column"] + 1
-                        )
+                        t.get_cell(i, j).colspan = r["last_column"] - r["first_column"] + 1
                     else:
                         t.get_cell(i, j).is_dummy = True
 
         return t
-
-   

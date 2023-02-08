@@ -159,7 +159,7 @@ class TabularDataset:
 
     @staticmethod
     def get_reference(table):
-        return table.get_generated_output("reference")
+        return table.props.get("reference")
 
     # @staticmethod
     # def get_generated_outputs(split, output_idx):
@@ -195,13 +195,13 @@ class TabularDataset:
     def get_info(self):
         return self.dataset_info
 
-    def export_table(self, table, export_format, cell_ids=None):
+    def export_table(self, table, export_format, cell_ids=None, displayed_props=None):
         if export_format == "txt":
             exported = self.table_to_linear(table, cell_ids)
         elif export_format == "triples":
             exported = self.table_to_triples(table, cell_ids)
         elif export_format == "html":
-            exported = self.table_to_html(table)
+            exported = self.table_to_html(table, displayed_props)
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
@@ -323,22 +323,43 @@ class TabularDataset:
         df = pd.read_html(table_html)[0]
         return df
 
-    def table_to_html(self, table):
-        if table.props:
-            meta_trs = []
-            for key, value in table.props.items():
-                meta_trs.append([h("th")(key), h("td")(value)])
+    @staticmethod
+    def meta_to_html(props, displayed_props):
+        meta_tbodies = []
+        meta_buttons = []
 
-            meta_tbodies = [h("tr")(tds) for tds in meta_trs]
-            meta_tbody_el = h("tbody")(meta_tbodies)
-            meta_table_el = h("table", klass="table table-sm caption-top meta-table")(
-                h("caption")("properties"), meta_tbody_el
+        for key, value in props.items():
+            meta_row_cls = "collapse show" if key in displayed_props else "collapse"
+            aria_expanded = "true" if key in displayed_props else "false"
+
+            # two wrappers around text required for collapsing
+            wrapper = h("div", klass=[meta_row_cls, f"row_{key}", "collapsible"])
+            cells = [h("th")(wrapper(h("div")(key))), h("td")(wrapper(h("div")(value)))]
+
+            meta_tbodies.append(h("tr")(cells))
+            meta_buttons.append(
+                h(
+                    "button",
+                    type_="button",
+                    klass="prop-btn btn btn-outline-primary btn-sm",
+                    data_bs_toggle="collapse",
+                    data_bs_target=f".row_{key}",
+                    aria_expanded=aria_expanded,
+                    aria_controls=f"row_{key}",
+                )(key)
             )
-        else:
-            meta_table_el = None
 
+        prop_caption = h("div", id_="prop-caption")("properties")
+        meta_buttons_div = h("div", klass="prop-buttons")(meta_buttons)
+        meta_tbody_el = h("tbody")(meta_tbodies)
+        meta_table_el = h("table", klass="table table-sm table-borderless caption-top meta-table")(meta_tbody_el)
+        meta_el = h("div")(prop_caption, meta_buttons_div, meta_table_el)
+        return meta_el
+
+    def table_to_html(self, table, displayed_props):
+        meta_el = self.meta_to_html(table.props, displayed_props) if table.props else None
         table_el = self._get_main_table_html(table)
-        area_el = h("div")(meta_table_el, table_el)
+        area_el = h("div")(meta_el, table_el)
 
         html = area_el.render()
         return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
@@ -362,7 +383,7 @@ class TabularDataset:
             trs.append(tds)
 
         tbodies = [h("tr")(tds) for tds in trs]
-        tbody_el = h("tbody")(tbodies)
+        tbody_el = h("tbody", id="main-table-body")(tbodies)
         table_el = h("table", klass="table table-sm table-bordered caption-top main-table")(
             h("caption")("data"), tbody_el
         )
@@ -377,6 +398,7 @@ class HFTabularDataset(TabularDataset):
         self.hf_extra_config = None
         self.split_mapping = {"train": "train", "dev": "validation", "test": "test"}
         self.dataset_info = {}
+        self.extra_info = {}
 
     def load(self, split, max_examples=None):
         hf_split = self.split_mapping[split]
@@ -395,7 +417,31 @@ class HFTabularDataset(TabularDataset):
         self.data[split] = dataset
 
     def get_info(self):
-        info = {key: self.dataset_info[key] for key in ["citation", "description", "homepage"]}
+        info = {key: self.dataset_info.get(key) for key in ["citation", "description", "version", "license"]}
+        info["examples"] = {}
+        info["links"] = {}
+
+        for split_name, split_info in self.dataset_info.get("splits").items():
+            if split_name.startswith("val"):
+                split_name = "dev"
+
+            if split_name not in ["train", "dev", "test"]:
+                continue
+
+            info["examples"][split_name] = split_info.num_examples
+
+        if info["version"] is not None:
+            info["version"] = str(info["version"])
+
+        if self.dataset_info.get("homepage"):
+            info["links"]["homepage"] = self.dataset_info["homepage"]
+        elif self.extra_info.get("homepage"):
+            info["links"]["homepage"] = self.extra_info["homepage"]
+
+        info["links"]["source"] = "https://huggingface.co/datasets/" + self.hf_id
         info["name"] = self.name
+
+        # some info may not be present on HF, set it manually
+        info.update(self.extra_info)
 
         return info

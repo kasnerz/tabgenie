@@ -57,6 +57,11 @@ pip install -e .
 tabgenie export -d DATASET_NAME -o OUTPUT_FILE -f FORMAT [-s SPLIT] [-t TEMPLATE]
 ```
 
+### HuggingFace Integration
+- The datasets are stored to `HF_DATASETS_CACHE` directory which defaults to `~/.cache/huggingface/`. Set the
+environment variable before launching any tabgenie command to store the potentially very large datasets to different
+directory. However, be consistent across all usage of Tabgenie commands.
+
 ## Datasets
 
 See `src/loaders/data.py` for an up-to-date list of available datasets.

@@ -13,6 +13,7 @@ class SportSettBasketball(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/sportsett_basketball"
         self.name = "SportSett Basketball"
+        self.extra_info = {"license": "MIT"}
 
     def _next_game_to_str(self, ng):
         if not ng:
@@ -23,7 +24,7 @@ class SportSettBasketball(HFTabularDataset):
     def prepare_table(self, split, table_idx):
         entry = self.data[split][table_idx]
         t = Table()
-        t.set_generated_output("reference", entry["target"])
+        t.props["reference"] = entry["target"]
 
         ht = entry["teams"]["home"]
         vt = entry["teams"]["vis"]

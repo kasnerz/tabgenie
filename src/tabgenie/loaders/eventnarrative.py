@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
 from ..structs.data import Cell, Table, HFTabularDataset
 from ..utils.text import normalize
-
+import ast
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class WebNLG(HFTabularDataset):
+class EventNarrative(HFTabularDataset):
     """
-    The WebNLG dataset: https://huggingface.co/datasets/GEM/web_nlg
-    Contains DBPedia triples and their crowdsourced verbalizations.
+    The EventNarrative dataset: https://www.kaggle.com/datasets/acolas1/eventnarration
+    A knowledge graph-to-text dataset from publicly available open-world knowledge graphs, focusing on event-centric data.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.hf_id = "GEM/web_nlg"
-        self.hf_extra_config = "en"
-        self.name = "WebNLG"
-        self.extra_info = {"version": "3.0", "license": "CC BY-NC 4.0"}
+        self.hf_id = "kasnerz/eventnarrative"
+        self.name = "EventNarrative"
 
     def table_to_triples(self, table, cell_ids):
         triples = []
@@ -34,10 +32,20 @@ class WebNLG(HFTabularDataset):
 
     def prepare_table(self, split, table_idx):
         entry = self.data[split][table_idx]
+        reference = entry["narration"]
+
+        for key, val in ast.literal_eval(entry["entity_ref_dict"]).items():
+            reference = reference.replace(key, val)
+
         t = Table()
-        t.props["reference"] = entry["target"]
-        t.props["category"] = entry["category"]
-        t.props["webnlg_id"] = entry["webnlg_id"]
+        t.props["reference"] = reference
+        t.props["title"] = entry["Event_Name"]
+        t.props["types"] = entry["types"]
+        t.props["reference_delex"] = entry["narration"]
+        t.props["entity_ref_dict"] = entry["entity_ref_dict"]
+        t.props["wikipediaLabel"] = entry["wikipediaLabel"]
+
+        triples = ast.literal_eval(entry["keep_triples"])
 
         for val in ["subject", "predicate", "object"]:
             c = Cell()
@@ -47,15 +55,11 @@ class WebNLG(HFTabularDataset):
 
         t.save_row()
 
-        for triple in entry["input"]:
-            elems = triple.split("|")
-            for el in elems:
+        for triple in triples:
+            for el in triple:
                 c = Cell()
                 c.value = normalize(el, remove_parentheses=False)
                 t.add_cell(c)
             t.save_row()
 
         return t
-
-    def get_task_definition(self):
-        return "Write a short description of the following RDF triples."

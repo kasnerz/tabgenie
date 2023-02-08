@@ -143,7 +143,7 @@ pre {
 }
 
 .area-content {
-    padding: 25px 20px 25px 20px;
+    padding: 5px 20px 0px 20px;
 }
 
 #page-input {
@@ -175,10 +175,10 @@ pre {
 }
 
 .container.large-container {
-    margin-left: 50px;
-    margin-right: 50px;
+    padding-left: 50px;
+    /* margin-right: 50px; */
     max-width: none;
-    padding-right: 50px;
+    /* padding-right: 50px; */
 }
 
 .split {
@@ -422,4 +422,48 @@ ul {
 
 .hwt-content mark.yellow {
     background-color: #FFF68F;
+}
+
+.prop-btn {
+    margin-bottom: 5px;
+}
+
+.prop-btn[aria-expanded="false"] {
+    background-color: #fff;
+    border-color: #0175ac;
+    color: #0175ac;
+}
+
+.prop-btn[aria-expanded="true"] {
+    color: #fff;
+    background-color: #0175ac;
+    border-color: #0175ac;
+}
+
+#prop-caption {
+    color: #6c757d;
+    font-size: 14px !important;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.meta-table div.collapsible div {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.meta-table td,
+.meta-table th {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.meta-table th {
+    width: 1rem;
+    /* hack */
+    padding-right: 1rem;
+}
+
+.modal-dialog {
+    max-width: 700px;
 }

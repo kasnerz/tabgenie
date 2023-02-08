@@ -1,11 +1,14 @@
 ---
 datasets:
+- cacapo
 - dart
 - e2e
+- eventnarrative
 - hitab
 - charttotext-s
 - logic2text
 - logicnlg
+- multiwoz22
 - numericnlg
 - scigen
 - sportsett
@@ -13,7 +16,7 @@ datasets:
 - webnlg
 - wikibio
 - wikisql
-- multiwoz22
+- wikitabletext
 default_dataset: multiwoz22
 debug: false
 # max_examples_per_split: 10000

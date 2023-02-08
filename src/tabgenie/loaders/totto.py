@@ -13,20 +13,23 @@ class ToTTo(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/totto"
         self.name = "ToTTo"
+        self.extra_info = {"license": "CC BY-SA 3.0"}
 
     def prepare_table(self, split, table_idx):
         entry = self.data[split][table_idx]
         t = Table()
-        t.set_generated_output("reference", entry["target"])
+        t.props["reference"] = entry["target"]
 
         t.props["title"] = entry["table_page_title"]
-
         if entry.get("table_section_text"):
             t.props["table_section_text"] = entry["table_section_text"]
 
         if entry.get("table_section_title"):
             t.props["table_section_title"] = entry["table_section_title"]
 
+        t.props["references"] = str(entry["references"])
+        t.props["linearized_input"] = entry["linearized_input"]
+        t.props["overlap_subset"] = entry["overlap_subset"]
         t.props["url"] = entry["table_webpage_url"]
 
         for i, row in enumerate(entry["table"]):
