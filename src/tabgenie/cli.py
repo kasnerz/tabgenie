@@ -33,6 +33,7 @@ def create_app(**kwargs):
     app.config["prompts"] = load_prompts()
 
     if app.config.get("pipelines") and not disable_pipelines:
+
         for pipeline_name in app.config["pipelines"].keys():
             initialize_pipeline(pipeline_name)
     else:
@@ -40,6 +41,8 @@ def create_app(**kwargs):
 
     # preload
     if config["cache_dev_splits"]:
+        from .main import get_dataset
+
         for dataset_name in app.config["datasets"]:
             get_dataset(dataset_name, "dev")
 
