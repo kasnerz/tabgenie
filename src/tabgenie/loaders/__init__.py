@@ -2,6 +2,7 @@ from .cacapo import CACAPO
 from .charttotext_s import ChartToTextS
 from .dart import DART
 from .e2e import E2E
+from .eventnarrative import EventNarrative
 from .hitab import HiTab
 from .logic2text import Logic2Text
 from .logicnlg import LogicNLG
@@ -19,6 +20,7 @@ DATASET_CLASSES = {
     "charttotext-s": ChartToTextS,
     "dart": DART,
     "e2e": E2E,
+    "eventnarrative": EventNarrative,
     "hitab": HiTab,
     "logic2text": Logic2Text,
     "logicnlg": LogicNLG,
