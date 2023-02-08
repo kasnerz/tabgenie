@@ -17,7 +17,6 @@ class CACAPO(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.hf_id = "kasnerz/cacapo"
         self.name = "CACAPO"
-        # self.extra_info = {"version": "3.0", "license": "CC BY-NC 4.0"}
 
     def prepare_table(self, split, table_idx):
         entry = self.data[split][table_idx]
@@ -41,6 +40,3 @@ class CACAPO(HFTabularDataset):
             t.save_row()
 
         return t
-
-    def get_task_definition(self):
-        return "Write a short description of the following RDF triples."
