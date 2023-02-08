@@ -1,3 +1,4 @@
+from .cacapo import CACAPO
 from .charttotext_s import ChartToTextS
 from .dart import DART
 from .e2e import E2E
@@ -14,10 +15,11 @@ from .wikisql import WikiSQL
 
 
 DATASET_CLASSES = {
+    "cacapo": CACAPO,
+    "charttotext-s": ChartToTextS,
     "dart": DART,
     "e2e": E2E,
     "hitab": HiTab,
-    "charttotext-s": ChartToTextS,
     "logic2text": Logic2Text,
     "logicnlg": LogicNLG,
     "numericnlg": NumericNLG,
@@ -26,5 +28,5 @@ DATASET_CLASSES = {
     "webnlg": WebNLG,
     "wikibio": WikiBio,
     "totto": ToTTo,
-    "wikisql": WikiSQL
+    "wikisql": WikiSQL,
 }
