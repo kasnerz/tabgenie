@@ -1,7 +1,9 @@
 ---
 datasets:
+- cacapo
 - dart
 - e2e
+- eventnarrative
 - hitab
 - charttotext-s
 - logic2text
@@ -13,7 +15,8 @@ datasets:
 - webnlg
 - wikibio
 - wikisql
-default_dataset: hitab
+- wikitabletext
+default_dataset: totto
 debug: false
 # max_examples_per_split: 10000
 host_prefix: "."

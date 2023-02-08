@@ -135,6 +135,15 @@ function get_pressed_props() {
   return pressed_props;
 }
 
+function toggle_props() {
+  // first show all, if all is shown then hide all
+  if ($(".prop-btn[aria-expanded='false']").length != 0) {
+    $(".prop-btn[aria-expanded='false']").click();
+  } else {
+    $(".prop-btn").click();
+  }
+}
+
 function set_dataset_info(info) {
   var ex_array = $.map(info.examples, function (num, split) {
     return $("<li/>").append([$("<b/>").text(`${split}: `), $("<span/>").text(num)]);
