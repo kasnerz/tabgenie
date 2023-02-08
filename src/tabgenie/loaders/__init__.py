@@ -13,6 +13,7 @@ from .totto import ToTTo
 from .webnlg import WebNLG
 from .wikibio import WikiBio
 from .wikisql import WikiSQL
+from .wikitabletext import WikiTableText
 
 
 DATASET_CLASSES = {
@@ -31,4 +32,5 @@ DATASET_CLASSES = {
     "wikibio": WikiBio,
     "totto": ToTTo,
     "wikisql": WikiSQL,
+    "wikitabletext": WikiTableText,
 }
