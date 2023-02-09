@@ -195,9 +195,8 @@ class TabularDataset:
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
-            # export HTML, writing HTML directly to Excel worksheet later
-            table_el = self._get_main_table_html(table)
-            exported = table_el.render()
+            # export table as object, writing directly to Excel worksheet later
+            exported = table
         elif export_format == "reference":
             exported = self.get_reference(table)
         else:
