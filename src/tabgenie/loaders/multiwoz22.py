@@ -296,8 +296,6 @@ class MultiWOZ22(HFTabularDataset):
         turns = entry["turns"]
         dialogue_acts = list(dai2tuples(just_user_acts(turns)))
         t.props["reference"] = list(generate_natural_user_prompt(dialogue_acts))
-        # __import__("ipdb").set_trace()
-
 
         col_names = ["turn_id", "speaker", "utterance", "frames", "dialogue_acts"]
         display_cols = ["turn_id", "speaker", "utterance"]
