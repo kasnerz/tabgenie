@@ -17,7 +17,7 @@ datasets:
 - wikibio
 - wikisql
 - wikitabletext
-default_dataset: multiwoz22
+default_dataset: totto
 debug: false
 # max_examples_per_split: 10000
 host_prefix: "."
