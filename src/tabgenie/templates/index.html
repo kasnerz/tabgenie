@@ -114,6 +114,10 @@
               </button>
               <input type="checkbox" class="btn-check" id="edit-btn" onclick="toggle_edit();" autocomplete="off">
               <label class="btn btn-sm btn-outline-secondary" for="edit-btn">✎ Edit mode</label>
+              <!-- <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#your-edits-modal">
+                📝 Your edits <div id="your-edits-count"></div>
+              </button> -->
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#favourites-modal">
                 ★ Favourites
@@ -253,6 +257,25 @@
     </div>
   </div>
 
+  <!-- <div class="modal fade" id="your-edits-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="your-edits-modal-label">Your edits</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group list-group-flush" id="your-edits-dataset-mode-box"></ul>
+          <ul class="list-group list-group-flush" id="your-edits-notes-mode-box"></ul>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="clear_edits();">Delete all</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
   <div class="modal fade" id="favourites-modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -261,8 +284,6 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-
-
           <ul class="list-group list-group-flush" id="favourites-box"></ul>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" onclick="clear_favourites();">Delete all</button>
@@ -282,6 +303,8 @@
   window.default_dataset = "{{ default_dataset }}";
   window.pipelines = {{ pipelines | tojson | safe }};
   window.prompts = {{ prompts | tojson | safe }};
+  window.favourites = {{ session.get("favourites", {}) | tojson | safe }};
+  window.editedCells = {{ session.get("editedCells", {}) | tojson | safe }};
 </script>
 
 <script src="{{ host_prefix }}/static/js/custom.js"></script>
