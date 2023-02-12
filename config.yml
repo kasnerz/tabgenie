@@ -8,6 +8,7 @@ datasets:
 - charttotext-s
 - logic2text
 - logicnlg
+- multiwoz22
 - numericnlg
 - scigen
 - sportsett

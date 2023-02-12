@@ -8,7 +8,7 @@ import linecache
 
 import coloredlogs
 from xlsxwriter import Workbook
-from flask import Flask, render_template, jsonify, request, send_file
+from flask import Flask, render_template, jsonify, request, send_file, session
 
 from .loaders import DATASET_CLASSES
 from .processing.processing import get_pipeline_class_by_name
@@ -20,6 +20,7 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 
 app = Flask("tabgenie", template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
+app.config.update(SECRET_KEY=os.urandom(24))
 
 file_handler = logging.FileHandler("error.log")
 file_handler.setLevel(logging.ERROR)
@@ -49,7 +50,12 @@ def get_pipeline_output():
     pipeline_name = content["pipeline"]
     out = run_pipeline(pipeline_name, pipeline_args=content, force=bool(content["edited_cells"]))
 
-    return {"out": str(out)}
+    return {"out": str(out), "session": get_session()}
+
+def get_session():
+    """Retrieve session with default values"""
+    session["favourites"] = session.get("favourites", {})
+    return session
 
 
 @app.route("/table", methods=["GET", "POST"])
@@ -59,6 +65,8 @@ def render_table():
     table_idx = int(request.args.get("table_idx"))
     displayed_props = json.loads(request.args.get("displayed_props"))
     table_data = get_table_data(dataset_name, split, table_idx, displayed_props)
+    logging.info(f"{session=} favourites {table_data['session']=}")
+
     return table_data
 
 
@@ -245,6 +253,7 @@ def get_table_data(dataset_name, split, table_idx, displayed_props):
         "total_examples": dataset.get_example_count(split),
         "dataset_info": dataset_info,
         "generated_outputs": generated_outputs,
+        "session": get_session(),
     }
 
 
@@ -261,6 +270,34 @@ def load_prompts():
         prompts[prompt_name] = prompt
 
     return prompts
+
+
+@app.route("/favourite", methods=["GET", "POST"])
+def favourites(): 
+    content = request.json
+    dataset = content.get("dataset")
+    split = content.get("split")
+    table_idx = content.get("table_idx")
+    action = content.get("action", "get_all")
+    if action in ["remove", "insert"]:
+        assert dataset and split and isinstance(table_idx, int), (dataset, split, table_idx)
+        favourite_id = f"{dataset}-{split}-{table_idx}"
+    if action == "remove":
+        if session.get("favourites"):
+            favourite = session.pop(favourite_id, None)
+            logging.info(f"Removed {favourite}")
+    elif action == "insert":
+        favourites = session.get("favourites", {})
+        favourites[favourite_id] = {"dataset": dataset, "split": split, "table_idx": table_idx}
+        session["favourites"] = favourites
+    elif action == "remove_all":
+        favourites = {}
+    else: 
+        assert action == "get_all"
+    favourite_d = session.get("favourites", {})
+    assert isinstance(favourite_d, dict)  # on dicts are applied jsonify
+    logging.info(f"favourite {content=} {session=}")
+    return favourite_d
 
 
 @app.route("/", methods=["GET", "POST"])

@@ -6,6 +6,7 @@ from .eventnarrative import EventNarrative
 from .hitab import HiTab
 from .logic2text import Logic2Text
 from .logicnlg import LogicNLG
+from .multiwoz22 import MultiWOZ22
 from .numericnlg import NumericNLG
 from .scigen import SciGen
 from .sportsett import SportSettBasketball
@@ -23,14 +24,15 @@ DATASET_CLASSES = {
     "e2e": E2E,
     "eventnarrative": EventNarrative,
     "hitab": HiTab,
+    "multiwoz22": MultiWOZ22,
     "logic2text": Logic2Text,
     "logicnlg": LogicNLG,
     "numericnlg": NumericNLG,
     "scigen": SciGen,
     "sportsett": SportSettBasketball,
+    "totto": ToTTo,
     "webnlg": WebNLG,
     "wikibio": WikiBio,
-    "totto": ToTTo,
     "wikisql": WikiSQL,
     "wikitabletext": WikiTableText,
 }

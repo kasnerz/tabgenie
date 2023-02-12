@@ -1,14 +1,16 @@
+var url_prefix = window.location.href.split('#')[0];
 var table_idx = 0;
 var total_examples = 1;
 var dataset = window.default_dataset;
 var pipelines = window.pipelines;
 var prompts = window.prompts;
 var generated_outputs = window.generated_outputs;
-var url_prefix = window.location.href.split('#')[0];
+var favourites = window.favourites;
+console.log(`Begging favourites: ${JSON.stringify(favourites)}`)
+console.log(`favourites ${favourites}`);
+var editedCells = window.editedCells; // TODO check updated all places
 var split = "dev";
 var mode = "highlight";
-var editedCells = {};
-var favourites = {};
 
 function update_svg_width() {
   if (typeof svg != "undefined") {
@@ -50,61 +52,154 @@ function randombtn() {
   gotopage(randint(total_examples - 1));
 }
 
-function favouritebtn() {
-  var favourite_id = `${dataset}-${split}-${table_idx}`;
+function get_favourite_id(dataset, split, table_idx) {
+  return `${dataset}-${split}-${table_idx}`;
 
-  if (favourite_id in favourites) {
-    remove_favourite(favourite_id);
-    return;
-  }
-  favourites[favourite_id] = { "dataset": dataset, "split": split, "table_idx": table_idx };
-
-  update_favourite_button();
-
-  $("#favourites-area").attr("hidden", false);
-  $("#option-export-favourites").removeAttr("disabled");
-
-  var btn_remove = $("<button></button>")
-    .attr("type", "button")
-    .css("width", "0.5em !important")
-    .addClass("btn")
-    .attr("onclick", `remove_favourite('${favourite_id}');`)
-    .text("✕");
-
-  var span_el = $("<span></span>")
-    .addClass("clickable")
-    .text(`${favourite_id}`)
-    .attr("onclick", `gotoexample('${dataset}', '${split}', '${table_idx}');`);
-
-  span_el.append(btn_remove);
-
-  var li_el = $("<li></li>")
-    .addClass("list-group-item")
-    .addClass("favourite-item")
-    .attr("id", `fav-${favourite_id}`);
-
-  li_el.append(span_el);
-
-  $("#favourites-box").append(li_el);
 }
 
-function remove_favourite(favourite) {
-  delete favourites[favourite];
-  $(`#fav-${favourite}`).remove();
-  update_favourite_button();
-
-  if ($.isEmptyObject(favourites)) {
-    // $("#favourites-area").attr("hidden", true);
-    $("#option-export-favourites").prop("disabled", true);
-    $("#option-export-favourites").prop("checked", false);
-    $("#option-export-table").prop("checked", true);
+function favouritebtn() {
+  favourite_id = get_favourite_id(dataset, split, table_idx);
+  if (favourite_id in favourites) {
+    remove_favourite(dataset, split, table_idx);
+  } else {
+    insert_favourite(dataset, split, table_idx)
   }
+}
+
+function insert_favourite(dataset, split, table_idx) {
+  let favourite_id = get_favourite_id(dataset, split, table_idx)
+
+  function local_insert_favourite() {
+    favourites[favourite_id] = { "dataset": dataset, "split": split, "table_idx": table_idx };
+
+    update_favourite_button(favourite_id);
+
+    $("#favourites-area").attr("hidden", false);
+    $("#option-export-favourites").removeAttr("disabled");
+
+    var btn_remove = $("<button></button>")
+      .attr("type", "button")
+      .css("width", "0.5em !important")
+      .addClass("btn")
+      .attr("onclick", `remove_favourite('${favourite_id}');`)
+      .text("✕");
+
+    var span_el = $("<span></span>")
+      .addClass("clickable")
+      .text(`${favourite_id}`)
+      .attr("onclick", `gotoexample('${dataset}', '${split}', '${table_idx}');`);
+
+    span_el.append(btn_remove);
+
+    var li_el = $("<li></li>")
+      .addClass("list-group-item")
+      .addClass("favourite-item")
+      .attr("id", `fav-${favourite_id}`);
+
+    li_el.append(span_el);
+
+    $("#favourites-box").append(li_el);
+  }
+
+  var request = {
+    "action": "insert",
+    "dataset": dataset,
+    "split": split,
+    "table_idx": table_idx,
+  };
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: `${url_prefix}/favourite`,
+    data: JSON.stringify(request),
+    success: function (server_favourites) {
+      favourites = server_favourites
+      local_insert_favourite();
+      console.log(`Afer insert ${JSON.stringify(favourites)}`)
+    },
+    error: function(xhr, error) {
+      msg = `Failed to store action to server: Insert favourite ${favourite_id}`;
+      console.log(msg)
+      alert(msg)
+      local_insert_favourite();  // still apply the action at least locally
+    },
+    dataType: "json",
+  });
+}
+
+
+function remove_favourite(dataset, split, table_idx) {
+  let favourite_id = get_favourite_id(dataset, split, table_idx)
+
+  console.log(`Removing ${dataset} ${split} ${table_idx} ie ${favourite_id}`);
+
+  function local_remove_favourite() {
+    console.log(`favourites before remove ${favourite_id} ${favourites}`);
+    delete favourites[favourite_id];
+    console.log(`favourites after remove ${favourite_id} ${favourites}`);
+    $(`#fav-${favourite_id}`).remove();
+    update_favourite_button(favourite_id);
+
+    if ($.isEmptyObject(favourites)) {
+      // $("#favourites-area").attr("hidden", true);
+      $("#option-export-favourites").prop("disabled", true);
+      $("#option-export-favourites").prop("checked", false);
+      $("#option-export-table").prop("checked", true);
+    }
+  }
+
+  var request = {
+    "action": "remove",
+    "dataset": dataset,
+    "split": split,
+    "table_idx": table_idx,
+  };
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: `${url_prefix}/favourite`,
+    data: JSON.stringify(request),
+    success: function (server_favourites) {
+      favourites = server_favourites
+      local_remove_favourite();
+      console.log(`Afer remove ${JSON.stringify(favourites)}`)
+    },
+    error: function(xhr, error) {
+      msg = `Failed to store action to server: Removed favourite ${favourite_id}`
+      console.log(msg)
+      alert(msg)
+      local_remove_favourite();  // still apply the action at least locally
+    },
+    dataType: "json",
+  });
 }
 
 function clear_favourites() {
-  favourites = {};
-  $(".favourite-item").remove();
-  update_favourite_button();
+  function local_clean_favourites() {
+    favourites = {}; 
+    $(".favourite-item").remove();
+    update_favourite_button(get_favourite_id(dataset, split, table_idx));
+  }
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: `${url_prefix}/favourite`,
+    data: JSON.stringify({"action": "remove_all"}),
+    success: function (server_favourites) {
+      if (Object.keys(server_favourites).length != 0) {
+        console.log(`WARNING successful remove_all to favourite did not remove all: ${server_favourites}`)
+      }
+      local_clean_favourites();
+      console.log(`Afer clear_favourites ${JSON.stringify(favourites)}`)
+    },
+    error: function(xhr, error) {
+      local_clean_favourites();
+      msg = "Failed to store action to server: Removed ALL favourites";
+      console.log(msg);
+      alert(msg);
+    },
+    dataType: "json",
+  });
 }
 
 function gotobtn() {
@@ -317,6 +412,8 @@ function export_table(format) {
   var export_option = $('input[name="options-export"]:checked').val();
   if (export_option == "favourites") {
     var filename = "export.zip";
+    // TODO fetch favourites using AJAX 
+    // just notify user that exporting local copy of failure on fetch favourites failure
     var export_examples = JSON.stringify(favourites);
   } else {
     var dataset = $('#dataset-select').val();
@@ -347,8 +444,9 @@ function insert_prompt(prompt_name, id) {
   textarea.highlightWithinTextarea("update");
 }
 
-function update_favourite_button() {
-  if (`${dataset}-${split}-${table_idx}` in favourites) {
+function update_favourite_button(favourite_id) {
+  console.log(`update button ${favourite_id} ${JSON.stringify(favourites)}`)
+  if (favourite_id in favourites) {
     $("#favourite-btn").css("background-color", "#ffc107");
   } else {
     $("#favourite-btn").css("background-color", "");
@@ -431,7 +529,13 @@ function fetch_table(dataset, split, table_idx, export_format) {
     info = set_dataset_info(data.dataset_info);
 
     init_cell_interactivity();
-    update_favourite_button();
+
+    console.log(`favourites before update ${JSON.stringify(favourites)}`)
+    console.log(`received session ${JSON.stringify(data.session)}`)
+    favourites = data.session.favourites;
+    console.log(`favourites updated to ${JSON.stringify(favourites)}`)
+    update_favourite_button(get_favourite_id(dataset, split, table_idx));
+
     show_generated_outputs(data.generated_outputs);
     refresh_pipelines(dataset);
   });

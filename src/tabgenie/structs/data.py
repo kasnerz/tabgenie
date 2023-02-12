@@ -19,15 +19,25 @@ class Cell:
     Table cell
     """
 
-    def __init__(self, value=None):
-        self.idx = None
+    def __init__(
+        self,
+        idx=None,
+        value=None,
+        colspan=1,
+        rowspan=1,
+        is_highlighted=False,
+        is_col_header=False,
+        is_row_header=False,
+        is_dummy=False,
+    ):
+        self.idx = idx
         self.value = value
-        self.colspan = 1
-        self.rowspan = 1
-        self.is_highlighted = False
-        self.is_col_header = False
-        self.is_row_header = False
-        self.is_dummy = False
+        self.colspan = colspan
+        self.rowspan = rowspan
+        self.is_highlighted = is_highlighted
+        self.is_col_header = is_col_header
+        self.is_row_header = is_row_header
+        self.is_dummy = is_dummy
 
     def is_header(self):
         return self.is_col_header or self.is_row_header
