@@ -140,3 +140,43 @@ def write_annotation_to_excel(tables, prop_list, ann_columns, out_file):
         start_row = end_row + 1
 
     workbook.close()
+
+
+if __name__ == '__main__':
+    from src.tabgenie.loaders.e2e import E2E
+    from src.tabgenie.loaders.hitab import HiTab
+    from src.tabgenie.loaders.webnlg import WebNLG
+
+    ann_columns = ['is_hallucination', 'notes']
+    prop_list = ['title', 'reference']
+    out_file = 'local_test.xlsx'
+
+    h = HiTab(path=None)
+    h.load('dev')
+
+    e = E2E(path=None)
+    e.load('dev')
+
+    w = WebNLG(path=None)
+    w.load('dev')
+    
+    tables = [
+        {
+            'table': h.prepare_table('dev', 675),
+            'table_id': 'hitab_dev_675',
+            'title': 'overqualification rates among workers aged 25 to 34 with a university degree by sex, visible minority and immigrant status, canada, 2011',
+            'reference': 'young visible minority women who were immigrants were more likely to be overqualified for their occupation than immigrant women who were not members of a visible minority group.',
+        },
+        {
+            'table': e.prepare_table('dev', 0),
+            'table_id': 'e2e_dev_0',
+            'reference': 'Over by the riverside, you can choose to dine at an average customer rated Travellers Rest Beefeaters, which is located near Raja Indian Cuisine.',
+        },
+        {
+            'table': w.prepare_table('dev', 899),
+            'table_id': 'webnlg_dev_899',
+            'reference': 'Arem arem originates from the country of Indonesia, where two of the leaders are, Joko Widodo and Jusuf Kalla.'
+        }
+    ]
+
+    write_annotation_to_excel(tables, prop_list, ann_columns, out_file)
