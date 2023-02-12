@@ -126,7 +126,7 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, expor
             if export_format == "xlsx":
                 workbook = Workbook(os.path.join(export_dir, out_filename))
                 worksheet = workbook.add_worksheet()
-                write_html_table_to_excel(exported_table, workbook, worksheet)
+                write_html_table_to_excel(exported_table, worksheet, workbook=workbook)
                 workbook.close()
             else:
                 with open(os.path.join(export_dir, out_filename), "w") as f:
