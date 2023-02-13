@@ -7,11 +7,12 @@ import logging
 import linecache
 
 import coloredlogs
-import pandas as pd
+from xlsxwriter import Workbook
 from flask import Flask, render_template, jsonify, request, send_file, session
 
 from .loaders import DATASET_CLASSES
 from .processing.processing import get_pipeline_class_by_name
+from .utils.excel import write_html_table_to_excel
 
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
@@ -132,14 +133,10 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, expor
             out_filename = f"{e['dataset']}_{e['split']}_tab_{e['table_idx']}.{export_format}"
 
             if export_format == "xlsx":
-                write_path = os.path.join(export_dir, out_filename)
-                header = exported_table.columns.to_frame(index=False).T  # for hierarchical tables
-                table_wo_header = exported_table.set_axis(range(exported_table.shape[1]), axis=1)
-
-                with pd.ExcelWriter(write_path) as writer:
-                    header.to_excel(writer, header=False, index=False)
-                    table_wo_header.to_excel(writer, header=False, index=False, startrow=header.shape[0])
-
+                workbook = Workbook(os.path.join(export_dir, out_filename))
+                worksheet = workbook.add_worksheet()
+                write_html_table_to_excel(exported_table, worksheet, workbook=workbook)
+                workbook.close()
             else:
                 with open(os.path.join(export_dir, out_filename), "w") as f:
                     f.write(exported_table)

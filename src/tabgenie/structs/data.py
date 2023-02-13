@@ -205,7 +205,8 @@ class TabularDataset:
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
-            exported = self.table_to_df(table)
+            # export table as object, writing directly to Excel worksheet later
+            exported = table
         elif export_format == "reference":
             exported = self.get_reference(table)
         else:
