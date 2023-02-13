@@ -52,9 +52,10 @@ def get_pipeline_output():
     return {"out": str(out), "session": get_session()}
 
 def get_session():
-    """Retrieve session with default values"""
-    session["favourites"] = session.get("favourites", {})
-    return session
+    """Retrieve session with default values and serializable"""
+    s = {}
+    s["favourites"] = session.get("favourites", {})
+    return s
 
 
 @app.route("/table", methods=["GET", "POST"])
@@ -66,7 +67,7 @@ def render_table():
     table_data = get_table_data(dataset_name, split, table_idx, displayed_props)
     logging.info(f"{session=} favourites {table_data['session']=}")
 
-    return table_data
+    return jsonify(table_data)
 
 
 @app.route("/export_to_file", methods=["GET", "POST"])
@@ -276,7 +277,7 @@ def load_prompts():
 
 
 @app.route("/favourite", methods=["GET", "POST"])
-def favourites(): 
+def favourites():
     content = request.json
     dataset = content.get("dataset")
     split = content.get("split")
@@ -295,12 +296,12 @@ def favourites():
         session["favourites"] = favourites
     elif action == "remove_all":
         favourites = {}
-    else: 
+    else:
         assert action == "get_all"
     favourite_d = session.get("favourites", {})
     assert isinstance(favourite_d, dict)  # on dicts are applied jsonify
     logging.info(f"favourite {content=} {session=}")
-    return favourite_d
+    return jsonify(favourite_d)
 
 
 @app.route("/", methods=["GET", "POST"])
