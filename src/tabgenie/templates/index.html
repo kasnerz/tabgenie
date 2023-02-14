@@ -65,14 +65,14 @@
 
       </div>
       <div class="navblock">
-        <div style="font-size: medium;">
-          <b>Interactive Table-to-Text Generation</b>
+        <div>
+          <b>Table-to-Text Generation Playground</b>
         </div>
         <ul class="pagination" style="margin-left: 10px;">
           <li class="page-item">
-            <a class="page-link" id="random-btn" onclick="show_info();" data-bs-toggle="tooltip"
-              data-bs-placement="bottom" title="About">
-              ⓘ
+            <a class="page-link" id="about-btn" onclick="show_info();" data-bs-toggle="modal"
+              data-bs-target="#about-modal" title="About">
+              ℹ️
             </a>
           </li>
         </ul>
@@ -289,6 +289,58 @@
           <ul class="list-group list-group-flush" id="favourites-box"></ul>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" onclick="clear_favourites();">Delete all</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="about-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="about-modal-label">About TabGenie</h5> <img
+            src="{{ host_prefix }}/static/img/genie.png" width="20px" style="margin-left: 5px">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id='aboutarea' class="tab-pane sidepanel-panel" role="tabpanel" tabindex="0">
+            <div id="about-info" class="area-content">
+              <p>TabGenie is a toolkit for <i>table-to-text generation</i> – the task of generating a description for
+                the tabular data.
+              </p>
+              <p>The web interface enables to explore existing table-to-text generation datasets and interact with
+                processing pipelines.</p>
+
+              <p>Built using HTML5, CSS, <a href="https://jquery.com">jQuery</a>, <a href="">Bootstrap 5</a>, <a
+                  href="https://flask.palletsprojects.com/en/2.2.x/">Flask</a>, and <a
+                  href="https://huggingface.co/docs/datasets/index">Huggingface Datasets</a>.</p>
+
+              <p><b>Developers:</b>
+
+              <ul>
+                <li><b>Zdeněk Kasner</b> – <code>kasner (at) ufal.mff.cuni.cz</code></li>
+                <li><b>Kate Garanina</b> – <code>katgerasimenko (at) gmail.com</code></li>
+                <li><b>Ondřej Plátek</b> – <code>oplatek (at) ufal.mff.cuni.cz</code></li>
+                <li><b>Ondřej Dušek</b> – <code>odusek (at) ufal.mff.cuni.cz</code></li>
+              </ul>
+              </p>
+              <p>
+                The project is being actively developed, please report any issues at <a
+                  href="https://github.com/kasnerz/tabgenie">https://github.com/kasnerz/tabgenie</a>.
+              </p>
+
+              <p>Available as open-source under Apache License 2.0.</p>
+              <p>
+                © 2023 <a href="https://ufal.mff.cuni.cz/">
+                  Institute of Formal and Applied
+                  Linguistics, Charles University</a>.
+              </p>
+
+            </div>
+          </div>
+          <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
