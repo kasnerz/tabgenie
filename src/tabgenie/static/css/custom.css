@@ -157,7 +157,7 @@ pre {
 
 .navbar-brand {
     padding-left: 20px;
-    font-size: 19px;
+    /* font-size: 19px; */
 }
 
 .pagination-buttons {
