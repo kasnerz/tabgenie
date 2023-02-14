@@ -11,6 +11,7 @@ console.log(`favourites ${favourites}`);
 var editedCells = window.editedCells; // TODO check updated all places
 var split = "dev";
 var mode = "highlight";
+var view_state = "all";
 
 function update_svg_width() {
   if (typeof svg != "undefined") {
@@ -117,7 +118,7 @@ function insert_favourite(dataset, split, table_idx) {
       local_insert_favourite();
       console.log(`Afer insert ${JSON.stringify(favourites)}`)
     },
-    error: function(xhr, error) {
+    error: function (xhr, error) {
       msg = `Failed to store action to server: Insert favourite ${favourite_id}`;
       console.log(msg)
       alert(msg)
@@ -164,7 +165,7 @@ function remove_favourite(dataset, split, table_idx) {
       local_remove_favourite();
       console.log(`Afer remove ${JSON.stringify(favourites)}`)
     },
-    error: function(xhr, error) {
+    error: function (xhr, error) {
       msg = `Failed to store action to server: Removed favourite ${favourite_id}`
       console.log(msg)
       alert(msg)
@@ -176,7 +177,7 @@ function remove_favourite(dataset, split, table_idx) {
 
 function clear_favourites() {
   function local_clean_favourites() {
-    favourites = {}; 
+    favourites = {};
     $(".favourite-item").remove();
     update_favourite_button(get_favourite_id(dataset, split, table_idx));
   }
@@ -184,7 +185,7 @@ function clear_favourites() {
     type: "POST",
     contentType: "application/json; charset=utf-8",
     url: `${url_prefix}/favourite`,
-    data: JSON.stringify({"action": "remove_all"}),
+    data: JSON.stringify({ "action": "remove_all" }),
     success: function (server_favourites) {
       if (Object.keys(server_favourites).length != 0) {
         console.log(`WARNING successful remove_all to favourite did not remove all: ${server_favourites}`)
@@ -192,7 +193,7 @@ function clear_favourites() {
       local_clean_favourites();
       console.log(`Afer clear_favourites ${JSON.stringify(favourites)}`)
     },
-    error: function(xhr, error) {
+    error: function (xhr, error) {
       local_clean_favourites();
       msg = "Failed to store action to server: Removed ALL favourites";
       console.log(msg);
@@ -238,6 +239,23 @@ function toggle_props() {
     $(".prop-btn").click();
   }
 }
+
+function toggle_view() {
+  if (view_state == "all") { // all -> table
+    splitInstance.collapse(1);
+    $('.gutter').hide();
+    view_state = "table";
+  } else if (view_state == "table") { // table -> out
+    splitInstance.collapse(0);
+    view_state = "out";
+  } else if (view_state == "out") { // out -> all
+    splitInstance.setSizes([70, 30])
+    $('.gutter').show();
+    view_state = "all";
+  }
+  update_svg_width();
+}
+
 
 function set_dataset_info(info) {
   var ex_array = $.map(info.examples, function (num, split) {
@@ -556,35 +574,7 @@ $('.output-checkbox').on('change', function () {
   }
 });
 
-// showing / hiding table
-$('#table-checkbox').on('change', function () {
-  if ($('#centerpanel').hasClass("show")) {
-    splitInstance.collapse(0);
-    // $('#tabulararea').css("overflow-x", "auto");
-    $('.gutter').hide();
-  } else {
-    splitInstance.setSizes([70, 30])
-    // $('#tabulararea').css("overflow-x", "scroll");
-    $('.gutter').show();
-  }
-  update_svg_width();
-  $('#centerpanel').collapse("toggle");
-});
 
-// showing / hiding panel
-$('#panel-checkbox').on('change', function () {
-  if ($('#rightpanel').hasClass("show")) {
-    splitInstance.collapse(1);
-    // $('#tabulararea').css("overflow-x", "auto");
-    $('.gutter').hide();
-  } else {
-    splitInstance.setSizes([70, 30])
-    // $('#tabulararea').css("overflow-x", "scroll");
-    $('.gutter').show();
-  }
-  update_svg_width();
-  $('#rightpanel').collapse("toggle");
-});
 
 $("#dataset-select").on("change", change_dataset);
 
