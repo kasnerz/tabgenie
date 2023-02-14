@@ -53,7 +53,6 @@
               data-bs-placement="bottom" title="Random example">
               🎲
             </a>
-
           </li>
           <li class="page-item">
             <a class="page-link" id="favourite-btn" onclick="favouritebtn();" data-bs-toggle="tooltip"
@@ -66,9 +65,17 @@
 
       </div>
       <div class="navblock">
-        <div>
-          About
+        <div style="font-size: medium;">
+          <b>Interactive Table-to-Text Generation</b>
         </div>
+        <ul class="pagination" style="margin-left: 10px;">
+          <li class="page-item">
+            <a class="page-link" id="random-btn" onclick="show_info();" data-bs-toggle="tooltip"
+              data-bs-placement="bottom" title="About">
+              ⓘ
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
   </nav>
@@ -119,7 +126,7 @@
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#export-modal">
-                🗎 Export
+                <b>⭳</b> Export
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#info-modal">
