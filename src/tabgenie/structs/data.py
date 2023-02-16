@@ -234,11 +234,13 @@ class TabularDataset:
 
         gen_input = []
 
-        for key, value in table.props.items():
-            gen_input.append(f"[{key}] {value}")
+        # for key, value in table.props.items():
+        #     if "reference" not in key:
+        #         gen_input.append(f"[{key}] {value}")
 
         for c in cells:
-            gen_input.append("[cell] " + c.value)
+            gen_input.append(c.value)
+            gen_input.append("|")
 
         return " ".join(gen_input)
 
@@ -274,7 +276,7 @@ class TabularDataset:
 
     def get_task_definition(self):
         # TODO implement for individual datasets
-        return "Write a short description of the data."
+        return "Describe the following structured data in one sentence."
 
     def get_positive_examples(self):
         # TODO implement for individual datasets

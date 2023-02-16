@@ -10,7 +10,8 @@ console.log(`Begging favourites: ${JSON.stringify(favourites)}`)
 console.log(`favourites ${favourites}`);
 var editedCells = window.editedCells; // TODO check updated all places
 var split = "dev";
-var mode = "highlight";
+var select_mode = "select";
+var interactive_mode = false;
 var view_state = "all";
 
 function update_svg_width() {
@@ -59,7 +60,7 @@ function get_favourite_id(dataset, split, table_idx) {
 }
 
 function favouritebtn() {
-  favourite_id = get_favourite_id(dataset, split, table_idx);
+  var favourite_id = get_favourite_id(dataset, split, table_idx);
   if (favourite_id in favourites) {
     remove_favourite(dataset, split, table_idx);
   } else {
@@ -346,23 +347,23 @@ function run_pipeline(pipeline) {
   });
 }
 
-function reload_pipelines() {
-  reset_pipeline_outputs();
-  for (var pipeline in pipelines) {
-    if (pipelines[pipeline].active) {
-      run_pipeline(pipeline);
-    }
-  }
+function reload_pipeline(pipeline) {
+  set_output(pipeline, "");
+  run_pipeline(pipeline);
 }
 
-function init_cell_interactivity() {
+function update_cell_interactivity() {
   ["th", "td"].forEach(
     function (celltype) {
       var cells = $("#main-table-body").find(celltype);
       cells.off("click");
       cells.removeAttr("contenteditable");
 
-      if (mode == "highlight") {
+      if (select_mode == "select") {
+        cells.removeClass("editable-cell");
+        cells.removeClass("highlightable-cell");
+      }
+      else if (select_mode == "highlight") {
         cells.removeClass("editable-cell");
         cells.addClass("highlightable-cell");
         cells.on("click",
@@ -370,7 +371,7 @@ function init_cell_interactivity() {
             $(this).toggleClass("table-active");
           }
         );
-      } else if (mode == "edit") {
+      } else if (select_mode == "edit") {
         cells.removeClass("highlightable-cell");
         cells.addClass("editable-cell");
         $(".editable-cell").attr("contenteditable", '');
@@ -399,6 +400,11 @@ function change_split() {
   table_idx = 0;
   fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
+}
+
+function change_mode() {
+  select_mode = $('#mode-select').val();
+  update_cell_interactivity();
 }
 
 function postRequestDownload(url, request, filename) {
@@ -471,16 +477,18 @@ function update_favourite_button(favourite_id) {
   }
 }
 
-function toggle_edit() {
-  if (mode == "edit") {
-    mode = "highlight";
-  } else {
-    mode = "edit";
-  }
-  init_cell_interactivity();
+function toggle_interactive() {
+  interactive_mode = !interactive_mode;
+  $("#mode-selectarea").toggle();
+  $("#pipelinearea").toggle();
+  update_cell_interactivity();
+  refresh_pipelines();
 }
 
-function refresh_pipelines(dataset) {
+function refresh_pipelines() {
+  if (!interactive_mode) {
+    return;
+  }
   for (var pipeline in pipelines) {
     if ( // pipeline should not be active for the dataset
       (("datasets" in pipelines[pipeline]) && !(pipelines[pipeline]["datasets"].includes(dataset)))
@@ -524,7 +532,7 @@ function show_generated_outputs(generated_outputs) {
     $('<div>', {
       id: `out-${name}`,
       class: 'output-box generated-output-box',
-    }).append(label).append(placeholder).appendTo('#pipelinearea');
+    }).append(label).append(placeholder).appendTo('#outputarea');
   }
 }
 
@@ -546,7 +554,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
     $("#total-examples").html(total_examples - 1);
     info = set_dataset_info(data.dataset_info);
 
-    init_cell_interactivity();
+    update_cell_interactivity();
 
     console.log(`favourites before update ${JSON.stringify(favourites)}`)
     console.log(`received session ${JSON.stringify(data.session)}`)
@@ -555,7 +563,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
     update_favourite_button(get_favourite_id(dataset, split, table_idx));
 
     show_generated_outputs(data.generated_outputs);
-    refresh_pipelines(dataset);
+    refresh_pipelines();
   });
 }
 
@@ -580,6 +588,8 @@ $("#dataset-select").on("change", change_dataset);
 
 $("#split-select").on("change", change_split);
 
+$("#mode-select").on("change", change_mode);
+
 $("#format-select").on("change", function (e) {
   $("#dataset-spinner").show();
   fetch_table(dataset, split, table_idx);
@@ -602,7 +612,7 @@ $(".custom-prompt-input").highlightWithinTextarea({
 $(document).keydown(function (event) {
   const key = event.key;
 
-  if (mode == "edit") {
+  if (select_mode == "edit") {
     return;
   }
   if (key === "ArrowRight") {

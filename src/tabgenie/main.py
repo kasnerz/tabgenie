@@ -52,6 +52,7 @@ def get_pipeline_output():
 
     return {"out": str(out), "session": get_session()}
 
+
 def get_session():
     """Retrieve session with default values and serializable"""
     s = {}
@@ -179,15 +180,15 @@ def initialize_pipeline(pipeline_name):
     pipeline_cfg = app.config["pipelines"][pipeline_name]
 
     with app.app_context():
-        if "config_template_file" in pipeline_cfg:
+        if "config_template" in pipeline_cfg:
             # TODO make the prompts less hard-coded
             template = render_template(
-                pipeline_cfg["config_template_file"],
+                pipeline_cfg["config_template"],
                 pipeline_name=pipeline_name,
                 cfg=pipeline_cfg,
                 prompts=app.config["prompts"],
             )
-            pipeline_cfg["config_template"] = template
+            app.config["pipelines"][pipeline_name]["config_template"] = template
 
     pipeline_obj = get_pipeline_class_by_name(pipeline_cfg["pipeline"])(name=pipeline_name, cfg=pipeline_cfg)
     app.config["pipelines_obj"][pipeline_name] = pipeline_obj
