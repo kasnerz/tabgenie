@@ -29,6 +29,7 @@ pipelines:
     model_url: http://localhost:8981/
     config_template_file: model_api_config.html
     default_prompt: tk-def-pos-simple
+    interactive: true
     datasets:
       - cacapo
       - dart

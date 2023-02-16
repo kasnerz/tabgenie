@@ -8,16 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_app(**kwargs):
-    from click import get_current_context
     import yaml
-
-    ctx = get_current_context(silent=True)
-    if ctx and hasattr(ctx.obj, "disable_pipelines"):
-        disable_pipelines = ctx.obj.disable_pipelines
-    else:
-        # Production server, e.g., gunincorn
-        # We don't have access to the current context, so must read kwargs instead.
-        disable_pipelines = kwargs.get("disable_pipelines", False)
 
     with open("config.yml") as f:
         config = yaml.safe_load(f)
@@ -32,8 +23,7 @@ def create_app(**kwargs):
     app.config["pipelines_obj"] = {}
     app.config["prompts"] = load_prompts()
 
-    if app.config.get("pipelines") and not disable_pipelines:
-
+    if app.config.get("pipelines"):
         for pipeline_name in app.config["pipelines"].keys():
             initialize_pipeline(pipeline_name)
     else:
