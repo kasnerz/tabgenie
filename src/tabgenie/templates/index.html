@@ -174,7 +174,7 @@
                     class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
                     id="pipeline-checkbox-{{ pipeline_name }}" checked></label>
 
-                {% if 'config_template' in attrs %}
+                {% if pipeline_name in pipelines_cfg_templates %}
                 <label class="label-settings" data-bs-toggle="modal" data-bs-target="#{{ pipeline_name }}-modal"><img
                     src="{{ host_prefix }}/static/img/settings.png" width="12px" /></label>
                 <div class="modal fade" id="{{ pipeline_name }}-modal" tabindex="-1">
@@ -186,7 +186,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        {{ attrs.config_template|safe }}
+                        {{ pipelines_cfg_templates[pipeline_name]|safe }}
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
@@ -194,8 +194,6 @@
                     </div>
                   </div>
                 </div>
-                <!-- remove the template from pipeline attributes -->
-                {% set _dummy=attrs.pop('config_template') %}
                 {% endif %}
                 <div id="pipeline-{{ pipeline_name }}-spinner" class="spinner-border" role="status"
                   style="display: none">
