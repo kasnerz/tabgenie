@@ -17,8 +17,7 @@ class LogicNLG(HFTabularDataset):
         self.hf_id = "kasnerz/logicnlg"
         self.name = "LogicNLG"
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
+    def prepare_table(self, entry):
         t = Table()
 
         t.props["reference"] = entry["ref"]

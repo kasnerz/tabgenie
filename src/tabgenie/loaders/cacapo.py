@@ -18,8 +18,7 @@ class CACAPO(HFTabularDataset):
         self.hf_id = "kasnerz/cacapo"
         self.name = "CACAPO"
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
+    def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = ast.literal_eval(entry["lex"]["text"][0])[0]
         t.props["category"] = entry["category"]

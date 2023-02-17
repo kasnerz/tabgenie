@@ -27,10 +27,8 @@ class SciGen(HFTabularDataset):
 
         return s
 
-    def prepare_table(self, split, table_idx):
+    def prepare_table(self, entry):
         t = Table()
-        entry = self.data[split][table_idx]
-
         caption = entry["table_caption"]
         t.props["reference"] = caption.replace("[CONTINUE]", "\n")
         t.props["title"] = entry["paper"]

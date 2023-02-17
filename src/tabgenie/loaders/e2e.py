@@ -53,9 +53,7 @@ class E2E(HFTabularDataset):
         # will be used as a key in a dictionary
         return triples
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
-
+    def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["target"]
         mrs = entry["meaning_representation"].split(", ")

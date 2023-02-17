@@ -19,10 +19,8 @@ class HiTab(HFTabularDataset):
         cells = [eval(x) for x in re.findall(r"\(\d+, \d+\)", s)]
         return cells
 
-    def prepare_table(self, split, table_idx):
+    def prepare_table(self, entry):
         t = Table()
-        entry = self.data[split][table_idx]
-
         t.props["reference"] = entry["sub_sentence"]
         content = ast.literal_eval(entry["table_content"])
         linked_cells = self._get_linked_cells(ast.literal_eval(entry["linked_cells"]))

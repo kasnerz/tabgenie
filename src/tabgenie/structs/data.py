@@ -106,9 +106,6 @@ class Table:
     def get_generated_output(self, key):
         return self.outputs.get(key)
 
-    # def get_generated_outputs(self):
-    # return [{"name": key, "out": val} for key, val in self.outputs.items()]
-
     def set_generated_output(self, key, value):
         self.outputs[key] = value
 
@@ -136,34 +133,9 @@ class TabularDataset:
         """
         raise NotImplementedError
 
-    # def load_generated_outputs(self, split):
-    #     raise NotImplementedError
-
-    #     out_fname = os.path.join("outputs", self.name.lower(), split, name + ".out")
-
-    #     # output does not exist for the dataset
-    #     if not (os.path.isfile(out_fname)):
-    #         logger.debug(out_fname + " does not exist")
-    #         return
-
-    #     with open(out_fname) as f:
-    #         outputs = f.readlines()
-
-    #         if len(outputs) != self.get_example_count(split):
-    #             raise AssertionError(
-    #                 f"Length of the outputs from '{name}' and the number of examples in {self.name}/{split} do not agree: {len(outputs)} vs. {self.get_example_count(split)}"
-    #             )
-
-    #         for o in outputs:
-    #             self.tables.set_output(name, o)
-
     @staticmethod
     def get_reference(table):
         return table.props.get("reference")
-
-    # @staticmethod
-    # def get_generated_outputs(split, output_idx):
-    # return table.get_generated_outputs()
 
     def get_example_count(self, split):
         return len(self.data[split])
@@ -175,7 +147,8 @@ class TabularDataset:
         table = self.tables[split].get(table_idx)
 
         if not table:
-            table = self.prepare_table(split, table_idx)
+            entry = self.data[split][table_idx]
+            table = self.prepare_table(entry)
             self.tables[split][table_idx] = table
 
         if edited_cells:
@@ -189,7 +162,7 @@ class TabularDataset:
 
         return table
 
-    def prepare_table(self, split, table_idx):
+    def prepare_table(self, entry):
         return NotImplementedError
 
     def get_info(self):
@@ -227,22 +200,27 @@ class TabularDataset:
         return exported
 
     def table_to_linear(self, table, cell_ids=None):
+        tokens = []
+
+        for prop in ["category", "title"]:
+            if prop in table.props:
+                tokens.append(f"[{prop}] {table.props[prop]}")
+
         if cell_ids:
+            # highlighted cells -> 1D pos encoding
             cells = [table.get_cell_by_id(int(idx)) for idx in cell_ids]
+
+            for i, cell in enumerate(cells):
+                tokens.append(f"[{i}]")
+                tokens.append(cell.value)
         else:
-            cells = table.get_flat_cells()
+            # full table -> 2D pos encoding
+            for i, row in enumerate(table.get_cells()):
+                for j, cell in enumerate(row):
+                    tokens.append(f"[{i}][{j}]")
+                    tokens.append(cell.value)
 
-        gen_input = []
-
-        # for key, value in table.props.items():
-        #     if "reference" not in key:
-        #         gen_input.append(f"[{key}] {value}")
-
-        for c in cells:
-            gen_input.append(c.value)
-            gen_input.append("|")
-
-        return " ".join(gen_input)
+        return " ".join(tokens)
 
     def table_to_triples(self, table, cell_ids):
         # default method (dataset-agnostic)
@@ -273,6 +251,49 @@ class TabularDataset:
                 triples.append([subj, pred, obj])
 
         return triples
+
+    def get_hf_dataset(self, split, linearize_fn, tokenizer, max_length=512, num_proc=8):
+        # linearize tables and convert to input_ids
+        # TODO num_proc acts weirdly in datasets 2.9.0, set temporarily to 1
+
+        logger.info(f"[tabgenie] linearizing tables using {linearize_fn}")
+        logger.info(
+            f"[tabgenie] linearized example ({split}/0): {linearize_fn(self.prepare_table(self.data[split][0]))}"
+        )
+
+        processed_dataset = self.data[split].map(
+            lambda x: tokenizer(linearize_fn(self.prepare_table(x)), max_length=max_length, truncation=True),
+            batched=False,
+            num_proc=1,
+        )
+        # add labels
+        labels = [
+            tokenizer(self.get_reference(self.get_table(split, i)))["input_ids"]
+            for i in range(self.get_example_count(split))
+        ]
+        processed_dataset = processed_dataset.add_column("labels", labels)
+        extra_columns = [
+            col for col in processed_dataset.features.keys() if col not in ["labels", "input_ids", "attention_mask"]
+        ]
+
+        processed_dataset = processed_dataset.remove_columns(extra_columns)
+        processed_dataset.set_format(type="torch")
+
+        return processed_dataset
+
+    def get_linearized_pairs(self, split, linearize_fn=None):
+        if linearize_fn is None:
+            linearize_fn = self.table_to_linear
+
+        data = []
+        for i, entry in enumerate(self.data[split]):
+            ex = [
+                linearize_fn(self.prepare_table(entry)),
+                self.get_reference(self.get_table(split, i)),
+            ]
+            data.append(ex)
+
+        return data
 
     def get_task_definition(self):
         # TODO implement for individual datasets
@@ -397,7 +418,7 @@ class TabularDataset:
 class HFTabularDataset(TabularDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, path=None, **kwargs)
-        self.hf_id = None  # TODO set
+        self.hf_id = None  # needs to be set
         self.hf_extra_config = None
         self.split_mapping = {"train": "train", "dev": "validation", "test": "test"}
         self.dataset_info = {}
@@ -412,10 +433,11 @@ class HFTabularDataset(TabularDataset):
                 self.hf_id,
                 name=self.hf_extra_config,
                 split=datasets.ReadInstruction(hf_split, to=max_examples + 1, unit="abs"),
+                num_proc=4,
             )
         except (AssertionError, ValueError, TypeError) as e:
             # max_examples is None or higher than the total number of examples in the dataset
-            dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=hf_split)
+            dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=hf_split, num_proc=4)
 
         self.dataset_info = dataset.info.__dict__
         self.data[split] = dataset

@@ -20,9 +20,7 @@ class WikiBio(HFTabularDataset):
     def normalize(s):
         return s.replace("-lrb-", "(").replace("-rrb-", ")")
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
-
+    def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["target_text"]
         t.props["title"] = self.normalize(entry["input_text"]["context"].rstrip("\n"))

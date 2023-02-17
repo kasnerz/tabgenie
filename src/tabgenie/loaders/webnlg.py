@@ -32,8 +32,7 @@ class WebNLG(HFTabularDataset):
 
         return triples
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
+    def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["target"]
         t.props["category"] = entry["category"]

@@ -162,18 +162,18 @@ if __name__ == '__main__':
     
     tables = [
         {
-            'table': h.prepare_table('dev', 675),
+            'table': h.prepare_table(h.data['dev'][675]),
             'table_id': 'hitab_dev_675',
             'title': 'overqualification rates among workers aged 25 to 34 with a university degree by sex, visible minority and immigrant status, canada, 2011',
             'reference': 'young visible minority women who were immigrants were more likely to be overqualified for their occupation than immigrant women who were not members of a visible minority group.',
         },
         {
-            'table': e.prepare_table('dev', 0),
+            'table': e.prepare_table(e.data['dev'][0]),
             'table_id': 'e2e_dev_0',
             'reference': 'Over by the riverside, you can choose to dine at an average customer rated Travellers Rest Beefeaters, which is located near Raja Indian Cuisine.',
         },
         {
-            'table': w.prepare_table('dev', 899),
+            'table': w.prepare_table(w.data['dev'][899]),
             'table_id': 'webnlg_dev_899',
             'reference': 'Arem arem originates from the country of Indonesia, where two of the leaders are, Joko Widodo and Jusuf Kalla.'
         }

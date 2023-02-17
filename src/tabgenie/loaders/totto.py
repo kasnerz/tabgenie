@@ -15,8 +15,7 @@ class ToTTo(HFTabularDataset):
         self.name = "ToTTo"
         self.extra_info = {"license": "CC BY-SA 3.0"}
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
+    def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["target"]
 
@@ -45,22 +44,3 @@ class ToTTo(HFTabularDataset):
             t.save_row()
 
         return t
-
-    def table_to_linear(self, table, cell_ids=None):
-        if cell_ids:
-            cells = [table.get_cell_by_id(int(idx)) for idx in cell_ids]
-        else:
-            cells = table.get_flat_cells(highlighted_only=True)
-
-        gen_input = []
-
-        for key, value in table.props.items():
-            if "title" in key:
-                gen_input.append(f"{key}: {value}")
-
-        gen_input.append("cells:")
-        for c in cells:
-            gen_input.append(c.value)
-            gen_input.append("|")
-
-        return " ".join(gen_input)

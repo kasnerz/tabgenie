@@ -13,9 +13,7 @@ class WikiTableText(HFTabularDataset):
         self.hf_id = "kasnerz/wikitabletext"
         self.name = "WikiTableText"
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
-
+    def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["reference"]
         t.props["row_number"] = entry["row_number"]
