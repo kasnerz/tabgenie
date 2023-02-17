@@ -396,16 +396,17 @@ class TabularDataset:
 
 class HFTabularDataset(TabularDataset):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, path=None, **kwargs)
         self.hf_id = None  # TODO set
         self.hf_extra_config = None
         self.split_mapping = {"train": "train", "dev": "validation", "test": "test"}
         self.dataset_info = {}
         self.extra_info = {}
 
-    def load(self, split, max_examples=None):
+    def _load_split(self, split, max_examples):
         hf_split = self.split_mapping[split]
 
+        logger.info(f"Loading {self.hf_id}/{split}")
         try:
             dataset = datasets.load_dataset(
                 self.hf_id,
@@ -413,11 +414,18 @@ class HFTabularDataset(TabularDataset):
                 split=datasets.ReadInstruction(hf_split, to=max_examples + 1, unit="abs"),
             )
         except (AssertionError, ValueError, TypeError) as e:
-            # max_examples is set higher than the total number of examples in the dataset
+            # max_examples is None or higher than the total number of examples in the dataset
             dataset = datasets.load_dataset(self.hf_id, name=self.hf_extra_config, split=hf_split)
 
         self.dataset_info = dataset.info.__dict__
         self.data[split] = dataset
+
+    def load(self, split=None, max_examples=None):
+        if split is None:
+            for split in self.split_mapping.keys():
+                self._load_split(split, max_examples)
+        else:
+            self._load_split(split, max_examples)
 
     def get_info(self):
         info = {key: self.dataset_info.get(key) for key in ["citation", "description", "version", "license"]}
