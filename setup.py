@@ -4,10 +4,10 @@ from setuptools import find_packages, setup
 
 project_root = Path(__file__).parent
 install_requires = [
-    "Flask==2.2.2",
-    "lxml==4.9.1",
-    "requests==2.28.1",
-    "datasets>=2.8.0",
+    "Flask>=2.2.2",
+    "datasets>=2.5",
+    "requests",
+    "lxml",
     "tinyhtml",
     "xlsxwriter",
     "coloredlogs",
