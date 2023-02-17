@@ -19,6 +19,7 @@ class ModelAPIProcessor(Processor):
     def process(self, content):
         data = {"input_text": content, "beam_size": 1}
         timeout = 25
+
         try:
             logger.debug(f"Calling model API with data: {data}")
             res = requests.post(self.model_url.rstrip("/") + "/generate/", json=data, timeout=timeout)

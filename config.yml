@@ -24,17 +24,25 @@ host_prefix: "."
 cache_dev_splits: false
 generated_outputs_dir: outputs
 pipelines:
-  totto_model:
-    pipeline: model_api
-    interactive: false
-    model_url: http://localhost:8980/
-    config_template_file: model_api_config.html
   tk_instruct_model:
     pipeline: model_api
-    interactive: false
     model_url: http://localhost:8981/
     config_template_file: model_api_config.html
-    default_prompt: tk-def-pos
+    default_prompt: tk-def-pos-simple
+    interactive: true
+    datasets:
+      - cacapo
+      - dart
+      - e2e
+      - eventnarrative
+      - hitab
+      - logic2text
+      - logicnlg
+      - numericnlg
+      - totto
+      - webnlg
+      - wikibio
+      - wikitabletext
   rdf_triples:
     pipeline: graph
     interactive: true

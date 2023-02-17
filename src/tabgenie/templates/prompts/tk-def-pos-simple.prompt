@@ -1,0 +1,16 @@
+Definition: Describe structured data.
+
+Positive Example 1 -
+Input:
+name | Wildwood | eatType | coffee shop | priceRange | moderate | near | Ranch
+Output:
+The Wildwood is an affordable coffee shop located in Ranch.
+Positive Example 2 -
+Input:
+subject | predicate | object | Hypermarcas | subsidiary | Mantecorp | Hypermarcas | location | São Paulo | Hypermarcas | founding date | 2001-01-01
+Output:
+Hypermarcas, the parent group of Mantecorp, was founded on January 1, 2001 in São Paulo.
+Now complete the following example - 
+Input:
+[PROMPTVAR:HL_CELLS]
+Output:

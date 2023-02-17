@@ -6,7 +6,6 @@ from ..processing import Processor
 
 
 class CustomInputProcessor(Processor):
-
     @staticmethod
     def format_prompt(prompt, table, dataset, cell_ids):
         random.seed(42)
@@ -33,6 +32,9 @@ class CustomInputProcessor(Processor):
         return prompt
 
     def process(self, content):
+        if "custom_input" not in content:
+            return ""
+
         custom_input = content["custom_input"]
 
         table = content["dataset_obj"].get_table(

@@ -65,14 +65,14 @@
 
       </div>
       <div class="navblock">
-        <div>
+        <div style="font-size: 15px">
           <b>Table-to-Text Generation Playground</b>
         </div>
         <ul class="pagination" style="margin-left: 10px;">
           <li class="page-item">
             <a class="page-link" id="about-btn" onclick="show_info();" data-bs-toggle="modal"
               data-bs-target="#about-modal" title="About">
-              ℹ️
+              <img src="{{ host_prefix }}/static/img/about.png" id="about-icon" />
             </a>
           </li>
         </ul>
@@ -103,23 +103,24 @@
             </select>
           </div>
 
+
           <div class="selectarea" id="actions-area">
             <div class="d-grid gap-2">
-              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="reload_pipelines();">
-                ⟳ Reload pipelines
-              </button>
+              <input type="checkbox" class="btn-check" id="interactive-btn" onclick="toggle_interactive();"
+                autocomplete="off">
+              <label class="btn btn-sm btn-outline-secondary" for="interactive-btn">🗲 Interactive mode</label>
+              <!-- <input type="checkbox" class="btn-check" id="edit-btn" onclick="toggle_edit();" autocomplete="off"> -->
+              <!-- <label class="btn btn-sm btn-outline-secondary" for="edit-btn">✎ Edit mode</label> -->
+              <!-- <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#your-edits-modal">
+                📝 Your edits <div id="your-edits-count"></div>
+              </button> -->
               <button type="button" class="btn btn-outline-secondary  btn-sm" onclick="toggle_props();">
                 ✚ Toggle properties
               </button>
               <button type="button" class="btn btn-outline-secondary  btn-sm" onclick="toggle_view();">
                 ⇋ Toggle view
               </button>
-              <input type="checkbox" class="btn-check" id="edit-btn" onclick="toggle_edit();" autocomplete="off">
-              <label class="btn btn-sm btn-outline-secondary" for="edit-btn">✎ Edit mode</label>
-              <!-- <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                data-bs-target="#your-edits-modal">
-                📝 Your edits <div id="your-edits-count"></div>
-              </button> -->
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#favourites-modal">
                 ★ Favourites
@@ -134,6 +135,16 @@
               </button>
             </div>
           </div>
+
+          <div class="selectarea" id="mode-selectarea" style="display: none;">
+            <b>mode</b>
+            <select id="mode-select" class="form-select form-select-sm">
+              <option value="select" selected>select</option>
+              <option value="highlight">highlight</option>
+              <option value="edit">edit</option>
+            </select>
+          </div>
+
         </div>
 
       </div>
@@ -154,15 +165,16 @@
         <div id="rightpanel" class="collapse show">
 
           <div id='sidepanel-content' class="tab-content">
-            <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel">
+            <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel" style="display: none;">
               {% for pipeline_name, attrs in pipelines.items() if attrs.interactive %}
               <div class="output-box pipeline-box" id="out-{{ pipeline_name }}">
                 <label class="label-name" for="pipeline-checkbox-{{ pipeline_name }}">{{ pipeline_name }}</label>
+                <label class="label-reload" onclick="reload_pipeline('{{ pipeline_name }}');">⟳</label>
                 <label class="label-on-off"><input
                     class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
                     id="pipeline-checkbox-{{ pipeline_name }}" checked></label>
 
-                {% if 'config_template' in attrs %}
+                {% if pipeline_name in pipelines_cfg_templates %}
                 <label class="label-settings" data-bs-toggle="modal" data-bs-target="#{{ pipeline_name }}-modal"><img
                     src="{{ host_prefix }}/static/img/settings.png" width="12px" /></label>
                 <div class="modal fade" id="{{ pipeline_name }}-modal" tabindex="-1">
@@ -174,7 +186,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        {{ attrs.config_template|safe }}
+                        {{ pipelines_cfg_templates[pipeline_name]|safe }}
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
@@ -182,8 +194,6 @@
                     </div>
                   </div>
                 </div>
-                <!-- remove the template from pipeline attributes -->
-                {% set _dummy=attrs.pop('config_template') %}
                 {% endif %}
                 <div id="pipeline-{{ pipeline_name }}-spinner" class="spinner-border" role="status"
                   style="display: none">
@@ -193,6 +203,8 @@
               </div>
               {% endfor %}
             </div>
+
+            <div id='outputarea'></div>
           </div>
         </div>
       </div>

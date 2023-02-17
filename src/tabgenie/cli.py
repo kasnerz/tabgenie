@@ -4,20 +4,12 @@ import os
 import logging
 from flask.cli import FlaskGroup, with_appcontext, pass_script_info
 
+
 logger = logging.getLogger(__name__)
 
 
 def create_app(**kwargs):
-    from click import get_current_context
     import yaml
-
-    ctx = get_current_context(silent=True)
-    if ctx and hasattr(ctx.obj, "disable_pipelines"):
-        disable_pipelines = ctx.obj.disable_pipelines
-    else:
-        # Production server, e.g., gunincorn
-        # We don't have access to the current context, so must read kwargs instead.
-        disable_pipelines = kwargs.get("disable_pipelines", False)
 
     with open("config.yml") as f:
         config = yaml.safe_load(f)
@@ -28,16 +20,17 @@ def create_app(**kwargs):
 
     app.config.update(config)
     app.config["root_dir"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir)
-    app.config["datasets_obj"] = {}
-    app.config["pipelines_obj"] = {}
-    app.config["prompts"] = load_prompts()
 
-    if app.config.get("pipelines") and not disable_pipelines:
+    app.db["datasets_obj"] = {}
+    app.db["pipelines_obj"] = {}
+    app.db["prompts"] = load_prompts()
+    app.db["pipelines_cfg"] = app.config["pipelines"]
 
+    if app.config.get("pipelines"):
         for pipeline_name in app.config["pipelines"].keys():
             initialize_pipeline(pipeline_name)
     else:
-        app.config["pipelines"] = {}
+        app.db["pipelines_cfg"] = {}
 
     # preload
     if config["cache_dev_splits"]:

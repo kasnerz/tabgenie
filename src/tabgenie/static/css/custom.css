@@ -288,12 +288,22 @@ pre {
     background-color: white;
 }
 
+.pipeline-box {
+    border: 1px solid #0175ac !important;
+}
+
 .label-name {
     left: 20px;
 }
 
 .label-settings {
+    right: 50px;
+}
+
+.label-reload {
     right: 30px;
+    font-size: 14px !important;
+    top: -10px !important;
 }
 
 .label-on-off {
@@ -466,4 +476,13 @@ ul {
 
 .modal-dialog {
     max-width: 700px;
+}
+
+#about-btn {
+    padding: 5px;
+    /* border-radius: 15px; */
+}
+
+#about-icon {
+    width: 20px;
 }

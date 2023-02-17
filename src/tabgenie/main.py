@@ -21,6 +21,8 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 app = Flask("tabgenie", template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.config.update(SECRET_KEY=os.urandom(24))
+app.db = {}
+app.db["cfg_templates"] = {}
 
 file_handler = logging.FileHandler("error.log")
 file_handler.setLevel(logging.ERROR)
@@ -51,6 +53,7 @@ def get_pipeline_output():
     out = run_pipeline(pipeline_name, pipeline_args=content, force=bool(content["edited_cells"]))
 
     return {"out": str(out), "session": get_session()}
+
 
 def get_session():
     """Retrieve session with default values and serializable"""
@@ -170,34 +173,34 @@ def initialize_dataset(dataset_name):
     # dataset_path = app.config["dataset_paths"][dataset_name]
     dataset_path = None  # not needed for HF
     dataset = DATASET_CLASSES[dataset_name](path=dataset_path)
-    app.config["datasets_obj"][dataset_name] = dataset
+    app.db["datasets_obj"][dataset_name] = dataset
 
     return dataset
 
 
-def initialize_pipeline(pipeline_name):
-    pipeline_cfg = app.config["pipelines"][pipeline_name]
-
-    with app.app_context():
-        if "config_template_file" in pipeline_cfg:
-            # TODO make the prompts less hard-coded
+def load_config_template(pipeline_name, pipeline_cfg):
+    if "config_template_file" in pipeline_cfg:
+        with app.app_context():
             template = render_template(
                 pipeline_cfg["config_template_file"],
                 pipeline_name=pipeline_name,
                 cfg=pipeline_cfg,
-                prompts=app.config["prompts"],
+                prompts=app.db["prompts"],
             )
-            pipeline_cfg["config_template"] = template
+        app.db["cfg_templates"][pipeline_name] = template
 
-    pipeline_obj = get_pipeline_class_by_name(pipeline_cfg["pipeline"])(name=pipeline_name, cfg=pipeline_cfg)
-    app.config["pipelines_obj"][pipeline_name] = pipeline_obj
 
-    return pipeline_obj
+def initialize_pipeline(pipeline_name):
+    pipeline_cfg = app.db["pipelines_cfg"][pipeline_name]
+    load_config_template(pipeline_name, pipeline_cfg)
+    pipeline_cls = get_pipeline_class_by_name(pipeline_cfg["pipeline"])
+    app.db["pipelines_obj"][pipeline_name] = pipeline_cls(name=pipeline_name, cfg=pipeline_cfg)
 
 
 def run_pipeline(pipeline_name, pipeline_args, cache_only=False, force=False):
-    pipeline = app.config["pipelines_obj"].get(pipeline_name)
-    pipeline_args["pipeline_cfg"] = app.config["pipelines"][pipeline_name]
+    pipeline = app.db["pipelines_obj"].get(pipeline_name)
+
+    pipeline_args["pipeline_cfg"] = app.db["pipelines_cfg"][pipeline_name]
 
     if pipeline_args.get("dataset") and pipeline_args.get("split"):
         dataset_obj = get_dataset(dataset_name=pipeline_args["dataset"], split=pipeline_args["split"])
@@ -209,7 +212,7 @@ def run_pipeline(pipeline_name, pipeline_args, cache_only=False, force=False):
 
 
 def get_dataset(dataset_name, split):
-    dataset = app.config["datasets_obj"].get(dataset_name)
+    dataset = app.db["datasets_obj"].get(dataset_name)
     max_examples = app.config.get("max_examples_per_split", None)
     if max_examples is not None and max_examples < 1:
         max_examples = None
@@ -308,8 +311,9 @@ def index():
     return render_template(
         "index.html",
         datasets=app.config["datasets"],
-        pipelines=app.config["pipelines"],
-        prompts=app.config["prompts"],
+        pipelines=app.db["pipelines_cfg"],
+        pipelines_cfg_templates=app.db["cfg_templates"],
+        prompts=app.db["prompts"],
         default_dataset=app.config["default_dataset"],
         host_prefix=app.config["host_prefix"],
     )

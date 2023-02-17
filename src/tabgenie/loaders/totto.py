@@ -55,9 +55,12 @@ class ToTTo(HFTabularDataset):
         gen_input = []
 
         for key, value in table.props.items():
-            gen_input.append(f"[{key}] {value}")
+            if "title" in key:
+                gen_input.append(f"{key}: {value}")
 
+        gen_input.append("cells:")
         for c in cells:
-            gen_input.append("[cell] " + c.value)
+            gen_input.append(c.value)
+            gen_input.append("|")
 
         return " ".join(gen_input)
