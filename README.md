@@ -60,7 +60,32 @@ tabgenie export -d DATASET_NAME -o OUTPUT_FILE -f FORMAT [-s SPLIT] [-t TEMPLATE
 
 ### Python
 
-TODO
+#### SimpleTransformers
+The file [examples/finetuning_simpletransformers.py](examples/finetuning_simpletransformers.py) contains a MWE of using TabGenie for finetuning and evaluating a sequence-to-sequence model on a linearized tables using :robot: [SimpleTransformers](https://simpletransformers.ai/docs/seq2seq-minimal-start/).
+
+#### Custom code
+If your code is based on Huggingface datasets, you can use the following snippet to get the Huggingface dataset object with linearized and tokenized tables:
+
+```python
+from transformers import AutoTokenizer
+import tabgenie as tg
+
+dataset_name = "totto"
+split = "train"
+tokenizer = AutoTokenizer(...)
+
+tg_dataset = tg.load_dataset(dataset_name)
+hf_dataset = tg_dataset.get_hf_dataset(
+            split=split,
+            tokenizer=tokenizer,
+)
+```
+
+The method `get_hf_dataset()` optionally accepts a parameter `linearize_fn` which is a function taking an argument of type `data.structs.Table` and returning a `str`. This can be used for custom table linearization.
+
+By default, this uses the `table_to_linear` function of the dataset (which can be also overridden in subclasses).
+
+
 
 ### HuggingFace Integration
 - The datasets are stored to `HF_DATASETS_CACHE` directory which defaults to `~/.cache/huggingface/`. Set the
