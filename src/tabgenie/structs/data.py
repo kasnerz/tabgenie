@@ -21,8 +21,8 @@ class Cell:
 
     def __init__(
         self,
-        idx=None,
         value=None,
+        idx=None,
         colspan=1,
         rowspan=1,
         is_highlighted=False,
