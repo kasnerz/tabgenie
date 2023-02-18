@@ -252,9 +252,12 @@ class TabularDataset:
 
         return triples
 
-    def get_hf_dataset(self, split, linearize_fn, tokenizer, max_length=512, num_proc=8):
+    def get_hf_dataset(self, split, tokenizer, linearize_fn=None, max_length=512, num_proc=8):
         # linearize tables and convert to input_ids
         # TODO num_proc acts weirdly in datasets 2.9.0, set temporarily to 1
+
+        if linearize_fn is None:
+            linearize_fn = self.table_to_linear
 
         logger.info(f"[tabgenie] linearizing tables using {linearize_fn}")
         logger.info(
