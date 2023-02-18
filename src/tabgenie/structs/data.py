@@ -259,17 +259,13 @@ class TabularDataset:
         if linearize_fn is None:
             linearize_fn = self.table_to_linear
 
-        def process_examples(examples):
-            table_objs = [
-                self.prepare_table(dict(zip(examples, t)))
-                for t in zip(*examples.values())
-            ]
-
-            linearized = [linearize_fn(x) for x in table_objs]
-            refs = [self.get_reference(x)["input_ids"] for x in table_objs]
+        def process_example(example):
+            table_obj = self.prepare_table(example)
+            linearized = linearize_fn(table_obj)
+            ref = self.get_reference(table_obj)
 
             tokens = tokenizer(linearized, max_length=max_length, truncation=True)
-            ref_tokens = tokenizer(refs, max_length=max_length, truncation=True)
+            ref_tokens = tokenizer(ref, max_length=max_length, truncation=True)
             tokens['labels'] = ref_tokens["input_ids"]
 
             return tokens
@@ -278,7 +274,7 @@ class TabularDataset:
         lin_example = linearize_fn(self.prepare_table(self.data[split][0]))
         logger.info(f"[tabgenie] linearized example ({split}/0): {lin_example}")
 
-        processed_dataset = self.data[split].map(process_examples, batched=True, num_proc=1)
+        processed_dataset = self.data[split].map(process_example, batched=False, num_proc=1)
         extra_columns = [
             col for col in processed_dataset.features.keys()
             if col not in ["labels", "input_ids", "attention_mask"]
