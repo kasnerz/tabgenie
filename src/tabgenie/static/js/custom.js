@@ -21,7 +21,7 @@ function update_svg_width() {
   }
 }
 
-// the draggable divider between the main area and the right panel 
+// the draggable divider between the main area and the right panel
 var splitInstance = Split(['#centerpanel', '#rightpanel'], {
   sizes: [70, 30], onDragEnd: function () { update_svg_width }, gutterSize: 1
 });
@@ -52,6 +52,10 @@ function endbtn() {
 
 function randombtn() {
   gotopage(randint(total_examples - 1));
+}
+
+function editnote() {
+	alert($('.modalNoteInput').val());
 }
 
 function get_favourite_id(dataset, split, table_idx) {
@@ -436,7 +440,7 @@ function export_table(format) {
   var export_option = $('input[name="options-export"]:checked').val();
   if (export_option == "favourites") {
     var filename = "export.zip";
-    // TODO fetch favourites using AJAX 
+    // TODO fetch favourites using AJAX
     // just notify user that exporting local copy of failure on fetch favourites failure
     var export_examples = JSON.stringify(favourites);
   } else {
