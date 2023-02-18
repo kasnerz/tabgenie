@@ -308,6 +308,9 @@ class TabularDataset:
         # linearize tables and convert to input_ids
         # TODO num_proc acts weirdly in datasets 2.9.0, set temporarily to 1
 
+        if linearize_params is None:
+            linearize_params = {}
+
         if linearize_fn is None:
             linearize_fn = self.table_to_linear
             linearize_params['separator'] = 'structure'
