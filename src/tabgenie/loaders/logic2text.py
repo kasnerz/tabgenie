@@ -15,7 +15,7 @@ class Logic2Text(HFTabularDataset):
         self.hf_id = "kasnerz/logic2text"
         self.name = "Logic2Text"
 
-    def prepare_table(self, split, table_idx):
+    def prepare_table(self, entry):
         def is_highlighted(i, j):
             # these fields are not documented properly, possible cases were found manually
             # FIXME: "subset" is not handled properly
@@ -49,9 +49,8 @@ class Logic2Text(HFTabularDataset):
             else:
                 return False
 
-        entry = self.data[split][table_idx]
-
         entry["annotation"] = ast.literal_eval(entry["annotation"])
+
         t = Table()
         t.props["reference"] = entry["sent"]
 

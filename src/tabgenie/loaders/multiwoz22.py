@@ -20,6 +20,7 @@ def filter_empty_recursive(c):
     else:
         return c
 
+
 def just_user_acts(turns):
     USER = 0
     SYSTEM = 1
@@ -27,7 +28,8 @@ def just_user_acts(turns):
     dialogue_acts = turns["dialogue_acts"]
     assert len(speakers) == len(dialogue_acts), (len(speakers), len(dialogue_acts))
     return [dai for s, dai in zip(speakers, dialogue_acts) if s == USER]
-    
+
+
 def dai2tuples(dais):
     """
     Converts dialogue act item (DAI) to linearized version
@@ -45,11 +47,11 @@ def dai2tuples(dais):
         slots = d["act_slots"]
         slot_namess = [slot["slot_name"] for slot in slots]
         slot_valuess = [slot["slot_value"] for slot in slots]
-        assert len(act_types) == len(slots) , (act_types, slots)
+        assert len(act_types) == len(slots), (act_types, slots)
         for act_type, slot_names, slot_values in zip(act_types, slot_namess, slot_valuess):
             assert len(slot_names) == len(slot_values), (len(slot_names), len(slot_values))
             for s, v in zip(slot_names, slot_values):
-                act, act_domain = act_type.split('-')
+                act, act_domain = act_type.split("-")
                 yield [act, act_domain, s, v]
 
 
@@ -282,9 +284,7 @@ class MultiWOZ22(HFTabularDataset):
         self.hf_id = "multi_woz_v22"
         self.name = "MultiWOZ_2.2 ref: User Goal"
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
-
+    def prepare_table(self, entry):
         t = Table()
         # No reference
         t.set_generated_output("reference", "")

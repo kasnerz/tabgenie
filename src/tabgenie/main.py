@@ -170,9 +170,7 @@ def export_dataset(dataset_name, split, out_dir, export_format, json_template=No
 
 
 def initialize_dataset(dataset_name):
-    # dataset_path = app.config["dataset_paths"][dataset_name]
-    dataset_path = None  # not needed for HF
-    dataset = DATASET_CLASSES[dataset_name](path=dataset_path)
+    dataset = DATASET_CLASSES[dataset_name]()
     app.db["datasets_obj"][dataset_name] = dataset
 
     return dataset

@@ -30,8 +30,7 @@ class EventNarrative(HFTabularDataset):
 
         return triples
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
+    def prepare_table(self, entry):
         reference = entry["narration"]
 
         for key, val in ast.literal_eval(entry["entity_ref_dict"]).items():

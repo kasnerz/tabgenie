@@ -26,8 +26,7 @@ class WikiSQL(HFTabularDataset):
             if value:
                 return value
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
+    def prepare_table(self, entry):
         t = Table()
 
         title = self._get_title(entry["table"])

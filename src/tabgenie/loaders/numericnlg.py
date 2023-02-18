@@ -14,9 +14,7 @@ class NumericNLG(HFTabularDataset):
         self.hf_id = "kasnerz/numericnlg"
         self.name = "NumericNLG"
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
-
+    def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["caption"]
         t.props["title"] = entry["table_name"]

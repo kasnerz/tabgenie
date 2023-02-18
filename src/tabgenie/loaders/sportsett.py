@@ -21,8 +21,7 @@ class SportSettBasketball(HFTabularDataset):
 
         return f"{ng['dayname']} {ng['day']} {ng['month']} {ng['year']}, {ng['opponent_place']} {ng['opponent_name']}, {ng['stadium']}, {ng['city']}"
 
-    def prepare_table(self, split, table_idx):
-        entry = self.data[split][table_idx]
+    def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["target"]
 
