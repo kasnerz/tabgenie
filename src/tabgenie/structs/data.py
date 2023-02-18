@@ -259,26 +259,27 @@ class TabularDataset:
         if linearize_fn is None:
             linearize_fn = self.table_to_linear
 
+        def process_examples(examples):
+            table_objs = [
+                self.prepare_table(dict(zip(examples, t)))
+                for t in zip(*examples.values())
+            ]
+            linearized = [linearize_fn(x) for x in table_objs]
+            tokens = tokenizer(linearized, max_length=max_length, truncation=True)
+            ref_tokens = [self.get_reference(x)["input_ids"] for x in table_objs]
+            tokens['labels'] = ref_tokens
+            return tokens
+
         logger.info(f"[tabgenie] linearizing tables using {linearize_fn}")
-        logger.info(
-            f"[tabgenie] linearized example ({split}/0): {linearize_fn(self.prepare_table(self.data[split][0]))}"
-        )
+        lin_example = linearize_fn(self.prepare_table(self.data[split][0]))
+        logger.info(f"[tabgenie] linearized example ({split}/0): {lin_example}")
 
-        processed_dataset = self.data[split].map(
-            lambda x: tokenizer(linearize_fn(self.prepare_table(x)), max_length=max_length, truncation=True),
-            batched=False,
-            num_proc=1,
-        )
-        # add labels
-        labels = [
-            tokenizer(self.get_reference(self.get_table(split, i)))["input_ids"]
-            for i in range(self.get_example_count(split))
-        ]
-        processed_dataset = processed_dataset.add_column("labels", labels)
+        sample = self.data[split].select(range(50))
+        processed_dataset = sample.map(process_examples, batched=True, num_proc=1)
         extra_columns = [
-            col for col in processed_dataset.features.keys() if col not in ["labels", "input_ids", "attention_mask"]
+            col for col in processed_dataset.features.keys()
+            if col not in ["labels", "input_ids", "attention_mask"]
         ]
-
         processed_dataset = processed_dataset.remove_columns(extra_columns)
         processed_dataset.set_format(type="torch")
 
