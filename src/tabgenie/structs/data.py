@@ -278,8 +278,7 @@ class TabularDataset:
         lin_example = linearize_fn(self.prepare_table(self.data[split][0]))
         logger.info(f"[tabgenie] linearized example ({split}/0): {lin_example}")
 
-        sample = self.data[split].select(range(50))
-        processed_dataset = sample.map(process_examples, batched=True, num_proc=1)
+        processed_dataset = self.data[split].map(process_examples, batched=True, num_proc=1)
         extra_columns = [
             col for col in processed_dataset.features.keys()
             if col not in ["labels", "input_ids", "attention_mask"]
