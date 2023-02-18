@@ -264,10 +264,14 @@ class TabularDataset:
                 self.prepare_table(dict(zip(examples, t)))
                 for t in zip(*examples.values())
             ]
+
             linearized = [linearize_fn(x) for x in table_objs]
+            refs = [self.get_reference(x)["input_ids"] for x in table_objs]
+
             tokens = tokenizer(linearized, max_length=max_length, truncation=True)
-            ref_tokens = [self.get_reference(x)["input_ids"] for x in table_objs]
-            tokens['labels'] = ref_tokens
+            ref_tokens = tokenizer(refs, max_length=max_length, truncation=True)
+            tokens['labels'] = ref_tokens["input_ids"]
+
             return tokens
 
         logger.info(f"[tabgenie] linearizing tables using {linearize_fn}")
