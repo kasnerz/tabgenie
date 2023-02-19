@@ -19,6 +19,7 @@ from tabgenie import load_dataset
 # evaluate
 # transformers==4.25.1
 # torch==1.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
+# sacrebleu
 
 
 # given that this script is in examples/ directory
@@ -55,8 +56,8 @@ def compute_bleu(eval_preds, tokenizer):
 @click.option("--base-model", "-m", default="t5-small", type=str, help="Base model to finetune")
 @click.option("--epochs", "-e", default=10, type=int, help="Maximum number of epochs")
 @click.option("--batch-size", "-b", default=16, type=int, help="Path to the output directory")
-@click.option("--ckpt-dir", "-c", default=ROOT_DIR / "checkpoints", type=int, help="Directory to store checkpoints")
-@click.option("--output-dir", "-o", default=ROOT_DIR / "models", type=int, help="Directory to store models and their outputs")
+@click.option("--ckpt-dir", "-c", default=os.path.join(ROOT_DIR, "checkpoints"), type=str, help="Directory to store checkpoints")
+@click.option("--output-dir", "-o", default=os.path.join(ROOT_DIR, "models"), type=str, help="Directory to store models and their outputs")
 def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
     os.makedirs(ckpt_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
@@ -64,10 +65,10 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
     model_name = f'{base_model.rsplit("/", 1)[-1]}_{dataset}_{epochs}e_{batch_size}bs'
     print(f'Fine-tuning {model_name}')
 
-    save_dir = output_dir / model_name
+    save_dir = os.path.join(output_dir, model_name)
     os.makedirs(save_dir, exist_ok=True)
-    os.makedirs(save_dir / "preds", exist_ok=True)
-    os.makedirs(save_dir / "scores", exist_ok=True)
+    os.makedirs(os.path.join(save_dir, "preds"), exist_ok=True)
+    os.makedirs(os.path.join(save_dir, "scores"), exist_ok=True)
 
     model = AutoModelForSeq2SeqLM.from_pretrained(base_model)
     tokenizer = AutoTokenizer.from_pretrained(base_model)
@@ -90,7 +91,7 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
         return compute_bleu(eval_preds, tokenizer)
 
     training_args = Seq2SeqTrainingArguments(
-        output_dir=str(ckpt_dir / model_name),
+        output_dir=os.path.join(ckpt_dir, model_name),
         report_to='none',
         evaluation_strategy='steps',
         eval_steps=eval_steps,
@@ -123,17 +124,19 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
     )
 
     trainer.train()
-    trainer.save_model(str(save_dir / "model"))
+    trainer.save_model(os.path.join(save_dir, "model"))
 
     for part in ['dev', 'test']:
         preds = trainer.predict(hf_datasets[part])
         decoded_preds = tokenizer.batch_decode(preds.predictions, skip_special_tokens=True)
         decoded_preds = [{'out': [p]} for p in decoded_preds]
 
-        with open(save_dir / "preds" / f'preds_{base_model}_{dataset}_{part}.jsonl', 'w') as f:
+        filename = f'{base_model}_{dataset}_{part}'
+
+        with open(os.path.join(save_dir, "preds", f'preds_{filename}.jsonl'), 'w') as f:
             f.write('\n'.join(json.dumps(pred) for pred in decoded_preds))
 
-        with open(save_dir / "scores" / f'scores_{base_model}_{dataset}_{part}.txt', 'w') as f:
+        with open(os.path.join(save_dir, "scores", f'scores_{filename}.txt'), 'w') as f:
             f.write(f'SacreBLEU: {preds.metrics["test_bleu"]}')
 
 
