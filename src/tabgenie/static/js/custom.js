@@ -54,17 +54,16 @@ function randombtn() {
   gotopage(randint(total_examples - 1));
 }
 
-function editnote() {
-	alert($('.modalNoteInput').val());
+function get_note_id(dataset, split, table_idx) {
+  return `${dataset}-${split}-${table_idx}`;
 }
 
 function get_favourite_id(dataset, split, table_idx) {
   return `${dataset}-${split}-${table_idx}`;
-
 }
 
 function favouritebtn() {
-  var favourite_id = get_favourite_id(dataset, split, table_idx);
+  let favourite_id = get_favourite_id(dataset, split, table_idx);
   if (favourite_id in favourites) {
     remove_favourite(dataset, split, table_idx);
   } else {
@@ -261,6 +260,44 @@ function toggle_view() {
   update_svg_width();
 }
 
+function set_note(dataset, split, table_idx) {
+  let note_id = get_note_id(dataset, split, table_idx);
+  if (note_id in notes) {
+    let msg = notes[note_id]["note"];
+  } else {
+    $("#note-btn").css("background-color", "#ffc107");
+    let msg = "Add your note!";
+  }
+  $(".modalNoteInput").val(msg);
+}
+
+function save_note() {
+  let note = $(".modalNoteInput").val();
+  let note_id = get_note_id(dataset_split, table_idx);
+  var request = {
+    "dataset": dataset,
+    "split": split,
+    "table_idx": table_idx,
+    "text": note,
+  };
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: `${url_prefix}/note`,
+    data: JSON.stringify(request),
+    success: function (server_notes) {
+      notes = server_notes;
+    },
+    error: function (xhr, error) {
+      msg = `Failed to store action to server: save_note ${note_id}`;
+      console.log(msg)
+      alert(msg)
+      // still apply the action at least locally
+      notes[note_id] = note;
+    },
+    dataType: "json",
+  });
+}
 
 function set_dataset_info(info) {
   var ex_array = $.map(info.examples, function (num, split) {
@@ -556,7 +593,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
 
     total_examples = data.total_examples;
     $("#total-examples").html(total_examples - 1);
-    info = set_dataset_info(data.dataset_info);
+
 
     update_cell_interactivity();
 
@@ -565,6 +602,8 @@ function fetch_table(dataset, split, table_idx, export_format) {
     favourites = data.session.favourites;
     console.log(`favourites updated to ${JSON.stringify(favourites)}`)
     update_favourite_button(get_favourite_id(dataset, split, table_idx));
+    notes = data.session.notes;
+    set_note(dataset, split, table_idx);
 
     show_generated_outputs(data.generated_outputs);
     refresh_pipelines();

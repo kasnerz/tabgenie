@@ -61,9 +61,7 @@
             </a>
           </li>
           <li class="page-item">
-              <a class="page-link"
-class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                data-bs-target="#note-modal">
+              <a class="page-link" id="note-btn" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#note-modal">
               🖊
             </a>
           </li>
@@ -219,23 +217,6 @@ class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
   </div>
 
   <!-- modal windows -->
-	<!-- <div class="modal fade" id="note-modal" tabindex="-1"> -->
-  <!--   <div class="modal-dialog"> -->
-  <!--     <div class="modal-content"> -->
-  <!--       <div class="modal-header"> -->
-	<!-- 				<h5 class="modal-title" id="note-modal-label">Edit note</h5> -->
-	<!-- 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
-	<!-- 			</div> -->
-	<!-- 			<div class="modal-body"> -->
-	<!-- 				<input class="modalNoteInput form-control" placeholder="Add you note" /> -->
-	<!-- 			</div> -->
-	<!-- 			<div class="modal-footer"> -->
-	<!-- 				<button type="button" class="saveEdit btn btn-primary" onclick="editnote();">Save changes</button> -->
-	<!-- 			</div> -->
-	<!-- 		</div> -->
-	<!-- 	</div> -->
-	<!-- </div> -->
-
   <div class="modal fade" id="note-modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -243,12 +224,12 @@ class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
           <h5 class="modal-title" id="note-modal-label">Edit note</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-				<div class="modal-body">
-					<input class="modalNoteInput form-control" placeholder="Add you note" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="saveEdit btn btn-primary" onclick="editnote();">Save changes</button>
-				</div>
+                <div class="modal-body">
+                    <input class="modalNoteInput form-control" placeholder="Add you note" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="saveEdit btn btn-primary" onclick="save_note();">Save changes</button>
+                </div>
         </div>
       </div>
     </div>
@@ -413,6 +394,7 @@ class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
   window.pipelines = {{ pipelines | tojson | safe }};
   window.prompts = {{ prompts | tojson | safe }};
   window.favourites = {{ session.get("favourites", {}) | tojson | safe }};
+  window.notes = {{ session.get("favourites", {}) | tojson | safe }};
   window.editedCells = {{ session.get("editedCells", {}) | tojson | safe }};
 </script>
 

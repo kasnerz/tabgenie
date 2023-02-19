@@ -59,6 +59,7 @@ def get_session():
     """Retrieve session with default values and serializable"""
     s = {}
     s["favourites"] = session.get("favourites", {})
+    s["notes"] = session.get("notes", {})
     return s
 
 
@@ -69,7 +70,6 @@ def render_table():
     table_idx = int(request.args.get("table_idx"))
     displayed_props = json.loads(request.args.get("displayed_props"))
     table_data = get_table_data(dataset_name, split, table_idx, displayed_props)
-    logging.info(f"{session=} favourites {table_data['session']=}")
 
     return jsonify(table_data)
 
@@ -273,9 +273,23 @@ def load_prompts():
 
     return prompts
 
+@app.route("/note", methods=["GET", "POST"])
+def note():
+    content = request.json
+    dataset = content.get("dataset")
+    split = content.get("split")
+    table_idx = content.get("table_idx")
+    note = content.get("note", "")
+    notes = session.get("notes", {})
+    note_id = f"{dataset}-{split}-{table_idx}"
+    if len(note) == 0:
+        notes.pop(note_id)
+    else:
+        notes[note_id] = {"dataset": dataset, "split": split, "table_idx": table_idx, "note": note}
+
 
 @app.route("/favourite", methods=["GET", "POST"])
-def favourites():
+def favourite():
     content = request.json
     dataset = content.get("dataset")
     split = content.get("split")
