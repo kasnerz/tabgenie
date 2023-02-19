@@ -122,6 +122,8 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
     trainer.save_model(os.path.join(save_dir, "model"))
 
     for part in ['dev', 'test']:
+        print(f'Running prediction on {part}')
+
         preds = trainer.predict(hf_datasets[part])
         decoded_preds = tokenizer.batch_decode(preds.predictions, skip_special_tokens=True)
         decoded_preds = [{'out': [p]} for p in decoded_preds]
