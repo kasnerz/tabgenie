@@ -39,6 +39,7 @@ class Cell:
         self.is_row_header = is_row_header
         self.is_dummy = is_dummy
 
+    @property
     def is_header(self):
         return self.is_col_header or self.is_row_header
 
@@ -59,6 +60,9 @@ class Table:
         self.cell_idx = 0
         self.current_row = []
         self.cell_by_ids = {}
+
+    def has_highlights(self):
+        return any(cell.is_highlighted for row in self.cells for cell in row)
 
     def save_row(self):
         if self.current_row:
@@ -199,28 +203,67 @@ class TabularDataset:
 
         return exported
 
-    def table_to_linear(self, table, cell_ids=None):
+    @staticmethod
+    def selected_cells_to_linear(table, cell_ids):
         tokens = []
 
+        # selected cells -> 1D pos encoding  # todo: why separately? why 1D?
+        cells = [table.get_cell_by_id(int(idx)) for idx in cell_ids]
+
+        for i, cell in enumerate(cells):
+            tokens.append(f"[{i}]")
+            tokens.append(cell.value)
+
+        return tokens
+
+    @staticmethod
+    def table_to_linear_2d(
+            table,
+            highlighted_only=False,
+            separator='index'
+    ):
+        tokens = []
+        table_has_highlights = table.has_highlights()
+
+        # full table -> 2D pos encoding
+        for i, row in enumerate(table.get_cells()):
+            for j, cell in enumerate(row):
+                if highlighted_only and table_has_highlights and not cell.is_highlighted:
+                    continue
+
+                if separator == 'structure':
+                    if not j:  # start of row
+                        tokens.append('[R]')
+                    tokens.append('[H]' if cell.is_header else '[C]')
+                else:
+                    tokens.append(f"[{i}][{j}]")
+
+                tokens.append(cell.value)
+
+        return tokens
+
+    def table_to_linear(
+            self,
+            table,
+            separator='index',  # 'index', 'structure'
+            highlighted_only=False,
+            cell_ids=None,
+    ):
+        prop_tokens = []
         for prop in ["category", "title"]:
             if prop in table.props:
-                tokens.append(f"[{prop}] {table.props[prop]}")
+                prop_tokens.append(f"[{prop}] {table.props[prop]}")
 
         if cell_ids:
-            # highlighted cells -> 1D pos encoding
-            cells = [table.get_cell_by_id(int(idx)) for idx in cell_ids]
-
-            for i, cell in enumerate(cells):
-                tokens.append(f"[{i}]")
-                tokens.append(cell.value)
+            table_tokens = self.selected_cells_to_linear(table, cell_ids)
         else:
-            # full table -> 2D pos encoding
-            for i, row in enumerate(table.get_cells()):
-                for j, cell in enumerate(row):
-                    tokens.append(f"[{i}][{j}]")
-                    tokens.append(cell.value)
+            table_tokens = self.table_to_linear_2d(
+                table,
+                highlighted_only=highlighted_only,
+                separator=separator
+        )
 
-        return " ".join(tokens)
+        return " ".join(prop_tokens + table_tokens)
 
     def table_to_triples(self, table, cell_ids):
         # default method (dataset-agnostic)
@@ -252,33 +295,47 @@ class TabularDataset:
 
         return triples
 
-    def get_hf_dataset(self, split, tokenizer, linearize_fn=None, max_length=512, num_proc=8):
+    def get_hf_dataset(
+            self,
+            split,
+            tokenizer,
+            linearize_fn=None,
+            linearize_params=None,
+            highlighted_only=True,
+            max_length=512,
+            num_proc=8
+    ):
         # linearize tables and convert to input_ids
         # TODO num_proc acts weirdly in datasets 2.9.0, set temporarily to 1
 
+        if linearize_params is None:
+            linearize_params = {}
+
         if linearize_fn is None:
             linearize_fn = self.table_to_linear
+            linearize_params['separator'] = 'structure'
+            linearize_params['highlighted_only'] = highlighted_only
+
+        def process_example(example):
+            table_obj = self.prepare_table(example)
+            linearized = linearize_fn(table_obj, **linearize_params)
+            ref = self.get_reference(table_obj)
+
+            tokens = tokenizer(linearized, max_length=max_length, truncation=True)
+            ref_tokens = tokenizer(ref, max_length=max_length, truncation=True)
+            tokens['labels'] = ref_tokens["input_ids"]
+
+            return tokens
 
         logger.info(f"[tabgenie] linearizing tables using {linearize_fn}")
-        logger.info(
-            f"[tabgenie] linearized example ({split}/0): {linearize_fn(self.prepare_table(self.data[split][0]))}"
-        )
+        lin_example = linearize_fn(self.prepare_table(self.data[split][0]))
+        logger.info(f"[tabgenie] linearized example ({split}/0): {lin_example}")
 
-        processed_dataset = self.data[split].map(
-            lambda x: tokenizer(linearize_fn(self.prepare_table(x)), max_length=max_length, truncation=True),
-            batched=False,
-            num_proc=1,
-        )
-        # add labels
-        labels = [
-            tokenizer(self.get_reference(self.get_table(split, i)))["input_ids"]
-            for i in range(self.get_example_count(split))
-        ]
-        processed_dataset = processed_dataset.add_column("labels", labels)
+        processed_dataset = self.data[split].map(process_example, batched=False, num_proc=1)
         extra_columns = [
-            col for col in processed_dataset.features.keys() if col not in ["labels", "input_ids", "attention_mask"]
+            col for col in processed_dataset.features.keys()
+            if col not in ["labels", "input_ids", "attention_mask"]
         ]
-
         processed_dataset = processed_dataset.remove_columns(extra_columns)
         processed_dataset.set_format(type="torch")
 
@@ -400,7 +457,7 @@ class TabularDataset:
                 if c.is_dummy:
                     continue
 
-                eltype = "th" if c.is_header() else "td"
+                eltype = "th" if c.is_header else "td"
                 td_el = h(eltype, colspan=c.colspan, rowspan=c.rowspan, cell_idx=c.idx)(c.value)
 
                 if c.is_highlighted:
