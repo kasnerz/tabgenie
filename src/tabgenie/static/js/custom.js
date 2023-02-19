@@ -260,20 +260,32 @@ function toggle_view() {
   update_svg_width();
 }
 
+
+// TODO save on close note-modal dialogue
+// $('.save-note-button').submit(function(e) {
+//   e.preventDefault();
+//   // Coding
+//   $('#note-modal').modal('toggle'); //or  $('#IDModal').modal('hide');
+//   return false;
+// });
+
+
+
 function set_note(dataset, split, table_idx) {
   let note_id = get_note_id(dataset, split, table_idx);
   if (note_id in notes) {
-    let msg = notes[note_id]["note"];
-  } else {
+    msg = notes[note_id]["note"];
+    $(".modalNoteInput").val(msg);
     $("#note-btn").css("background-color", "#ffc107");
-    let msg = "Add your note!";
+  } else {
+    $("#note-btn").css("background-color", "");
+    $(".modalNoteInput").val("");
   }
-  $(".modalNoteInput").val(msg);
 }
 
 function save_note() {
   let note = $(".modalNoteInput").val();
-  let note_id = get_note_id(dataset_split, table_idx);
+  let note_id = get_note_id(dataset, split, table_idx);
   var request = {
     "dataset": dataset,
     "split": split,

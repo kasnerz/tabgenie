@@ -282,11 +282,15 @@ def note():
     note = content.get("note", "")
     notes = session.get("notes", {})
     note_id = f"{dataset}-{split}-{table_idx}"
-    if len(note) == 0:
+    if len(note) == 0 and note_id in notes:
         notes.pop(note_id)
     else:
         notes[note_id] = {"dataset": dataset, "split": split, "table_idx": table_idx, "note": note}
-
+        session["notes"] = notes
+        # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
+        session.modified = True
+    logging.warning(f"DEBUG /note \n\t{content=}\n\t{get_session()}")
+    return jsonify(notes)
 
 @app.route("/favourite", methods=["GET", "POST"])
 def favourite():
@@ -306,6 +310,8 @@ def favourite():
         favourites = session.get("favourites", {})
         favourites[favourite_id] = {"dataset": dataset, "split": split, "table_idx": table_idx}
         session["favourites"] = favourites
+        # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
+        session.modified = True
     elif action == "remove_all":
         favourites = {}
     else:
