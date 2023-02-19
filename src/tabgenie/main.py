@@ -101,7 +101,7 @@ def export_to_file():
 
     if export_option == "favourites":
         file_to_download = os.path.join(export_dir, "export.zip")
-        shutil.make_archive(file_to_download.rstrip(".zip"), "zip", os.path.join(export_dir, "files"))
+        shutil.make_archive(file_to_download.rsplit('.', 1)[0], "zip", os.path.join(export_dir, "files"))
 
     logger.info("Sending file")
     return send_file(file_to_download, mimetype="text/plain", as_attachment=True)
@@ -237,7 +237,7 @@ def get_generated_outputs(dataset_name, split, output_idx):
     for filename in glob.glob(out_dir + "/" + "*.jsonl"):
         line = linecache.getline(filename, output_idx + 1)  # 1-based indexing
         j = json.loads(line)
-        model_name = os.path.basename(filename).rstrip(".jsonl")
+        model_name = os.path.basename(filename).rsplit('.', 1)[0]
         outputs[model_name] = j
 
     return outputs

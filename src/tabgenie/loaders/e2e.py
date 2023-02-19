@@ -57,6 +57,7 @@ class E2E(HFTabularDataset):
         t = Table()
         t.props["reference"] = entry["target"]
         mrs = entry["meaning_representation"].split(", ")
+        print(entry, mrs)
 
         for mr in mrs:
             key = mr.split("[")[0]
