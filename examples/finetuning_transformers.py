@@ -134,7 +134,7 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
         filename = f'{base_model}_{dataset}_{part}'
 
         with open(os.path.join(save_dir, "preds", f'preds_{filename}.jsonl'), 'w') as f:
-            f.write('\n'.join(json.dumps(pred) for pred in decoded_preds))
+            f.write('\n'.join(json.dumps(pred, ensure_ascii=False) for pred in decoded_preds))
 
         with open(os.path.join(save_dir, "scores", f'scores_{filename}.txt'), 'w') as f:
             f.write(f'SacreBLEU: {preds.metrics["test_bleu"]}')
