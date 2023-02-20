@@ -43,8 +43,8 @@ BLEU_METRIC = evaluate.load("sacrebleu")
 
 
 # TODO: basically, almost a copypaste from default func
-def table_to_linear_with_prefix(table):
-    tokens = [f'{table["dataset"]}:']
+def table_to_linear_with_prefix(table, dataset_name):
+    tokens = [f'{dataset_name}:']
     for prop in ["category", "title"]:
         if prop in table.props:
             tokens.append(f"[{prop}] {table.props[prop]}")
@@ -129,7 +129,8 @@ def main(datasets, base_model, epochs, batch_size, ckpt_dir, output_dir):
                 split=p,
                 tokenizer=tokenizer,
                 max_length=MAX_LENGTH,
-                linearize_fn=table_to_linear_with_prefix
+                linearize_fn=table_to_linear_with_prefix,
+                linearize_params={'dataset_name': dataset}
             )
             for p in tg_dataset.splits
         }
