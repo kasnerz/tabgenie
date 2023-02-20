@@ -1,7 +1,9 @@
 import os
 import json
+import random
 from pathlib import Path
 
+import torch
 import click
 import evaluate
 import numpy as np
@@ -20,6 +22,13 @@ from tabgenie import load_dataset
 # transformers==4.25.1
 # torch==1.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
 # sacrebleu
+
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.backends.cudnn.deterministic = True
 
 
 # given that this script is in examples/ directory
