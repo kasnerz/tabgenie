@@ -121,7 +121,7 @@ def main(datasets, base_model, epochs, batch_size, ckpt_dir, output_dir):
             )
             for p in tg_dataset.splits
         }
-        print(tokenizer.deccode(hf_datasets[dataset]['train'][0]['input_ids']))
+        print(tokenizer.decode(hf_datasets[dataset]['train'][0]['input_ids']))
 
     joint_train = concatenate_datasets([x['train'] for x in hf_datasets.values()])
     joint_train = joint_train.shuffle(seed=SEED)
