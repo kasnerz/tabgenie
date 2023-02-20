@@ -35,6 +35,11 @@ torch.backends.cudnn.deterministic = True
 # given that this script is in examples/ directory
 ROOT_DIR = Path(__file__).parent.parent
 
+LIN_FUNC_PARAMS = {
+    'separator': 'structure',
+    'highlighted_only': True
+}
+
 MAX_LENGTH = 512
 LABEL_PAD_TOKEN_ID = -100
 PATIENCE = 5
@@ -107,17 +112,21 @@ def main(datasets, base_model, epochs, batch_size, ckpt_dir, output_dir):
 
     for dataset in datasets:
         tg_dataset = load_dataset(dataset)
+
+        lin_params = {
+            'dataset_name': dataset,
+            'dataset_obj': tg_dataset,
+            # any other dataset-specific kwargs
+        }
+        lin_params.update(LIN_FUNC_PARAMS)
+
         hf_datasets[dataset] = {
             p: tg_dataset.get_hf_dataset(
                 split=p,
                 tokenizer=tokenizer,
                 max_length=MAX_LENGTH,
                 linearize_fn=table_to_linear_with_prefix,
-                linearize_params={
-                    'dataset_name': dataset,
-                    'dataset_obj': tg_dataset
-                    # any other dataset-specific kwargs
-                }
+                linearize_params=lin_params
             )
             for p in tg_dataset.splits
         }
