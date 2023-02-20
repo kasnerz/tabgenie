@@ -34,10 +34,25 @@ torch.backends.cudnn.deterministic = True
 # given that this script is in examples/ directory
 ROOT_DIR = Path(__file__).parent.parent
 
+MAX_LENGTH = 512
 LABEL_PAD_TOKEN_ID = -100
 PATIENCE = 5
 
 BLEU_METRIC = evaluate.load("sacrebleu")
+
+
+def calc_truncated(df):
+    n_truncated_inputs = 0
+    n_truncated_outputs = 0
+    for item in df:
+        if item['input_ids'].size[-1] == MAX_LENGTH:
+            n_truncated_inputs += 1
+        if item['labels'].size[-1] == MAX_LENGTH:
+            n_truncated_outputs += 1
+
+    p_truncated_inputs = round(n_truncated_inputs / df.num_rows, 4)
+    p_truncated_outputs = round(n_truncated_outputs / df.num_rows, 4)
+    return p_truncated_inputs, p_truncated_outputs
 
 
 def compute_bleu(eval_preds, tokenizer):
@@ -46,7 +61,7 @@ def compute_bleu(eval_preds, tokenizer):
         preds = preds[0]
 
     decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-    labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
+    labels = np.where(labels != LABEL_PAD_TOKEN_ID, labels, tokenizer.pad_token_id)
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
     result = BLEU_METRIC.compute(predictions=decoded_preds, references=decoded_labels)
@@ -83,9 +98,14 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
 
     tg_dataset = load_dataset(dataset)
     hf_datasets = {
-        p: tg_dataset.get_hf_dataset(split=p, tokenizer=tokenizer)
+        p: tg_dataset.get_hf_dataset(split=p, tokenizer=tokenizer, max_length=MAX_LENGTH)
         for p in tg_dataset.splits
     }
+
+    # to control if the data fits into the predefined length limit
+    p_truncated_inputs, p_truncated_outputs = calc_truncated(hf_datasets['train'])
+    print(f'Truncated inputs: {p_truncated_inputs}')
+    print(f'Truncated outputs: {p_truncated_outputs}')
 
     collator = DataCollatorForSeq2Seq(
         tokenizer,
