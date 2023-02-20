@@ -25,12 +25,14 @@ class LogicNLG(HFTabularDataset):
         t.props["table_id"] = entry["table_id"]
         t.props["template"] = entry["template"]
         t.props["linked_columns"] = entry["linked_columns"]
+        t.props["disclaimer"] = "Column highlighting is determined automatically in the original dataset " \
+                                "and can contain errors."
 
         for i, row in enumerate(ast.literal_eval(entry["table"])):
             for j, x in enumerate(row):
                 c = Cell()
                 c.value = x
-                # c.is_highlighted = j in ast.literal_eval(entry["linked_columns"])
+                c.is_highlighted = j in ast.literal_eval(entry["linked_columns"])
                 if i == 0:
                     c.is_col_header = True
                 t.add_cell(c)

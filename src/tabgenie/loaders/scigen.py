@@ -29,10 +29,9 @@ class SciGen(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        caption = entry["table_caption"]
-        t.props["reference"] = caption.replace("[CONTINUE]", "\n")
-        t.props["title"] = entry["paper"]
-        t.props["text"] = (entry.get("text") or "").replace("[CONTINUE]", "\n")
+        t.props["reference"] = (entry.get("text") or "").replace("[CONTINUE]", "\n")
+        t.props["title"] = entry["table_caption"].replace("[CONTINUE]", "\n")
+        t.props["paper"] = entry["paper"]
         t.props["paper_id"] = entry.get("paper_id")
 
         for col in ast.literal_eval(entry["table_column_names"]):
