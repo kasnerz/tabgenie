@@ -42,26 +42,9 @@ PATIENCE = 5
 BLEU_METRIC = evaluate.load("sacrebleu")
 
 
-# TODO: basically, almost a copypaste from default func
-def table_to_linear_with_prefix(table, dataset_name):
-    tokens = [f'{dataset_name}:']
-    for prop in ["category", "title"]:
-        if prop in table.props:
-            tokens.append(f"[{prop}] {table.props[prop]}")
-
-    table_has_highlights = table.has_highlights()
-
-    for i, row in enumerate(table.get_cells()):
-        for j, cell in enumerate(row):
-            if table_has_highlights and not cell.is_highlighted:
-                continue
-
-            if not j:  # start of row
-                tokens.append('[R]')
-            tokens.append('[H]' if cell.is_header else '[C]')
-            tokens.append(cell.value)
-
-    return " ".join(tokens)
+def table_to_linear_with_prefix(table, dataset_name, dataset_obj, **kwargs):
+    lin_table = dataset_obj.table_to_linear(table, **kwargs)
+    return f'{dataset_name}: {lin_table}'
 
 
 def calc_truncated(df):
@@ -130,10 +113,15 @@ def main(datasets, base_model, epochs, batch_size, ckpt_dir, output_dir):
                 tokenizer=tokenizer,
                 max_length=MAX_LENGTH,
                 linearize_fn=table_to_linear_with_prefix,
-                linearize_params={'dataset_name': dataset}
+                linearize_params={
+                    'dataset_name': dataset,
+                    'dataset_obj': tg_dataset
+                    # any other dataset-specific kwargs
+                }
             )
             for p in tg_dataset.splits
         }
+        print(tokenizer.deccode(hf_datasets[dataset]['train'][0]['input_ids']))
 
     joint_train = concatenate_datasets([x['train'] for x in hf_datasets.values()])
     joint_train = joint_train.shuffle(seed=SEED)
