@@ -16,8 +16,13 @@ class NumericNLG(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["caption"]
+        t.props["reference"] = entry["description"]
+        t.props["header_mention"] = entry["header_mention"]
+        t.props["class_sentence"] = entry["header_mention"]
+        t.props["table_id_paper"] = entry.get("table_id_paper")
+        t.props["table_id"] = entry.get("table_id")
         t.props["title"] = entry["table_name"]
+        t.props["caption"] = entry["caption"]
         t.props["dir"] = entry.get("dir")
         t.props["metrics_loc"] = entry.get("metrics_loc")
         t.props["metrics_type"] = str(entry.get("metrics_type") or "")
@@ -25,8 +30,7 @@ class NumericNLG(HFTabularDataset):
         t.props["page_no"] = entry.get("page_no")
         t.props["target_entity"] = str(entry.get("target_entity") or "")
         t.props["valid"] = entry.get("valid")
-        t.props["table_id_paper"] = entry.get("table_id_paper")
-        t.props["table_id"] = entry.get("table_id")
+
 
         for i in range(int(entry["column_header_level"])):
             c = Cell("")
