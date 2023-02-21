@@ -131,6 +131,10 @@
                 ★ Favourites
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#notes-modal">
+                🖊 Notes
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#export-modal">
                 <b>⭳</b> Export
               </button>
@@ -227,7 +231,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
                 <div class="modal-body">
-                    <input class="modalNoteInput form-control" placeholder="Add you note" />
+                    <input class="modalNoteInput form-control" placeholder="Add your note" />
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="delete-note-button btn btn-primary" onclick="delete_note();">Delete</button>
@@ -327,6 +331,24 @@
           <ul class="list-group list-group-flush" id="favourites-box"></ul>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" onclick="clear_favourites();">Delete all</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="notes-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="notes-modal-label">Nots</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group list-group-flush" id="notes-box"></ul>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="clear_notes();">Delete all</button>
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>

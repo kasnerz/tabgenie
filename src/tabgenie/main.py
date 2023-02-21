@@ -276,19 +276,28 @@ def load_prompts():
 @app.route("/note", methods=["GET", "POST"])
 def note():
     content = request.json
+    action = content.get("action", "edit_note")
     dataset = content.get("dataset")
     split = content.get("split")
     table_idx = content.get("table_idx")
     note = content.get("note", "")
+
     notes = session.get("notes", {})
-    note_id = f"{dataset}-{split}-{table_idx}"
-    if len(note) == 0 and note_id in notes:
-        notes.pop(note_id)
+
+    if action == "remove_all":
+        notes = {}
     else:
-        notes[note_id] = {"dataset": dataset, "split": split, "table_idx": table_idx, "note": note}
-        session["notes"] = notes
-        # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
-        session.modified = True
+        assert action == "edit_note"
+        note_id = f"{dataset}-{split}-{table_idx}"
+        if len(note) == 0 and note_id in notes:
+            notes.pop(note_id)
+        else:
+            notes[note_id] = {"dataset": dataset, "split": split, "table_idx": table_idx, "note": note}
+
+    session["notes"] = notes
+    # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
+    session.modified = True
+
     logging.info(f"/note \n\t{content=}\n\t{get_session()}")
     return jsonify(notes)
 
@@ -302,24 +311,23 @@ def favourite():
     if action in ["remove", "insert"]:
         assert dataset and split and isinstance(table_idx, int), (dataset, split, table_idx)
         favourite_id = f"{dataset}-{split}-{table_idx}"
+    favourites = session.get("favourites", {})
     if action == "remove":
-        if session.get("favourites"):
-            favourite = session.pop(favourite_id, None)
-            logging.info(f"Removed {favourite}")
+        favourite = favourites.pop(favourite_id, None)
+        logging.info(f"Removed {favourite}")
     elif action == "insert":
-        favourites = session.get("favourites", {})
         favourites[favourite_id] = {"dataset": dataset, "split": split, "table_idx": table_idx}
-        session["favourites"] = favourites
-        # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
-        session.modified = True
     elif action == "remove_all":
         favourites = {}
     else:
         assert action == "get_all"
-    favourite_d = session.get("favourites", {})
-    assert isinstance(favourite_d, dict)  # on dicts are applied jsonify
-    logging.info(f"favourite {content=} {session=}")
-    return jsonify(favourite_d)
+
+    session["favourites"] = favourites
+    # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
+    session.modified = True
+
+    logging.info(f"favourite\n\t{content=}\n\t{get_session()}")
+    return jsonify(favourites)
 
 
 @app.route("/", methods=["GET", "POST"])
