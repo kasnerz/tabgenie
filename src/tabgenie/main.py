@@ -99,7 +99,7 @@ def export_to_file():
         json_template=default_template,
     )
 
-    if export_option == "favourites":
+    if export_option in ["favourites", "notes"]:
         file_to_download = os.path.join(export_dir, "export.zip")
         shutil.make_archive(file_to_download.rstrip(".zip"), "zip", os.path.join(export_dir, "files"))
 

@@ -561,14 +561,17 @@ function postRequestDownload(url, request, filename) {
 function export_table(format) {
   var export_option = $('input[name="options-export"]:checked').val();
   if (export_option == "favourites") {
-    var filename = "export.zip";
+    var filename = "tabgenie_favourites.zip";
     // TODO fetch favourites using AJAX
     // just notify user that exporting local copy of failure on fetch favourites failure
     var export_examples = JSON.stringify(favourites);
+  } else if (export_option == "notes") {
+    var filename = "tabgenie_notes.zip";
+    var export_examples = JSON.stringify(notes);
   } else {
     var dataset = $('#dataset-select').val();
     var split = $('#split-select').val();
-    var filename = `${dataset}_${split}_tab_${table_idx}.${format}`;
+    var filename = `tabgenie_${dataset}_${split}_tab_${table_idx}.${format}`;
     var export_examples = JSON.stringify([{
       "dataset": dataset,
       "split": split,
