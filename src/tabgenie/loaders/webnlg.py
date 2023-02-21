@@ -20,9 +20,6 @@ class WebNLG(HFTabularDataset):
         self.name = "WebNLG"
         self.extra_info = {"version": "3.0", "license": "CC BY-NC 4.0"}
 
-    def get_task_definition(self):
-        return "Convert triples to text."
-
     def table_to_triples(self, table, cell_ids):
         triples = []
         rows = table.get_cells()[1:]  # skip headers
