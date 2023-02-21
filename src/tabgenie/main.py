@@ -289,7 +289,7 @@ def note():
         session["notes"] = notes
         # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
         session.modified = True
-    logging.warning(f"DEBUG /note \n\t{content=}\n\t{get_session()}")
+    logging.info(f"/note \n\t{content=}\n\t{get_session()}")
     return jsonify(notes)
 
 @app.route("/favourite", methods=["GET", "POST"])
