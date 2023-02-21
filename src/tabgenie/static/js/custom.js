@@ -6,8 +6,8 @@ var pipelines = window.pipelines;
 var prompts = window.prompts;
 var generated_outputs = window.generated_outputs;
 var favourites = window.favourites;
-console.log(`Begging favourites: ${JSON.stringify(favourites)}`)
-console.log(`favourites ${favourites}`);
+// console.log(`Begging favourites: ${JSON.stringify(favourites)}`)
+// console.log(`favourites ${favourites}`);
 var editedCells = window.editedCells; // TODO check updated all places
 var split = "dev";
 var select_mode = "select";
@@ -21,7 +21,7 @@ function update_svg_width() {
   }
 }
 
-// the draggable divider between the main area and the right panel 
+// the draggable divider between the main area and the right panel
 var splitInstance = Split(['#centerpanel', '#rightpanel'], {
   sizes: [70, 30], onDragEnd: function () { update_svg_width }, gutterSize: 1
 });
@@ -54,13 +54,16 @@ function randombtn() {
   gotopage(randint(total_examples - 1));
 }
 
+function get_note_id(dataset, split, table_idx) {
+  return `${dataset}-${split}-${table_idx}`;
+}
+
 function get_favourite_id(dataset, split, table_idx) {
   return `${dataset}-${split}-${table_idx}`;
-
 }
 
 function favouritebtn() {
-  var favourite_id = get_favourite_id(dataset, split, table_idx);
+  let favourite_id = get_favourite_id(dataset, split, table_idx);
   if (favourite_id in favourites) {
     remove_favourite(dataset, split, table_idx);
   } else {
@@ -117,11 +120,9 @@ function insert_favourite(dataset, split, table_idx) {
     success: function (server_favourites) {
       favourites = server_favourites
       local_insert_favourite();
-      console.log(`Afer insert ${JSON.stringify(favourites)}`)
     },
     error: function (xhr, error) {
       msg = `Failed to store action to server: Insert favourite ${favourite_id}`;
-      console.log(msg)
       alert(msg)
       local_insert_favourite();  // still apply the action at least locally
     },
@@ -133,12 +134,8 @@ function insert_favourite(dataset, split, table_idx) {
 function remove_favourite(dataset, split, table_idx) {
   let favourite_id = get_favourite_id(dataset, split, table_idx)
 
-  console.log(`Removing ${dataset} ${split} ${table_idx} ie ${favourite_id}`);
-
   function local_remove_favourite() {
-    console.log(`favourites before remove ${favourite_id} ${favourites}`);
     delete favourites[favourite_id];
-    console.log(`favourites after remove ${favourite_id} ${favourites}`);
     $(`#fav-${favourite_id}`).remove();
     update_favourite_button(favourite_id);
 
@@ -164,7 +161,6 @@ function remove_favourite(dataset, split, table_idx) {
     success: function (server_favourites) {
       favourites = server_favourites
       local_remove_favourite();
-      console.log(`Afer remove ${JSON.stringify(favourites)}`)
     },
     error: function (xhr, error) {
       msg = `Failed to store action to server: Removed favourite ${favourite_id}`
@@ -177,7 +173,7 @@ function remove_favourite(dataset, split, table_idx) {
 }
 
 function clear_favourites() {
-  function local_clean_favourites() {
+  function local_clear_favourites() {
     favourites = {};
     $(".favourite-item").remove();
     update_favourite_button(get_favourite_id(dataset, split, table_idx));
@@ -191,11 +187,10 @@ function clear_favourites() {
       if (Object.keys(server_favourites).length != 0) {
         console.log(`WARNING successful remove_all to favourite did not remove all: ${server_favourites}`)
       }
-      local_clean_favourites();
-      console.log(`Afer clear_favourites ${JSON.stringify(favourites)}`)
+      local_clear_favourites();
     },
     error: function (xhr, error) {
-      local_clean_favourites();
+      local_clear_favourites();
       msg = "Failed to store action to server: Removed ALL favourites";
       console.log(msg);
       alert(msg);
@@ -257,6 +252,137 @@ function toggle_view() {
   update_svg_width();
 }
 
+
+function clear_notes() {
+  function local_clear_notes() {
+    notes = {};
+    update_note_pen_background(get_note_id(dataset, split, table_idx));
+    update_notes_modal();
+  }
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: `${url_prefix}/note`,
+    data: JSON.stringify({ "action": "remove_all" }),
+    success: function (server_notes) {
+      if (Object.keys(server_notes).length != 0) {
+        console.log(`WARNING successful remove_all to notes did not remove all: ${server_notes}`)
+      }
+      local_clear_notes();
+    },
+    error: function (xhr, error) {
+      local_clear_notes();
+      msg = "Failed to store action to server: Removed ALL notes";
+      console.log(msg);
+      alert(msg);
+    },
+    dataType: "json",
+  });
+}
+
+function set_note(dataset, split, table_idx) {
+  let note_id = get_note_id(dataset, split, table_idx);
+  if (note_id in notes) {
+    msg = notes[note_id]["note"];
+    $(".modalNoteInput").val(msg);
+  } else {
+    $(".modalNoteInput").val("");
+  }
+  update_note_pen_background(note_id);
+}
+
+function update_note_pen_background(note_id) {
+  if (note_id in notes) {
+    $("#note-btn").css("background-color", "#ffc107");
+  } else {
+    $("#note-btn").css("background-color", "");
+  }
+}
+
+function update_notes_modal() {
+  if ($.isEmptyObject(notes)) {
+    $("#notes-area").attr("hidden", true);
+    $("#option-export-notes").prop("disabled", true);  // TODO add this option
+  } else {
+    $("#notes-area").attr("hidden", false);
+    $("#option-export-notes").removeAttr("disabled");  // TODO add this option
+  }
+
+  $("#notes-box").html("");
+  for (const [note_id, note_d] of Object.entries(notes)) {
+    var btn_remove = $("<button></button>")
+      .attr("type", "button")
+      .css("width", "0.5em !important")
+      .addClass("btn")
+      .attr("onclick", `save_note_val('${note_id}', '');`)
+      .text("✕");
+
+    let ndataset = note_d["dataset"];
+    let nsplit = note_d["split"];
+    let ntable_idx = note_d["table_idx"];
+    var span_el = $("<span></span>")
+      .addClass("clickable")
+      .text(`${note_id}`)
+      .attr("onclick", `gotoexample('${ndataset}', '${nsplit}', '${ntable_idx}');`);
+
+    span_el.append(btn_remove);
+
+    var li_el = $("<li></li>")
+      .addClass("list-group-item")
+      .addClass("note-item")
+      .attr("id", `note-${note_id}`);
+
+    li_el.append(span_el);
+
+    $("#notes-box").append(li_el);
+  }
+}
+
+function save_note() {
+  let note = $(".modalNoteInput").val();
+  let note_id = get_note_id(dataset, split, table_idx);
+  save_note_val(note_id, note);
+}
+
+function delete_note() {
+  $(".modalNoteInput").val("");
+  let note_id = get_note_id(dataset, split, table_idx);
+  save_note_val(note_id, "");
+}
+
+function save_note_val(note_id, note) {
+  var request = {
+    "action": "edit_note",
+    "dataset": dataset,
+    "split": split,
+    "table_idx": table_idx,
+    "note": note,
+  };
+  function after_save_note_val() {
+    update_note_pen_background(note_id);
+    update_notes_modal();
+  }
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: `${url_prefix}/note`,
+    data: JSON.stringify(request),
+    success: function (server_notes) {
+      notes = server_notes;
+      after_save_note_val();
+    },
+    error: function (xhr, error) {
+      msg = `Failed to store action to server: save_note ${note_id}`;
+      alert(msg)
+      // still apply the action at least locally
+      if (note.length > 0) {
+        notes[note_id] = note;
+      }
+      after_save_note_val();
+    },
+    dataType: "json",
+  });
+}
 
 function set_dataset_info(info) {
   var ex_array = $.map(info.examples, function (num, split) {
@@ -435,14 +561,17 @@ function postRequestDownload(url, request, filename) {
 function export_table(format) {
   var export_option = $('input[name="options-export"]:checked').val();
   if (export_option == "favourites") {
-    var filename = "export.zip";
-    // TODO fetch favourites using AJAX 
+    var filename = "tabgenie_favourites.zip";
+    // TODO fetch favourites using AJAX
     // just notify user that exporting local copy of failure on fetch favourites failure
     var export_examples = JSON.stringify(favourites);
+  } else if (export_option == "notes") {
+    var filename = "tabgenie_notes.zip";
+    var export_examples = JSON.stringify(notes);
   } else {
     var dataset = $('#dataset-select').val();
     var split = $('#split-select').val();
-    var filename = `${dataset}_${split}_tab_${table_idx}.${format}`;
+    var filename = `tabgenie_${dataset}_${split}_tab_${table_idx}.${format}`;
     var export_examples = JSON.stringify([{
       "dataset": dataset,
       "split": split,
@@ -469,7 +598,6 @@ function insert_prompt(prompt_name, id) {
 }
 
 function update_favourite_button(favourite_id) {
-  console.log(`update button ${favourite_id} ${JSON.stringify(favourites)}`)
   if (favourite_id in favourites) {
     $("#favourite-btn").css("background-color", "#ffc107");
   } else {
@@ -552,15 +680,17 @@ function fetch_table(dataset, split, table_idx, export_format) {
 
     total_examples = data.total_examples;
     $("#total-examples").html(total_examples - 1);
-    info = set_dataset_info(data.dataset_info);
+
 
     update_cell_interactivity();
 
-    console.log(`favourites before update ${JSON.stringify(favourites)}`)
-    console.log(`received session ${JSON.stringify(data.session)}`)
+    // console.log(`favourites before update ${JSON.stringify(favourites)}`)
+    // console.log(`received session ${JSON.stringify(data.session)}`)
     favourites = data.session.favourites;
-    console.log(`favourites updated to ${JSON.stringify(favourites)}`)
     update_favourite_button(get_favourite_id(dataset, split, table_idx));
+    notes = data.session.notes;
+    set_note(dataset, split, table_idx);
+    update_notes_modal();
 
     show_generated_outputs(data.generated_outputs);
     refresh_pipelines();

@@ -60,6 +60,11 @@
               ★
             </a>
           </li>
+          <li class="page-item">
+              <a class="page-link" id="note-btn" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#note-modal">
+              🖊
+            </a>
+          </li>
         </ul>
 
 
@@ -124,6 +129,10 @@
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#favourites-modal">
                 ★ Favourites
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#notes-modal">
+                🖊 Notes
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#export-modal">
@@ -212,6 +221,27 @@
   </div>
 
   <!-- modal windows -->
+
+  <!-- // TODO save on close note-modal dialogue -->
+  <div class="modal fade" id="note-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="note-modal-label">Edit note</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+                <div class="modal-body">
+                    <input class="modalNoteInput form-control" placeholder="Add your note" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="delete-note-button btn btn-primary" onclick="delete_note();">Delete</button>
+                    <button type="button" class="save-note-button btn btn-primary" onclick="save_note();">Save changes</button>
+                </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="export-modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -230,6 +260,11 @@
             <input type="radio" class="form-check-input" name="options-export" value="favourites"
               id="option-export-favourites" disabled>
             <label class="form-check-label" for="option-export-favourites">favourites</label>
+          </div>
+          <div style="margin-bottom: 10px" class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="options-export" value="notes"
+              id="option-export-notes" disabled>
+            <label class="form-check-label" for="option-export-notes">notes</label>
           </div>
           <h5>Format</h5>
           <div class="btn-group btn-group-sm" role="group">
@@ -308,6 +343,24 @@
     </div>
   </div>
 
+  <div class="modal fade" id="notes-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="notes-modal-label">Notes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group list-group-flush" id="notes-box"></ul>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="clear_notes();">Delete all</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="about-modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -371,6 +424,7 @@
   window.pipelines = {{ pipelines | tojson | safe }};
   window.prompts = {{ prompts | tojson | safe }};
   window.favourites = {{ session.get("favourites", {}) | tojson | safe }};
+  window.notes = {{ session.get("favourites", {}) | tojson | safe }};
   window.editedCells = {{ session.get("editedCells", {}) | tojson | safe }};
 </script>
 
