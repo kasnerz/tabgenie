@@ -19,7 +19,7 @@ datasets:
 - wikitabletext
 default_dataset: totto
 debug: false
-host_prefix: "/namuddis/debugtabgenie"
+host_prefix: "."
 cache_dev_splits: false
 generated_outputs_dir: outputs
 pipelines:
