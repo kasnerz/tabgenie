@@ -74,6 +74,9 @@ def write_html_table_to_excel(
             if cell.is_dummy:
                 continue
 
+            while (row_num, col_num) in merged_cells:
+                col_num += 1
+
             style_key = 'data_table'
             if cell.is_col_header or cell.is_row_header:
                 style_key += '_header'
