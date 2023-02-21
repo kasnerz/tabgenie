@@ -18,6 +18,9 @@ class DART(HFTabularDataset):
         self.name = "DART"
         self.extra_info = {"license": "MIT", "homepage": "https://github.com/Yale-LILY/dart"}
 
+    def get_task_definition(self):
+        return "Convert triples to text."
+
     def table_to_triples(self, table, cell_ids):
         triples = []
         rows = table.get_cells()[1:]  # skip headers

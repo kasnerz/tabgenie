@@ -15,6 +15,9 @@ class ToTTo(HFTabularDataset):
         self.name = "ToTTo"
         self.extra_info = {"license": "CC BY-SA 3.0"}
 
+    def get_task_definition(self):
+        return "Convert highlighted cells from a table to text"
+
     def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["target"]

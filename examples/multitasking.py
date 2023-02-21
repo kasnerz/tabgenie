@@ -35,11 +35,6 @@ torch.backends.cudnn.deterministic = True
 # given that this script is in examples/ directory
 ROOT_DIR = Path(__file__).parent.parent
 
-LIN_FUNC_PARAMS = {
-    'separator': 'structure',
-    'highlighted_only': True
-}
-
 MAX_LENGTH = 512
 LABEL_PAD_TOKEN_ID = -100
 PATIENCE = 5
@@ -47,23 +42,26 @@ PATIENCE = 5
 BLEU_METRIC = evaluate.load("sacrebleu")
 
 
-def table_to_linear_with_prefix(table, dataset_name, dataset_obj, **kwargs):
-    lin_table = dataset_obj.table_to_linear(table, **kwargs)
-    return f'{dataset_name}: {lin_table}'
+def linearize_triples(table):
+    return ' | '.join(
+        ' : '.join([x.value for x in row])
+        for row in table.get_cells()[1:]  # skip header
+        if len(row) == 3  # omit invalid rows if any
+    )
 
 
-def calc_truncated(df):
-    n_truncated_inputs = 0
-    n_truncated_outputs = 0
-    for item in df:
-        if item['input_ids'].size[-1] == MAX_LENGTH:
-            n_truncated_inputs += 1
-        if item['labels'].size[-1] == MAX_LENGTH:
-            n_truncated_outputs += 1
+def linearize_pairs(table):
+    return ', '.join(
+        f'{row[0].value}: {row[1].value}'
+        for row in table.get_cells()
+    )
 
-    p_truncated_inputs = round(n_truncated_inputs / df.num_rows, 4)
-    p_truncated_outputs = round(n_truncated_outputs / df.num_rows, 4)
-    return p_truncated_inputs, p_truncated_outputs
+
+def table_to_linear_with_prefix(table, dataset_obj, linearize_fn=None, **kwargs):
+    if linearize_fn is None:
+        linearize_fn = dataset_obj.table_to_linear
+    lin_table = linearize_fn(table, **kwargs)
+    return f'{dataset_obj.get_task_definition()} {lin_table}'
 
 
 def compute_bleu(eval_preds, tokenizer):
@@ -83,6 +81,25 @@ def compute_bleu(eval_preds, tokenizer):
     result = {k: round(v, 4) for k, v in result.items()}
 
     return result
+
+
+CUSTOM_LINEARIZE_FNS = {
+    'webnlg': {
+        'func': linearize_triples,
+        'params': {}
+    },
+    'e2e': {
+        'func': linearize_pairs,
+        'params': {}
+    },
+    'totto': {
+        'func': None,  # will use default function
+        'params': {
+            'separator': 'structure',
+            'highlighted_only': True
+        }
+    }
+}
 
 
 @click.command()
@@ -113,12 +130,12 @@ def main(datasets, base_model, epochs, batch_size, ckpt_dir, output_dir):
     for dataset in datasets:
         tg_dataset = load_dataset(dataset)
 
-        lin_params = {
-            'dataset_name': dataset,
+        lin_func_config = CUSTOM_LINEARIZE_FNS.get(dataset, {})
+        prefix_lin_params = {
             'dataset_obj': tg_dataset,
-            # any other dataset-specific kwargs
+            'linearize_fn': lin_func_config.get('func')
         }
-        lin_params.update(LIN_FUNC_PARAMS)
+        prefix_lin_params.update(lin_func_config.get('params', {}))
 
         hf_datasets[dataset] = {
             p: tg_dataset.get_hf_dataset(
@@ -126,7 +143,7 @@ def main(datasets, base_model, epochs, batch_size, ckpt_dir, output_dir):
                 tokenizer=tokenizer,
                 max_length=MAX_LENGTH,
                 linearize_fn=table_to_linear_with_prefix,
-                linearize_params=lin_params
+                linearize_params=prefix_lin_params
             )
             for p in tg_dataset.splits
         }
