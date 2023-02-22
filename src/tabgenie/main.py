@@ -133,12 +133,9 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, inclu
 
 
 def write_exported_table_to_file(exported_table, export_format, export_dir, out_filename):
-    # TODO use the `in_memory` parameter
     if export_format == "xlsx":
-        workbook = Workbook(os.path.join(export_dir, out_filename))
-        worksheet = workbook.add_worksheet()
-        write_html_table_to_excel(exported_table, worksheet, workbook=workbook)
-        workbook.close()
+        exported_table.filename = os.path.join(export_dir, out_filename)
+        exported_table.close()
     else:
         with open(os.path.join(export_dir, out_filename), "w") as f:
             f.write(exported_table)

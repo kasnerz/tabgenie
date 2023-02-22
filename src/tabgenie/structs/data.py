@@ -9,7 +9,8 @@ import lxml.etree
 import lxml.html
 
 from tinyhtml import h
-
+from xlsxwriter import Workbook
+from ..utils.excel import write_html_table_to_excel
 
 logger = logging.getLogger(__name__)
 
@@ -183,8 +184,7 @@ class TabularDataset:
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
-            # export table as object, writing directly to Excel worksheet later
-            exported = table
+            exported = self.table_to_excel(table)
         elif export_format == "reference":
             exported = self.get_reference(table)
         else:
@@ -218,11 +218,7 @@ class TabularDataset:
         return tokens
 
     @staticmethod
-    def table_to_linear_2d(
-            table,
-            highlighted_only=False,
-            separator='index'
-    ):
+    def table_to_linear_2d(table, highlighted_only=False, separator="index"):
         tokens = []
         table_has_highlights = table.has_highlights()
 
@@ -232,10 +228,10 @@ class TabularDataset:
                 if highlighted_only and table_has_highlights and not cell.is_highlighted:
                     continue
 
-                if separator == 'structure':
+                if separator == "structure":
                     if not j:  # start of row
-                        tokens.append('[R]')
-                    tokens.append('[H]' if cell.is_header else '[C]')
+                        tokens.append("[R]")
+                    tokens.append("[H]" if cell.is_header else "[C]")
                 else:
                     tokens.append(f"[{i}][{j}]")
 
@@ -244,11 +240,11 @@ class TabularDataset:
         return tokens
 
     def table_to_linear(
-            self,
-            table,
-            separator='index',  # 'index', 'structure'
-            highlighted_only=False,
-            cell_ids=None,
+        self,
+        table,
+        separator="index",  # 'index', 'structure'
+        highlighted_only=False,
+        cell_ids=None,
     ):
         prop_tokens = []
         for prop in ["category", "title"]:
@@ -258,11 +254,7 @@ class TabularDataset:
         if cell_ids:
             table_tokens = self.selected_cells_to_linear(table, cell_ids)
         else:
-            table_tokens = self.table_to_linear_2d(
-                table,
-                highlighted_only=highlighted_only,
-                separator=separator
-        )
+            table_tokens = self.table_to_linear_2d(table, highlighted_only=highlighted_only, separator=separator)
 
         return " ".join(prop_tokens + table_tokens)
 
@@ -296,15 +288,22 @@ class TabularDataset:
 
         return triples
 
+    def table_to_excel(self, table):
+        workbook = Workbook("tmp.xlsx", {"in_memory": True})
+        worksheet = workbook.add_worksheet()
+        write_html_table_to_excel(table, worksheet, workbook=workbook)
+
+        return workbook
+
     def get_hf_dataset(
-            self,
-            split,
-            tokenizer,
-            linearize_fn=None,
-            linearize_params=None,
-            highlighted_only=True,
-            max_length=512,
-            num_proc=8
+        self,
+        split,
+        tokenizer,
+        linearize_fn=None,
+        linearize_params=None,
+        highlighted_only=True,
+        max_length=512,
+        num_proc=8,
     ):
         # linearize tables and convert to input_ids
         # TODO num_proc acts weirdly in datasets 2.9.0, set temporarily to 1
@@ -314,8 +313,8 @@ class TabularDataset:
 
         if linearize_fn is None:
             linearize_fn = self.table_to_linear
-            linearize_params['separator'] = 'structure'
-            linearize_params['highlighted_only'] = highlighted_only
+            linearize_params["separator"] = "structure"
+            linearize_params["highlighted_only"] = highlighted_only
 
         def process_example(example):
             table_obj = self.prepare_table(example)
@@ -324,7 +323,7 @@ class TabularDataset:
 
             tokens = tokenizer(linearized, max_length=max_length, truncation=True)
             ref_tokens = tokenizer(ref, max_length=max_length, truncation=True)
-            tokens['labels'] = ref_tokens["input_ids"]
+            tokens["labels"] = ref_tokens["input_ids"]
 
             return tokens
 
@@ -334,8 +333,7 @@ class TabularDataset:
 
         processed_dataset = self.data[split].map(process_example, batched=False, num_proc=1)
         extra_columns = [
-            col for col in processed_dataset.features.keys()
-            if col not in ["labels", "input_ids", "attention_mask"]
+            col for col in processed_dataset.features.keys() if col not in ["labels", "input_ids", "attention_mask"]
         ]
         processed_dataset = processed_dataset.remove_columns(extra_columns)
         processed_dataset.set_format(type="torch")
