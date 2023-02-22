@@ -16,10 +16,9 @@ class ExportProcessor(Processor):
         table = dataset.get_table(
             split=content["split"], table_idx=content["table_idx"], edited_cells=content.get("edited_cells")
         )
-        export_html_format = "simple_html_with_props" if content["include_props"] else "simple_html"
 
         exported = dataset.export_table(
-            table, export_format=content["export_format"], export_html_format=export_html_format
+            table, export_format=content["export_format"], html_format="export", include_props=content["include_props"]
         )
 
         return exported

@@ -174,17 +174,21 @@ class TabularDataset:
     def get_info(self):
         return self.dataset_info
 
-    def export_table(self, table, export_format, cell_ids=None, displayed_props=None, export_html_format="webview"):
+    def export_table(
+        self, table, export_format, cell_ids=None, displayed_props=None, include_props=True, html_format="web"
+    ):
         if export_format == "txt":
             exported = self.table_to_linear(table, cell_ids)
         elif export_format == "triples":
             exported = self.table_to_triples(table, cell_ids)
         elif export_format == "html":
-            exported = self.table_to_html(table, displayed_props, export_html_format)
+            exported = self.table_to_html(table, displayed_props, include_props, html_format)
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
             exported = self.table_to_excel(table)
+        elif export_format == "json":
+            exported = self.table_to_json(table, include_props)
         elif export_format == "reference":
             exported = self.get_reference(table)
         else:
@@ -452,10 +456,10 @@ class TabularDataset:
         )
         return meta_table_el
 
-    def table_to_html(self, table, displayed_props, export_html_format):
-        if export_html_format == "webview" and table.props is not None:
+    def table_to_html(self, table, displayed_props, include_props, html_format):
+        if html_format == "web" and table.props is not None:
             meta_el = self.meta_to_html(table.props, displayed_props)
-        elif export_html_format == "simple_html_with_props":
+        elif html_format == "export" and include_props and table.props is not None:
             meta_el = self.meta_to_simple_html(table.props)
         else:
             meta_el = None
@@ -465,6 +469,14 @@ class TabularDataset:
 
         html = area_el.render()
         return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
+
+    def table_to_json(self, table, include_props):
+        j = {"data": [[c.__dict__ for c in row] for row in table.get_cells()]}
+
+        if include_props and table.props is not None:
+            j["properties"] = table.props
+
+        return j
 
     @staticmethod
     def _get_main_table_html(table):

@@ -136,6 +136,9 @@ def write_exported_table_to_file(exported_table, export_format, export_dir, out_
     if export_format == "xlsx":
         exported_table.filename = os.path.join(export_dir, out_filename)
         exported_table.close()
+    elif export_format == "json":
+        with open(os.path.join(export_dir, out_filename), "w") as f:
+            json.dump(exported_table, f)
     else:
         with open(os.path.join(export_dir, out_filename), "w") as f:
             f.write(exported_table)
