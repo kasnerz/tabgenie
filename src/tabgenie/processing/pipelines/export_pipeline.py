@@ -30,6 +30,7 @@ class ExportPipeline(Pipeline):
             "dataset": example["dataset"],
             "split": example["split"],
             "table_idx": example["table_idx"],
+            "include_props": pipeline_args["include_props"],
             "edited_cells": edited_cells,  # TODO
         }
         return self.processors[0].process(content)

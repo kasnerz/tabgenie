@@ -565,7 +565,7 @@ function postRequestDownload(url, request, filename) {
 
 function export_table(export_option) {
   var format = $('#export-format-select').val();
-  var include_properties = $('#checkbox-table-props').is(":checked");
+  var include_props = $('#checkbox-table-props').is(":checked");
   var export_edited_cells = $('#checkbox-edited-cells').is(":checked");
 
   if (export_option == "favourites") {
@@ -590,7 +590,7 @@ function export_table(export_option) {
     "export_format": format,
     "export_option": export_option,
     "export_examples": export_examples,
-    "include_properties": include_properties,
+    "include_props": include_props,
   };
 
   if (export_edited_cells) {

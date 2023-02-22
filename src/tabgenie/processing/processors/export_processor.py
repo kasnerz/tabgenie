@@ -17,6 +17,6 @@ class ExportProcessor(Processor):
             split=content["split"], table_idx=content["table_idx"], edited_cells=content.get("edited_cells")
         )
 
-        exported = dataset.export_table(table, export_format=content["export_format"])
+        exported = dataset.export_table(table, export_format=content["export_format"], include_props=content["include_props"])
 
         return exported

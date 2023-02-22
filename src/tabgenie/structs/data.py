@@ -174,13 +174,13 @@ class TabularDataset:
     def get_info(self):
         return self.dataset_info
 
-    def export_table(self, table, export_format, cell_ids=None, displayed_props=None):
+    def export_table(self, table, export_format, cell_ids=None, displayed_props=None, include_props=False):
         if export_format == "txt":
             exported = self.table_to_linear(table, cell_ids)
         elif export_format == "triples":
             exported = self.table_to_triples(table, cell_ids)
         elif export_format == "html":
-            exported = self.table_to_html(table, displayed_props)
+            exported = self.table_to_html(table, displayed_props, include_props)
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
@@ -439,8 +439,8 @@ class TabularDataset:
         meta_el = h("div")(prop_caption, meta_buttons_div, meta_table_el)
         return meta_el
 
-    def table_to_html(self, table, displayed_props):
-        meta_el = self.meta_to_html(table.props, displayed_props) if table.props else None
+    def table_to_html(self, table, displayed_props, include_props=True):
+        meta_el = self.meta_to_html(table.props, displayed_props) if (table.props and include_props) else None
         table_el = self._get_main_table_html(table)
         area_el = h("div")(meta_el, table_el)
 

@@ -79,7 +79,7 @@ def export_to_file():
     content = request.json
     export_option = content["export_option"]
     export_format = content["export_format"]
-    include_properties = content["include_properties"]
+    include_props = content["include_props"]
     export_examples = json.loads(content["export_examples"])
     edited_cells = json.loads(content.get("edited_cells", "{}"))
 
@@ -94,7 +94,7 @@ def export_to_file():
         export_examples,
         export_dir=os.path.join(export_dir, "files"),
         export_format=export_format,
-        include_properties=include_properties,
+        include_props=include_props,
         edited_cells=edited_cells,
     )
 
@@ -106,7 +106,7 @@ def export_to_file():
     return send_file(file_to_download, mimetype="text/plain", as_attachment=True)
 
 
-def export_examples_to_file(examples_to_export, export_format, export_dir, include_properties, edited_cells):
+def export_examples_to_file(examples_to_export, export_format, export_dir, include_props, edited_cells):
 
     if type(examples_to_export) is dict:
         # TODO look at this in more detail, favourites behaves differently
@@ -115,7 +115,7 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, inclu
     pipeline_args = {
         "examples_to_export": examples_to_export,
         "export_format": export_format,
-        "include_properties": include_properties,
+        "include_props": include_props,
         "edited_cells": edited_cells,
         "dataset_objs": {
             dataset_name: get_dataset(dataset_name, split)
@@ -141,7 +141,7 @@ def write_exported_table_to_file(exported_table, export_format, export_dir, out_
             f.write(exported_table)
 
 
-def export_dataset(dataset_name, split, out_dir, export_format, include_properties):
+def export_dataset(dataset_name, split, out_dir, export_format, include_props):
     dataset = get_dataset(dataset_name, split)
 
     examples_to_export = [
@@ -157,7 +157,7 @@ def export_dataset(dataset_name, split, out_dir, export_format, include_properti
         export_format=export_format,
         export_dir=out_dir,
         export_filename=export_filename,
-        include_properties=include_properties,
+        include_props=include_props,
     )
 
     logger.info("Export finished")
