@@ -50,19 +50,22 @@
         <ul class="pagination" id="nav-examples">
           <li class="page-item">
             <a class="page-link" id="random-btn" onclick="randombtn();" data-bs-toggle="tooltip"
-              data-bs-placement="bottom" title="Random example">
+              data-bs-placement="bottom" title="Go to a random example">
               🎲
             </a>
+          </li>
+          <li class="page-item">
+            <span data-bs-toggle="modal" data-bs-target="#note-modal">
+              <a class="page-link" id="note-btn" class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip"
+                data-bs-placement="bottom" title="Add a note">
+                🖊
+              </a>
+            </span>
           </li>
           <li class="page-item">
             <a class="page-link" id="favourite-btn" onclick="favouritebtn();" data-bs-toggle="tooltip"
               data-bs-placement="bottom" title="Add to favourites">
               ★
-            </a>
-          </li>
-          <li class="page-item">
-              <a class="page-link" id="note-btn" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#note-modal">
-              🖊
             </a>
           </li>
         </ul>
@@ -132,7 +135,7 @@
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#notes-modal">
-                🖊 Notes
+                ✎ Notes
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#export-modal">
@@ -230,16 +233,16 @@
           <h5 class="modal-title" id="note-modal-label">Edit note</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-                <div class="modal-body">
-                    <input class="modalNoteInput form-control" placeholder="Add your note" />
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="delete-note-button btn btn-primary" onclick="delete_note();">Delete</button>
-                    <button type="button" class="save-note-button btn btn-primary" onclick="save_note();">Save changes</button>
-                </div>
+        <div class="modal-body">
+          <input class="modalNoteInput form-control" placeholder="Add your note" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="delete-note-button btn btn-primary" onclick="delete_note();">Delete</button>
+          <button type="button" class="save-note-button btn btn-primary" onclick="save_note();">Save changes</button>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <div class="modal fade" id="export-modal" tabindex="-1">
@@ -262,8 +265,8 @@
             <label class="form-check-label" for="option-export-favourites">favourites</label>
           </div>
           <div style="margin-bottom: 10px" class="form-check form-check-inline">
-            <input type="radio" class="form-check-input" name="options-export" value="notes"
-              id="option-export-notes" disabled>
+            <input type="radio" class="form-check-input" name="options-export" value="notes" id="option-export-notes"
+              disabled>
             <label class="form-check-label" for="option-export-notes">notes</label>
           </div>
           <h5>Format</h5>
