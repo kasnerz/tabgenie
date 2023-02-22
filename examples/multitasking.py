@@ -57,6 +57,10 @@ def linearize_pairs(table):
     )
 
 
+def linearize_totto(table):
+    return table.props['linearized_input']
+
+
 def table_to_linear_with_prefix(table, dataset_obj, linearize_fn=None, **kwargs):
     if linearize_fn is None:
         linearize_fn = dataset_obj.table_to_linear
@@ -93,11 +97,8 @@ CUSTOM_LINEARIZE_FNS = {
         'params': {}
     },
     'totto': {
-        'func': None,  # will use default function
-        'params': {
-            'separator': 'structure',
-            'highlighted_only': True
-        }
+        'func': linearize_totto,
+        'params': {}
     }
 }
 
