@@ -692,6 +692,7 @@ function fetch_table(dataset, split, table_idx, export_format) {
 
 
     update_cell_interactivity();
+    set_dataset_info(data.dataset_info);
 
     // console.log(`favourites before update ${JSON.stringify(favourites)}`)
     // console.log(`received session ${JSON.stringify(data.session)}`)
