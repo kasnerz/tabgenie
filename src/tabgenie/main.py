@@ -12,7 +12,7 @@ from flask import Flask, render_template, jsonify, request, send_file, session
 
 from .loaders import DATASET_CLASSES
 from .processing.processing import get_pipeline_class_by_name
-from .utils.excel import write_html_table_to_excel
+from .utils.excel import write_html_table_to_excel, write_annotation_to_excel
 
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
@@ -92,11 +92,14 @@ def export_to_file():
 
     os.makedirs(os.path.join(export_dir, "files"))
 
+    notes = session.get("notes", {})
+    logging.warning(f"{export_examples=}  {notes=}")
     file_to_download = export_examples_to_file(
         export_examples,
         export_dir=os.path.join(export_dir, "files"),
         export_format=export_format,
         json_template=default_template,
+        notes=session.get("notes", {}),
     )
 
     if export_option in ["favourites", "notes"]:
@@ -107,7 +110,7 @@ def export_to_file():
     return send_file(file_to_download, mimetype="text/plain", as_attachment=True)
 
 
-def export_examples_to_file(examples_to_export, export_format, export_dir, export_filename=None, json_template=None):
+def export_examples_to_file(examples_to_export, export_format, export_dir, export_filename=None, json_template=None, notes=None):
     if type(examples_to_export) is dict:
         # TODO look at this in more detail, favourites behaves differently
         examples_to_export = examples_to_export.values()
@@ -130,6 +133,24 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, expor
 
         with open(os.path.join(export_dir, out_filename), "w") as f:
             json.dump(exported, f, indent=4, ensure_ascii=False)
+    elif export_format == "xlsx":
+        out_filename = export_filename or "exported-annotations.xlsx"
+        notes = notes if notes is not None else {}
+
+        tables = []
+        for e, exported_table in zip(examples_to_export, exported):
+            # See get_note_id in JS
+            table_id = f"{e['dataset']}-{e['split']}-{e['table_idx']}"
+            note = notes.get(table_id, {"note": ""})["note"]
+            # TODO make sure that export pipeline does NOT allow changing original table
+            # adding notes to the table
+            tables.append({"table": exported_table, "table_id": table_id, "reference": exported_table.props.get("reference", ""), "Tabgenie-Notes": note})
+
+        # TODO infer from highligheted properties in JS
+        # and add the tabgenie notes added to properties
+        prop_list = ["reference"] + ["Tabgenie-Notes"]
+        ann_columns = ["notes"]  # able to specify in JS columns? Is it necessary?
+        write_annotation_to_excel(tables, prop_list, ann_columns, os.path.join(export_dir, out_filename))
     else:
         # multiple outputs
         for e, exported_table in zip(examples_to_export, exported):

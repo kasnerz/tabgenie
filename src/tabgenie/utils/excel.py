@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
     w = WebNLG(path=None)
     w.load('dev')
-    
+
     tables = [
         {
             'table': h.prepare_table(h.data['dev'][675]),
