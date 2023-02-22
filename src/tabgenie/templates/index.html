@@ -253,35 +253,99 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <h5>Export</h5>
-          <div class="form-check form-check-inline">
-            <input type="radio" class="form-check-input" name="options-export" value="example" id="option-export-table"
-              checked>
-            <label class="form-check-label" for="option-export-table">current example</label>
+
+
+          <div class="export-block">
+            <h5>Format</h5>
+
+            <select class="form-select">
+              <option selected value="csv">CSV</option>
+              <option value="xlsx">XLSX</option>
+              <option value="html">HTML</option>
+              <option value="txt">TXT</option>
+              <option value="json">JSON</option>
+            </select>
           </div>
-          <div style="margin-bottom: 10px" class="form-check form-check-inline">
-            <input type="radio" class="form-check-input" name="options-export" value="favourites"
-              id="option-export-favourites" disabled>
-            <label class="form-check-label" for="option-export-favourites">favourites</label>
+
+          <!-- 
+          <div class="export-block">
+            <span><b>Current example: </b></span>
+            <div class="btn-group btn-group-sm" role="group">
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('csv');">CSV</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('xlsx');">XLSX</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('html');">HTML</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('txt');">TXT</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('json');">JSON</button>
+            </div>
           </div>
-          <div style="margin-bottom: 10px" class="form-check form-check-inline">
-            <input type="radio" class="form-check-input" name="options-export" value="notes" id="option-export-notes"
-              disabled>
-            <label class="form-check-label" for="option-export-notes">notes</label>
+
+          <div class="export-block">
+            <span><b>Favourites: </b></span>
+            <div class="btn-group btn-group-sm" role="group">
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('csv');">CSV</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('xlsx');">XLSX</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('html');">HTML</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('txt');">TXT</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
+                onclick="export_table('json');">JSON</button>
+            </div>
           </div>
-          <h5>Format</h5>
-          <div class="btn-group btn-group-sm" role="group">
-            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-              onclick="export_table('csv');">CSV</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-              onclick="export_table('xlsx');">XLSX</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-              onclick="export_table('html');">HTML</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-              onclick="export_table('txt');">TXT</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm gen-btn"
-              onclick="export_table('json');">JSON</button>
+ -->
+
+          <!-- <h5>Notes</h5> -->
+          <!-- 
+          <div>
+            <div class="form-check form-check-inline">
+              <input type="radio" class="form-check-input" name="options-export" value="example"
+                id="option-export-table" checked>
+              <label class="form-check-label" for="option-export-table">current example</label>
+            </div>
+            <div style="margin-bottom: 10px" class="form-check form-check-inline">
+              <input type="radio" class="form-check-input" name="options-export" value="favourites"
+                id="option-export-favourites" disabled>
+              <label class="form-check-label" for="option-export-favourites">favourites</label>
+            </div>
+            <div style="margin-bottom: 10px" class="form-check form-check-inline">
+              <input type="radio" class="form-check-input" name="options-export" value="notes" id="option-export-notes"
+                disabled>
+              <label class="form-check-label" for="option-export-notes">notes</label>
+            </div>
+          </div> -->
+
+          <div class="export-block">
+            <h5>Options</h5>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+              <label class="form-check-label" for="flexSwitchCheckDefault">Include table properties</label>
+            </div>
           </div>
+
+          <div class="export-block">
+            <h5>Export</h5>
+            <!-- <div class="btn-group" role="group"> -->
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="export_table();">Current
+              example</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="export_table(); disabled"
+              disabled>Favourites
+              (ZIP)</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="export_table();"
+              disabled>Notes
+              (ZIP)</button>
+            <!-- </div> -->
+          </div>
+
+
+          <!-- <h5>Format</h5> -->
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
