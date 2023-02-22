@@ -6,8 +6,6 @@ var pipelines = window.pipelines;
 var prompts = window.prompts;
 var generated_outputs = window.generated_outputs;
 var favourites = window.favourites;
-// console.log(`Begging favourites: ${JSON.stringify(favourites)}`)
-// console.log(`favourites ${favourites}`);
 var editedCells = window.editedCells; // TODO check updated all places
 var split = "dev";
 var select_mode = "select";
@@ -80,7 +78,8 @@ function insert_favourite(dataset, split, table_idx) {
     update_favourite_button(favourite_id);
 
     $("#favourites-area").attr("hidden", false);
-    $("#option-export-favourites").removeAttr("disabled");
+    $("#btn-export-favourites").removeProp("disabled");
+    $("#btn-export-favourites").addClass("btn-primary").removedClass("btn-secondary");
 
     var btn_remove = $("<button></button>")
       .attr("type", "button")
@@ -141,9 +140,8 @@ function remove_favourite(dataset, split, table_idx) {
 
     if ($.isEmptyObject(favourites)) {
       // $("#favourites-area").attr("hidden", true);
-      $("#option-export-favourites").prop("disabled", true);
-      $("#option-export-favourites").prop("checked", false);
-      $("#option-export-table").prop("checked", true);
+      $("#btn-export-favourites").prop("disabled", true);
+      $("#btn-export-favourites").addClass("btn-secondary").removedClass("btn-primary");
     }
   }
 
@@ -293,7 +291,7 @@ function set_note(dataset, split, table_idx) {
 
 function update_note_pen_background(note_id) {
   if (note_id in notes) {
-    $("#note-btn").css("background-color", "#ffc107");
+    $("#note-btn").css("background-color", "#FFF68F");
   } else {
     $("#note-btn").css("background-color", "");
   }
@@ -302,10 +300,15 @@ function update_note_pen_background(note_id) {
 function update_notes_modal() {
   if ($.isEmptyObject(notes)) {
     $("#notes-area").attr("hidden", true);
-    $("#option-export-notes").prop("disabled", true);  // TODO add this option
+
+    $("#btn-export-notes").prop("disabled", true);
+    $("#btn-export-notes").addClass("btn-secondary").removedClass("btn-primary");
+
   } else {
     $("#notes-area").attr("hidden", false);
-    $("#option-export-notes").removeAttr("disabled");  // TODO add this option
+
+    $("#btn-export-notes").removeProp("disabled");
+    $("#btn-export-notes").addClass("btn-primary").removedClass("btn-secondary");
   }
 
   $("#notes-box").html("");
@@ -558,8 +561,9 @@ function postRequestDownload(url, request, filename) {
 }
 
 
-function export_table(format) {
-  var export_option = $('input[name="options-export"]:checked').val();
+function export_table(export_option) {
+  var format = $('#export-format-select').val();
+
   if (export_option == "favourites") {
     var filename = "tabgenie_favourites.zip";
     // TODO fetch favourites using AJAX
@@ -586,9 +590,6 @@ function export_table(format) {
   };
 
   postRequestDownload("export_to_file", request, filename);
-
-  $("#exp-btn").html("Export");
-  $("#exp-btn").removeClass('disabled');
 }
 
 function insert_prompt(prompt_name, id) {
@@ -599,7 +600,7 @@ function insert_prompt(prompt_name, id) {
 
 function update_favourite_button(favourite_id) {
   if (favourite_id in favourites) {
-    $("#favourite-btn").css("background-color", "#ffc107");
+    $("#favourite-btn").css("background-color", "#FFF68F");
   } else {
     $("#favourite-btn").css("background-color", "");
   }
