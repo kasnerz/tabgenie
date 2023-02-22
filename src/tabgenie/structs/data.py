@@ -156,6 +156,7 @@ class TabularDataset:
             self.tables[split][table_idx] = table
 
         if edited_cells:
+            # make a temporary copy of the table with edited cells
             table_modif = copy.deepcopy(table)
 
             for cell_id, val in edited_cells.items():

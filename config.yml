@@ -53,4 +53,3 @@ pipelines:
   export:
     pipeline: export
     interactive: false
-    default_format: json

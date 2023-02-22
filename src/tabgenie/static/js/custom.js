@@ -563,6 +563,8 @@ function postRequestDownload(url, request, filename) {
 
 function export_table(export_option) {
   var format = $('#export-format-select').val();
+  var include_properties = $('#checkbox-table-props').is(":checked");
+  var export_edited_cells = $('#checkbox-edited-cells').is(":checked");
 
   if (export_option == "favourites") {
     var filename = "tabgenie_favourites.zip";
@@ -586,8 +588,12 @@ function export_table(export_option) {
     "export_format": format,
     "export_option": export_option,
     "export_examples": export_examples,
-    "edited_cells": JSON.stringify(editedCells)
+    "include_properties": include_properties,
   };
+
+  if (export_edited_cells) {
+    request["edited_cells"] = JSON.stringify(editedCells);
+  }
 
   postRequestDownload("export_to_file", request, filename);
 }

@@ -65,20 +65,8 @@ def run(script_info, disable_pipelines):
     type=click.Choice(["json", "csv", "xlsx", "html"]),
     help="Output file format",
 )
-@click.option(
-    "--json_template",
-    "-t",
-    type=str,
-    help="Template used for formatting JSON file",
-)
 @with_appcontext
-def export(dataset, split, out_dir, export_format, json_template):
+def export(dataset, split, out_dir, export_format):
     from .main import export_dataset
 
-    export_dataset(
-        dataset_name=dataset,
-        split=split,
-        out_dir=out_dir,
-        export_format=export_format,
-        json_template=json_template,
-    )
+    export_dataset(dataset_name=dataset, split=split, out_dir=out_dir, export_format=export_format)

@@ -60,6 +60,7 @@ def write_html_table_to_excel(
         merge_cells=True
 ):
     if style_objs is None:
+        # TODO this will fail if workbook is None
         style_objs = {k: workbook.add_format(v) for k, v in STYLES.items()}
 
     row_num = start_row
