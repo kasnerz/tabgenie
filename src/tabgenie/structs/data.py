@@ -174,13 +174,13 @@ class TabularDataset:
     def get_info(self):
         return self.dataset_info
 
-    def export_table(self, table, export_format, cell_ids=None, displayed_props=None, include_props=False):
+    def export_table(self, table, export_format, cell_ids=None, displayed_props=None, export_html_format="webview"):
         if export_format == "txt":
             exported = self.table_to_linear(table, cell_ids)
         elif export_format == "triples":
             exported = self.table_to_triples(table, cell_ids)
         elif export_format == "html":
-            exported = self.table_to_html(table, displayed_props, include_props)
+            exported = self.table_to_html(table, displayed_props, export_html_format)
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
@@ -439,8 +439,27 @@ class TabularDataset:
         meta_el = h("div")(prop_caption, meta_buttons_div, meta_table_el)
         return meta_el
 
-    def table_to_html(self, table, displayed_props, include_props=True):
-        meta_el = self.meta_to_html(table.props, displayed_props) if (table.props and include_props) else None
+    @staticmethod
+    def meta_to_simple_html(props):
+        meta_trs = []
+        for key, value in props.items():
+            meta_trs.append([h("th")(key), h("td")(value)])
+
+        meta_tbodies = [h("tr")(tds) for tds in meta_trs]
+        meta_tbody_el = h("tbody")(meta_tbodies)
+        meta_table_el = h("table", klass="table table-sm caption-top meta-table")(
+            h("caption")("properties"), meta_tbody_el
+        )
+        return meta_table_el
+
+    def table_to_html(self, table, displayed_props, export_html_format):
+        if export_html_format == "webview" and table.props is not None:
+            meta_el = self.meta_to_html(table.props, displayed_props)
+        elif export_html_format == "simple_html_with_props":
+            meta_el = self.meta_to_simple_html(table.props)
+        else:
+            meta_el = None
+
         table_el = self._get_main_table_html(table)
         area_el = h("div")(meta_el, table_el)
 
