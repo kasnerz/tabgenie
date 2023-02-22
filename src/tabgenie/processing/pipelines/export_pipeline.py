@@ -24,7 +24,6 @@ class ExportPipeline(Pipeline):
         export_format = pipeline_args["export_format"]
         edited_cells = pipeline_args.get("edited_cells")
 
-        breakpoint()
         content = {
             "dataset_obj": dataset_obj,
             "export_format": export_format,

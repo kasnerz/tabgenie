@@ -443,6 +443,7 @@ function reset_pipeline_outputs() {
 }
 function reset_edited_cells() {
   editedCells = {};
+  $("#checkbox-edited-cells").attr("disabled", true);
 }
 
 function run_pipeline(pipeline) {
@@ -509,6 +510,7 @@ function update_cell_interactivity() {
           content = $(this).text();
           editedCells[cell_id] = content;
           $(this).css("font-style", "italic");
+          $("#checkbox-edited-cells").removeAttr("disabled");
         });
       }
     }
