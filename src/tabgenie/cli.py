@@ -62,11 +62,26 @@ def run(script_info, disable_pipelines):
     "--export_format",
     "-f",
     required=True,
-    type=click.Choice(["json", "csv", "xlsx", "html"]),
+    type=click.Choice(["json", "csv", "xlsx", "html", "txt"]),
     help="Output file format",
 )
+@click.option("--include_props", "-p", type=bool, is_flag=True, default=False, help="Include properties in the output")
+@click.option(
+    "--table_id",
+    "-t",
+    multiple=True,
+    type=int,
+    help="Table ID to export (can be specified multiple times), all tables are exported by default",
+)
 @with_appcontext
-def export(dataset, split, out_dir, export_format):
+def export(dataset, split, out_dir, export_format, include_props, table_id):
     from .main import export_dataset
 
-    export_dataset(dataset_name=dataset, split=split, out_dir=out_dir, export_format=export_format)
+    export_dataset(
+        dataset_name=dataset,
+        split=split,
+        out_dir=out_dir,
+        export_format=export_format,
+        include_props=include_props,
+        table_ids=table_id,
+    )

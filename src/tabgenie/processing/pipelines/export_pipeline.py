@@ -37,18 +37,14 @@ class ExportPipeline(Pipeline):
 
     def run(self, pipeline_args, cache_only=False, force=True):
         # no caching
-        # if pipeline_args.get("examples_to_export") is None:
-        #     pipeline_args["examples_to_export"] = [
-        #         {
-        #             "dataset": pipeline_args["dataset"],
-        #             "split": pipeline_args["split"],
-        #             "table_idx": pipeline_args["table_idx"],
-        #         }
-        #     ]
-
         out = []
 
-        for example in pipeline_args["examples_to_export"]:
+        for i, example in enumerate(pipeline_args["examples_to_export"]):
+            if i % 100 == 0:
+                logger.info(f"Exported {i+1} example(s)")
+
             out.append(self.run_single(pipeline_args=pipeline_args, example=example))
+
+        logger.info(f"Exported {i+1} example(s)")
 
         return out

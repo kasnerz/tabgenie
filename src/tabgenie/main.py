@@ -109,7 +109,7 @@ def export_to_file():
 def export_examples_to_file(examples_to_export, export_format, export_dir, include_props, edited_cells):
 
     if type(examples_to_export) is dict:
-        # TODO look at this in more detail, favourites behaves differently
+        # favourites / notes
         examples_to_export = examples_to_export.values()
 
     pipeline_args = {
@@ -144,23 +144,21 @@ def write_exported_table_to_file(exported_table, export_format, export_dir, out_
             f.write(exported_table)
 
 
-def export_dataset(dataset_name, split, out_dir, export_format, include_props):
+def export_dataset(dataset_name, split, out_dir, export_format, include_props, table_ids):
     dataset = get_dataset(dataset_name, split)
+    example_ids = table_ids or range(dataset.get_example_count(split))
 
     examples_to_export = [
-        {"dataset": dataset_name, "split": split, "table_idx": table_idx}
-        for table_idx in range(dataset.get_example_count(split))
+        {"dataset": dataset_name, "split": split, "table_idx": table_idx} for table_idx in example_ids
     ]
-
-    # only relevant for JSON
-    export_filename = f"{split}.json"
 
     export_examples_to_file(
         examples_to_export,
         export_format=export_format,
         export_dir=out_dir,
-        export_filename=export_filename,
+        # export_filename=export_filename,
         include_props=include_props,
+        edited_cells={},
     )
 
     logger.info("Export finished")
