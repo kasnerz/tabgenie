@@ -238,7 +238,8 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="delete-note-button btn btn-primary" onclick="delete_note();">Delete</button>
-          <button type="button" class="save-note-button btn btn-primary" onclick="save_note();">Save changes</button>
+          <button type="button" class="save-note-button btn btn-primary" data-bs-dismiss="modal"
+            onclick="save_note();">Save changes</button>
         </div>
       </div>
     </div>
@@ -258,19 +259,19 @@
             <h5>Format</h5>
 
             <select class="form-select" id="export-format-select">
-              <option selected value="csv">CSV</option>
-              <option value="xlsx">XLSX</option>
+              <option value="xlsx" selected>XLSX</option>
               <option value="html">HTML</option>
-              <option value="txt">TXT</option>
               <option value="json">JSON</option>
+              <option value="csv">CSV</option>
+              <option value="txt">TXT</option>
             </select>
           </div>
 
           <div class="export-block">
             <h5>Options</h5>
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-              <label class="form-check-label" for="flexSwitchCheckDefault">Include table properties</label>
+              <input class="form-check-input" type="checkbox" role="switch" id="checkbox-table-props">
+              <label class="form-check-label" for="checkbox-table-props">Include table properties</label>
             </div>
           </div>
 
@@ -280,10 +281,10 @@
               onclick="export_table('current');">Current
               example</button>
             <button type="button" id="btn-export-favourites" class="btn btn-secondary"
-              onclick="export_table('favourites');" disabled>Favourites
+              onclick="export_table('favourites');" disabled>Favourite examples
               (ZIP)</button>
             <button type="button" id="btn-export-notes" class="btn btn-secondary" onclick="export_table('notes');"
-              disabled>Notes
+              disabled>Exaples with notes
               (ZIP)</button>
           </div>
 

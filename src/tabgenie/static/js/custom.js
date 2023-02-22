@@ -78,8 +78,8 @@ function insert_favourite(dataset, split, table_idx) {
     update_favourite_button(favourite_id);
 
     $("#favourites-area").attr("hidden", false);
-    $("#btn-export-favourites").removeProp("disabled");
-    $("#btn-export-favourites").addClass("btn-primary").removedClass("btn-secondary");
+    $("#btn-export-favourites").removeAttr("disabled");
+    $("#btn-export-favourites").addClass("btn-primary").removeClass("btn-secondary");
 
     var btn_remove = $("<button></button>")
       .attr("type", "button")
@@ -140,8 +140,8 @@ function remove_favourite(dataset, split, table_idx) {
 
     if ($.isEmptyObject(favourites)) {
       // $("#favourites-area").attr("hidden", true);
-      $("#btn-export-favourites").prop("disabled", true);
-      $("#btn-export-favourites").addClass("btn-secondary").removedClass("btn-primary");
+      $("#btn-export-favourites").attr("disabled", true);
+      $("#btn-export-favourites").addClass("btn-secondary").removeClass("btn-primary");
     }
   }
 
@@ -301,14 +301,14 @@ function update_notes_modal() {
   if ($.isEmptyObject(notes)) {
     $("#notes-area").attr("hidden", true);
 
-    $("#btn-export-notes").prop("disabled", true);
-    $("#btn-export-notes").addClass("btn-secondary").removedClass("btn-primary");
+    $("#btn-export-notes").attr("disabled", true);
+    $("#btn-export-notes").addClass("btn-secondary").removeClass("btn-primary");
 
   } else {
     $("#notes-area").attr("hidden", false);
 
-    $("#btn-export-notes").removeProp("disabled");
-    $("#btn-export-notes").addClass("btn-primary").removedClass("btn-secondary");
+    $("#btn-export-notes").removeAttr("disabled");
+    $("#btn-export-notes").addClass("btn-primary").removeClass("btn-secondary");
   }
 
   $("#notes-box").html("");
@@ -725,6 +725,10 @@ $("#format-select").on("change", function (e) {
   $("#dataset-spinner").show();
   fetch_table(dataset, split, table_idx);
 });
+
+$('#export-format-select').on("change", function () {
+  $('#checkbox-table-props').prop('disabled', this.value == 'csv' || this.value == 'txt');
+})
 
 $(".custom-prompt-input").highlightWithinTextarea({
   highlight: [
