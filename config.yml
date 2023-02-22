@@ -8,7 +8,7 @@ datasets:
 - charttotext-s
 - logic2text
 - logicnlg
-- multiwoz22
+# - multiwoz22
 - numericnlg
 - scigen
 - sportsett
@@ -53,4 +53,3 @@ pipelines:
   export:
     pipeline: export
     interactive: false
-    default_format: json

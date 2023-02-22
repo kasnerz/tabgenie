@@ -9,7 +9,8 @@ import lxml.etree
 import lxml.html
 
 from tinyhtml import h
-
+from xlsxwriter import Workbook
+from ..utils.excel import write_html_table_to_excel
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +157,7 @@ class TabularDataset:
             self.tables[split][table_idx] = table
 
         if edited_cells:
+            # make a temporary copy of the table with edited cells
             table_modif = copy.deepcopy(table)
 
             for cell_id, val in edited_cells.items():
@@ -172,18 +174,21 @@ class TabularDataset:
     def get_info(self):
         return self.dataset_info
 
-    def export_table(self, table, export_format, cell_ids=None, displayed_props=None):
+    def export_table(
+        self, table, export_format, cell_ids=None, displayed_props=None, include_props=True, html_format="web"
+    ):
         if export_format == "txt":
             exported = self.table_to_linear(table, cell_ids)
         elif export_format == "triples":
             exported = self.table_to_triples(table, cell_ids)
         elif export_format == "html":
-            exported = self.table_to_html(table, displayed_props)
+            exported = self.table_to_html(table, displayed_props, include_props, html_format)
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
-            # export table as object, writing directly to Excel worksheet later
-            exported = table
+            exported = self.table_to_excel(table, include_props)
+        elif export_format == "json":
+            exported = self.table_to_json(table, include_props)
         elif export_format == "reference":
             exported = self.get_reference(table)
         else:
@@ -217,11 +222,7 @@ class TabularDataset:
         return tokens
 
     @staticmethod
-    def table_to_linear_2d(
-            table,
-            highlighted_only=False,
-            separator='index'
-    ):
+    def table_to_linear_2d(table, highlighted_only=False, separator="index"):
         tokens = []
         table_has_highlights = table.has_highlights()
 
@@ -231,10 +232,10 @@ class TabularDataset:
                 if highlighted_only and table_has_highlights and not cell.is_highlighted:
                     continue
 
-                if separator == 'structure':
+                if separator == "structure":
                     if not j:  # start of row
-                        tokens.append('[R]')
-                    tokens.append('[H]' if cell.is_header else '[C]')
+                        tokens.append("[R]")
+                    tokens.append("[H]" if cell.is_header else "[C]")
                 else:
                     tokens.append(f"[{i}][{j}]")
 
@@ -243,11 +244,11 @@ class TabularDataset:
         return tokens
 
     def table_to_linear(
-            self,
-            table,
-            separator='index',  # 'index', 'structure'
-            highlighted_only=False,
-            cell_ids=None,
+        self,
+        table,
+        separator="index",  # 'index', 'structure'
+        highlighted_only=False,
+        cell_ids=None,
     ):
         prop_tokens = []
         for prop in ["category", "title"]:
@@ -257,11 +258,7 @@ class TabularDataset:
         if cell_ids:
             table_tokens = self.selected_cells_to_linear(table, cell_ids)
         else:
-            table_tokens = self.table_to_linear_2d(
-                table,
-                highlighted_only=highlighted_only,
-                separator=separator
-        )
+            table_tokens = self.table_to_linear_2d(table, highlighted_only=highlighted_only, separator=separator)
 
         return " ".join(prop_tokens + table_tokens)
 
@@ -295,15 +292,22 @@ class TabularDataset:
 
         return triples
 
+    def table_to_excel(self, table, include_props=True):
+        workbook = Workbook("tmp.xlsx", {"in_memory": True})
+        worksheet = workbook.add_worksheet()
+        write_html_table_to_excel(table, worksheet, workbook=workbook, write_table_props=include_props)
+
+        return workbook
+
     def get_hf_dataset(
-            self,
-            split,
-            tokenizer,
-            linearize_fn=None,
-            linearize_params=None,
-            highlighted_only=True,
-            max_length=512,
-            num_proc=8
+        self,
+        split,
+        tokenizer,
+        linearize_fn=None,
+        linearize_params=None,
+        highlighted_only=True,
+        max_length=512,
+        num_proc=8,
     ):
         # linearize tables and convert to input_ids
         # TODO num_proc acts weirdly in datasets 2.9.0, set temporarily to 1
@@ -313,8 +317,8 @@ class TabularDataset:
 
         if linearize_fn is None:
             linearize_fn = self.table_to_linear
-            linearize_params['separator'] = 'structure'
-            linearize_params['highlighted_only'] = highlighted_only
+            linearize_params["separator"] = "structure"
+            linearize_params["highlighted_only"] = highlighted_only
 
         def process_example(example):
             table_obj = self.prepare_table(example)
@@ -323,7 +327,7 @@ class TabularDataset:
 
             tokens = tokenizer(linearized, max_length=max_length, truncation=True)
             ref_tokens = tokenizer(ref, max_length=max_length, truncation=True)
-            tokens['labels'] = ref_tokens["input_ids"]
+            tokens["labels"] = ref_tokens["input_ids"]
 
             return tokens
 
@@ -333,8 +337,7 @@ class TabularDataset:
 
         processed_dataset = self.data[split].map(process_example, batched=False, num_proc=1)
         extra_columns = [
-            col for col in processed_dataset.features.keys()
-            if col not in ["labels", "input_ids", "attention_mask"]
+            col for col in processed_dataset.features.keys() if col not in ["labels", "input_ids", "attention_mask"]
         ]
         processed_dataset = processed_dataset.remove_columns(extra_columns)
         processed_dataset.set_format(type="torch")
@@ -440,13 +443,40 @@ class TabularDataset:
         meta_el = h("div")(prop_caption, meta_buttons_div, meta_table_el)
         return meta_el
 
-    def table_to_html(self, table, displayed_props):
-        meta_el = self.meta_to_html(table.props, displayed_props) if table.props else None
+    @staticmethod
+    def meta_to_simple_html(props):
+        meta_trs = []
+        for key, value in props.items():
+            meta_trs.append([h("th")(key), h("td")(value)])
+
+        meta_tbodies = [h("tr")(tds) for tds in meta_trs]
+        meta_tbody_el = h("tbody")(meta_tbodies)
+        meta_table_el = h("table", klass="table table-sm caption-top meta-table")(
+            h("caption")("properties"), meta_tbody_el
+        )
+        return meta_table_el
+
+    def table_to_html(self, table, displayed_props, include_props, html_format):
+        if html_format == "web" and table.props is not None:
+            meta_el = self.meta_to_html(table.props, displayed_props)
+        elif html_format == "export" and include_props and table.props is not None:
+            meta_el = self.meta_to_simple_html(table.props)
+        else:
+            meta_el = None
+
         table_el = self._get_main_table_html(table)
         area_el = h("div")(meta_el, table_el)
 
         html = area_el.render()
         return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
+
+    def table_to_json(self, table, include_props):
+        j = {"data": [[c.__dict__ for c in row] for row in table.get_cells()]}
+
+        if include_props and table.props is not None:
+            j["properties"] = table.props
+
+        return j
 
     @staticmethod
     def _get_main_table_html(table):

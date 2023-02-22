@@ -486,3 +486,9 @@ ul {
 #about-icon {
     width: 20px;
 }
+
+.export-block {
+    margin-bottom: 20px;
+    /* display: inline-block; */
+    vertical-align: middle;
+}

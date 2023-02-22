@@ -79,16 +79,14 @@ def export_to_file():
     content = request.json
     export_option = content["export_option"]
     export_format = content["export_format"]
+    include_props = content["include_props"]
     export_examples = json.loads(content["export_examples"])
-    # TODO export edited cells
-    # edited_cells = json.loads(content.get("edited_cells") or {})
+    edited_cells = json.loads(content.get("edited_cells", "{}"))
 
     export_dir = os.path.join(app.config["root_dir"], "tmp")
 
     if os.path.isdir(export_dir):
         shutil.rmtree(export_dir)
-
-    default_template = "export/json_templates/default.yml"
 
     os.makedirs(os.path.join(export_dir, "files"))
 
@@ -96,26 +94,29 @@ def export_to_file():
         export_examples,
         export_dir=os.path.join(export_dir, "files"),
         export_format=export_format,
-        json_template=default_template,
+        include_props=include_props,
+        edited_cells=edited_cells,
     )
 
     if export_option in ["favourites", "notes"]:
         file_to_download = os.path.join(export_dir, "export.zip")
-        shutil.make_archive(file_to_download.rsplit('.', 1)[0], "zip", os.path.join(export_dir, "files"))
+        shutil.make_archive(file_to_download.rsplit(".", 1)[0], "zip", os.path.join(export_dir, "files"))
 
     logger.info("Sending file")
     return send_file(file_to_download, mimetype="text/plain", as_attachment=True)
 
 
-def export_examples_to_file(examples_to_export, export_format, export_dir, export_filename=None, json_template=None):
+def export_examples_to_file(examples_to_export, export_format, export_dir, include_props, edited_cells):
+
     if type(examples_to_export) is dict:
-        # TODO look at this in more detail, favourites behaves differently
+        # favourites / notes
         examples_to_export = examples_to_export.values()
 
     pipeline_args = {
         "examples_to_export": examples_to_export,
         "export_format": export_format,
-        "json_template": json_template,
+        "include_props": include_props,
+        "edited_cells": edited_cells,
         "dataset_objs": {
             dataset_name: get_dataset(dataset_name, split)
             for dataset_name, split in map(lambda x: (x["dataset"], x["split"]), examples_to_export)
@@ -124,46 +125,40 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, expor
     os.makedirs(export_dir, exist_ok=True)
     exported = run_pipeline("export", pipeline_args=pipeline_args, force=True)
 
-    if export_format == "json":
-        # only a single, aggregated output
-        out_filename = export_filename or "out.json"
-
-        with open(os.path.join(export_dir, out_filename), "w") as f:
-            json.dump(exported, f, indent=4, ensure_ascii=False)
-    else:
-        # multiple outputs
-        for e, exported_table in zip(examples_to_export, exported):
-            out_filename = f"{e['dataset']}_{e['split']}_tab_{e['table_idx']}.{export_format}"
-
-            if export_format == "xlsx":
-                workbook = Workbook(os.path.join(export_dir, out_filename))
-                worksheet = workbook.add_worksheet()
-                write_html_table_to_excel(exported_table, worksheet, workbook=workbook)
-                workbook.close()
-            else:
-                with open(os.path.join(export_dir, out_filename), "w") as f:
-                    f.write(exported_table)
+    for e, exported_table in zip(examples_to_export, exported):
+        out_filename = f"{e['dataset']}_{e['split']}_tab_{e['table_idx']}.{export_format}"
+        write_exported_table_to_file(exported_table, export_format, export_dir, out_filename)
 
     return os.path.join(export_dir, out_filename)
 
 
-def export_dataset(dataset_name, split, out_dir, export_format, json_template=None):
+def write_exported_table_to_file(exported_table, export_format, export_dir, out_filename):
+    if export_format == "xlsx":
+        exported_table.filename = os.path.join(export_dir, out_filename)
+        exported_table.close()
+    elif export_format == "json":
+        with open(os.path.join(export_dir, out_filename), "w") as f:
+            json.dump(exported_table, f)
+    else:
+        with open(os.path.join(export_dir, out_filename), "w") as f:
+            f.write(exported_table)
+
+
+def export_dataset(dataset_name, split, out_dir, export_format, include_props, table_ids):
     dataset = get_dataset(dataset_name, split)
+    example_ids = table_ids or range(dataset.get_example_count(split))
 
     examples_to_export = [
-        {"dataset": dataset_name, "split": split, "table_idx": table_idx}
-        for table_idx in range(dataset.get_example_count(split))
+        {"dataset": dataset_name, "split": split, "table_idx": table_idx} for table_idx in example_ids
     ]
-
-    # only relevant for JSON
-    export_filename = f"{split}.json"
 
     export_examples_to_file(
         examples_to_export,
         export_format=export_format,
         export_dir=out_dir,
-        export_filename=export_filename,
-        json_template=json_template,
+        # export_filename=export_filename,
+        include_props=include_props,
+        edited_cells={},
     )
 
     logger.info("Export finished")
@@ -197,7 +192,6 @@ def initialize_pipeline(pipeline_name):
 
 def run_pipeline(pipeline_name, pipeline_args, cache_only=False, force=False):
     pipeline = app.db["pipelines_obj"].get(pipeline_name)
-
     pipeline_args["pipeline_cfg"] = app.db["pipelines_cfg"][pipeline_name]
 
     if pipeline_args.get("dataset") and pipeline_args.get("split"):
@@ -237,7 +231,7 @@ def get_generated_outputs(dataset_name, split, output_idx):
     for filename in glob.glob(out_dir + "/" + "*.jsonl"):
         line = linecache.getline(filename, output_idx + 1)  # 1-based indexing
         j = json.loads(line)
-        model_name = os.path.basename(filename).rsplit('.', 1)[0]
+        model_name = os.path.basename(filename).rsplit(".", 1)[0]
         outputs[model_name] = j
 
     return outputs
@@ -273,6 +267,7 @@ def load_prompts():
 
     return prompts
 
+
 @app.route("/note", methods=["GET", "POST"])
 def note():
     content = request.json
@@ -300,6 +295,7 @@ def note():
 
     logging.info(f"/note \n\t{content=}\n\t{get_session()}")
     return jsonify(notes)
+
 
 @app.route("/favourite", methods=["GET", "POST"])
 def favourite():
