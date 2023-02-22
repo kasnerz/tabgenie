@@ -549,8 +549,6 @@ class HFTabularDataset(TabularDataset):
         info["examples"] = {}
         info["links"] = {}
 
-        breakpoint()
-
         for split_name, split_info in self.dataset_info.get("splits").items():
             if split_name.startswith("val"):
                 split_name = "dev"
