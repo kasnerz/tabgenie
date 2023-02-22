@@ -186,7 +186,7 @@ class TabularDataset:
         elif export_format == "csv":
             exported = self.table_to_csv(table)
         elif export_format == "xlsx":
-            exported = self.table_to_excel(table)
+            exported = self.table_to_excel(table, include_props)
         elif export_format == "json":
             exported = self.table_to_json(table, include_props)
         elif export_format == "reference":
@@ -292,10 +292,10 @@ class TabularDataset:
 
         return triples
 
-    def table_to_excel(self, table):
+    def table_to_excel(self, table, include_props=True):
         workbook = Workbook("tmp.xlsx", {"in_memory": True})
         worksheet = workbook.add_worksheet()
-        write_html_table_to_excel(table, worksheet, workbook=workbook)
+        write_html_table_to_excel(table, worksheet, workbook=workbook, write_table_props=include_props)
 
         return workbook
 
