@@ -76,12 +76,13 @@ def compute_bleu(eval_preds, tokenizer):
 
 @click.command()
 @click.option("--dataset", "-d", required=True, type=str, help="Dataset to train on")
+@click.option("--properties", "-p", default=None, type=str, help="Table properties to include in the input")
 @click.option("--base-model", "-m", default="t5-small", type=str, help="Base model to finetune")
 @click.option("--epochs", "-e", default=30, type=int, help="Maximum number of epochs")
 @click.option("--batch-size", "-b", default=16, type=int, help="Path to the output directory")
 @click.option("--ckpt-dir", "-c", default=os.path.join(ROOT_DIR, "checkpoints"), type=str, help="Directory to store checkpoints")
 @click.option("--output-dir", "-o", default=os.path.join(ROOT_DIR, "models"), type=str, help="Directory to store models and their outputs")
-def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
+def main(dataset, properties, base_model, epochs, batch_size, ckpt_dir, output_dir):
     os.makedirs(ckpt_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
 
@@ -96,9 +97,16 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
     model = AutoModelForSeq2SeqLM.from_pretrained(base_model)
     tokenizer = AutoTokenizer.from_pretrained(base_model)
 
+    linearize_params = {'properties': properties.split(',')} if properties is not None else None
+
     tg_dataset = load_dataset(dataset)
     hf_datasets = {
-        p: tg_dataset.get_hf_dataset(split=p, tokenizer=tokenizer, max_length=MAX_LENGTH)
+        p: tg_dataset.get_hf_dataset(
+            split=p,
+            tokenizer=tokenizer,
+            max_length=MAX_LENGTH,
+            linearize_params=linearize_params
+        )
         for p in tg_dataset.splits
     }
 
