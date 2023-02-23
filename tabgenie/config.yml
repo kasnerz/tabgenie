@@ -17,7 +17,7 @@ datasets:
 - wikibio
 - wikisql
 - wikitabletext
-default_dataset: totto
+default_dataset: webnlg
 debug: false
 host_prefix: "."
 cache_dev_splits: false

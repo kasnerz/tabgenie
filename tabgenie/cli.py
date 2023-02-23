@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 def create_app(**kwargs):
     import yaml
 
-    with open("config.yml") as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yml")) as f:
         config = yaml.safe_load(f)
 
     # Imports from main slow down flask CLI
