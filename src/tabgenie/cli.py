@@ -95,7 +95,7 @@ def export(dataset, split, out_dir, export_format, include_props, table_id):
     "-i",
     default=None,
     type=str,
-    help="Path to the file with hypotheses (JSONL format). The field 'output' has to contain a list of hypotheses. Currently only the first reference is used",
+    help="Path to the file with hypotheses (JSONL format). The field 'output' has to contain a list of hypotheses. Currently only the first hypothesis is used.",
 )
 @click.option("--out_file", "-o", default=None, type=str, help="Path to the output file")
 @click.option(
@@ -112,7 +112,7 @@ def export(dataset, split, out_dir, export_format, include_props, table_id):
     help="Random seed.",
 )
 @with_appcontext
-def analyze(dataset, split, in_file, out_file, count, random_seed):
+def sheet(dataset, split, in_file, out_file, count, random_seed):
     from .main import export_error_analysis
 
     export_error_analysis(
