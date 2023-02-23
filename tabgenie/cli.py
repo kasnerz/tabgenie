@@ -83,7 +83,8 @@ def export(dataset, split, out_dir, export_format, linearization_style, include_
     from .main import export_dataset
 
     if export_format == 'txt' and linearization_style is None:
-        raise ValueError('For export to txt, --linearization_style (-l) parameter is required.')
+        logger.error('For export to txt, --linearization_style (-l) parameter is required.')
+        return
 
     export_dataset(
         dataset_name=dataset,
