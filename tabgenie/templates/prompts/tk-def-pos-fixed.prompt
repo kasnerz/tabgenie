@@ -1,0 +1,22 @@
+Definition: Describe structured data.
+
+Positive Example 1 -
+Input:
+===
+title: List of the busiest airports in Romania
+===
+| 4. | Iași International Airport |
+Output:
+The Lași Airport is the fourth busiest airport in Romania in terms of passenger traffic.
+Positive Example 2 -
+Input:
+| subject | predicate | object |
+| Hypermarcas | subsidiary | Mantecorp |
+| Hypermarcas | location | São Paulo |
+| Hypermarcas | founding date | 2001-01-01 |
+Output:
+Hypermarcas, the parent group of Mantecorp, was founded on January 1, 2001 in São Paulo.
+Now complete the following example - 
+Input:
+[PROMPTVAR:HL_CELLS]
+Output:

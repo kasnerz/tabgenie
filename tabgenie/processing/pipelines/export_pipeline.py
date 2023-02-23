@@ -22,11 +22,13 @@ class ExportPipeline(Pipeline):
             dataset_obj = pipeline_args["dataset_obj"]
 
         export_format = pipeline_args["export_format"]
+        linearization_style = pipeline_args["linearization_style"]
         edited_cells = pipeline_args.get("edited_cells")
 
         content = {
             "dataset_obj": dataset_obj,
             "export_format": export_format,
+            "linearization_style": linearization_style,
             "dataset": example["dataset"],
             "split": example["split"],
             "table_idx": example["table_idx"],

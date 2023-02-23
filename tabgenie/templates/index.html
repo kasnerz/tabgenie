@@ -58,7 +58,7 @@
             <span data-bs-toggle="modal" data-bs-target="#note-modal">
               <a class="page-link" id="note-btn" class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip"
                 data-bs-placement="bottom" title="Add a note">
-                📝
+                📑
               </a>
             </span>
           </li>
@@ -278,6 +278,15 @@
               <label class="form-check-label" for="checkbox-edited-cells">Include edited cells (current
                 only)</label>
             </div>
+          </div>
+
+          <div id="linearization-format-block" style="display: none; margin-bottom: 20px;">
+            <label for="linearization-format-select" class="control-label"> Linearization style </label>
+            <select class="form-select form-select-sm" id="linearization-format-select" style="width: 200px">
+              <option value="2d" selected>2d</option>
+              <option value="index">index</option>
+              <option value="markers">markers</option>
+            </select>
           </div>
 
           <div class="export-block">

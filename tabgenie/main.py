@@ -110,6 +110,7 @@ def export_to_file():
     content = request.json
     export_option = content["export_option"]
     export_format = content["export_format"]
+    linearization_style = content["linearization_style"]
     include_props = content["include_props"]
     export_examples = json.loads(content["export_examples"])
     edited_cells = json.loads(content.get("edited_cells", "{}"))
@@ -127,6 +128,7 @@ def export_to_file():
         export_examples,
         export_dir=os.path.join(export_dir, "files"),
         export_format=export_format,
+        linearization_style=linearization_style,
         include_props=include_props,
         edited_cells=edited_cells,
         notes=session.get("notes", {}),
@@ -140,7 +142,9 @@ def export_to_file():
     return send_file(file_to_download, mimetype="text/plain", as_attachment=True)
 
 
-def export_examples_to_file(examples_to_export, export_format, export_dir, include_props, edited_cells, notes=None):
+def export_examples_to_file(
+    examples_to_export, export_format, linearization_style, export_dir, include_props, edited_cells, notes=None
+):
     if type(examples_to_export) is dict:
         # favourites / notes
         examples_to_export = examples_to_export.values()
@@ -148,6 +152,7 @@ def export_examples_to_file(examples_to_export, export_format, export_dir, inclu
     pipeline_args = {
         "examples_to_export": examples_to_export,
         "export_format": export_format,
+        "linearization_style": linearization_style,
         "include_props": include_props,
         "edited_cells": edited_cells,
         "dataset_objs": {
@@ -198,7 +203,7 @@ def write_exported_table_to_file(exported_table, export_format, export_dir, out_
             f.write(exported_table)
 
 
-def export_dataset(dataset_name, split, out_dir, export_format, include_props, table_ids):
+def export_dataset(dataset_name, split, out_dir, export_format, linearization_style, include_props, table_ids):
     dataset = get_dataset(dataset_name, split)
     example_ids = table_ids or range(dataset.get_example_count(split))
 
@@ -210,6 +215,7 @@ def export_dataset(dataset_name, split, out_dir, export_format, include_props, t
         examples_to_export,
         export_format=export_format,
         export_dir=out_dir,
+        linearization_style=linearization_style,
         # export_filename=export_filename,
         include_props=include_props,
         edited_cells={},

@@ -15,10 +15,8 @@ class GraphPipeline(Pipeline):
         self.processors = [TableTripleProcessor(), GraphProcessor()]
 
     def to_key(self, pipeline_args):
-        cells = pipeline_args.get("cells", None)
-
-        if cells:
-            cells = str(set(cells))
+        cells = pipeline_args.get("cells", {})
+        cells = str(set(cells))
 
         key = (pipeline_args["dataset"], pipeline_args["split"], pipeline_args["table_idx"], cells)
         return key

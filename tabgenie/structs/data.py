@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
-import os
 import copy
 import logging
 
 import datasets
-import pandas as pd
-import lxml.etree
-import lxml.html
-
-from tinyhtml import h
-from xlsxwriter import Workbook
-from ..utils.excel import write_html_table_to_excel
+from ..utils import export
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +83,9 @@ class Table:
 
     def get_flat_cells(self, highlighted_only=False):
         return [x for row in self.cells for x in row if (x.is_highlighted or not highlighted_only)]
+
+    def get_highlighed_cells(self):
+        return self.get_flat_cells(highlighted_only=True)
 
     def get_cells(self):
         return self.cells
@@ -175,12 +171,25 @@ class TabularDataset:
         return self.dataset_info
 
     def export_table(
-        self, table, export_format, cell_ids=None, displayed_props=None, include_props=True, html_format="web"
+        self,
+        table,
+        export_format,
+        cell_ids=None,
+        displayed_props=None,
+        include_props=True,
+        linearization_style="2d",
+        html_format="web",  # 'web' or 'export'
     ):
         if export_format == "txt":
-            exported = self.table_to_linear(table, cell_ids)
+            exported = self.table_to_linear(
+                table,
+                cell_ids=cell_ids,
+                include_props_mode="all" if include_props else "none",
+                style=linearization_style,
+                highlighted_only=False,
+            )
         elif export_format == "triples":
-            exported = self.table_to_triples(table, cell_ids)
+            exported = self.table_to_triples(table, cell_ids=cell_ids)
         elif export_format == "html":
             exported = self.table_to_html(table, displayed_props, include_props, html_format)
         elif export_format == "csv":
@@ -208,97 +217,6 @@ class TabularDataset:
 
         return exported
 
-    @staticmethod
-    def selected_cells_to_linear(table, cell_ids):
-        tokens = []
-
-        # selected cells -> 1D pos encoding  # todo: why separately? why 1D?
-        cells = [table.get_cell_by_id(int(idx)) for idx in cell_ids]
-
-        for i, cell in enumerate(cells):
-            tokens.append(f"[{i}]")
-            tokens.append(cell.value)
-
-        return tokens
-
-    @staticmethod
-    def table_to_linear_2d(table, highlighted_only=False, separator="index"):
-        tokens = []
-        table_has_highlights = table.has_highlights()
-
-        # full table -> 2D pos encoding
-        for i, row in enumerate(table.get_cells()):
-            for j, cell in enumerate(row):
-                if highlighted_only and table_has_highlights and not cell.is_highlighted:
-                    continue
-
-                if separator == "structure":
-                    if not j:  # start of row
-                        tokens.append("[R]")
-                    tokens.append("[H]" if cell.is_header else "[C]")
-                else:
-                    tokens.append(f"[{i}][{j}]")
-
-                tokens.append(cell.value)
-
-        return tokens
-
-    def table_to_linear(
-        self,
-        table,
-        separator="index",  # 'index', 'structure'
-        highlighted_only=False,
-        cell_ids=None,
-    ):
-        prop_tokens = []
-        for prop in ["category", "title"]:
-            if prop in table.props:
-                prop_tokens.append(f"[{prop}] {table.props[prop]}")
-
-        if cell_ids:
-            table_tokens = self.selected_cells_to_linear(table, cell_ids)
-        else:
-            table_tokens = self.table_to_linear_2d(table, highlighted_only=highlighted_only, separator=separator)
-
-        return " ".join(prop_tokens + table_tokens)
-
-    def table_to_triples(self, table, cell_ids):
-        # default method (dataset-agnostic)
-        title = table.props.get("title")
-        triples = []
-
-        for i, row in enumerate(table.get_cells()):
-            for j, cell in enumerate(row):
-                if cell.is_header():
-                    continue
-
-                row_headers = table.get_row_headers(i)
-                col_headers = table.get_col_headers(j)
-
-                if row_headers and col_headers:
-                    subj = row_headers[0].value
-                    pred = col_headers[0].value
-
-                elif row_headers and not col_headers:
-                    subj = title
-                    pred = row_headers[0].value
-
-                elif col_headers and not row_headers:
-                    subj = title
-                    pred = col_headers[0].value
-
-                obj = cell.value
-                triples.append([subj, pred, obj])
-
-        return triples
-
-    def table_to_excel(self, table, include_props=True):
-        workbook = Workbook("tmp.xlsx", {"in_memory": True})
-        worksheet = workbook.add_worksheet()
-        write_html_table_to_excel(table, worksheet, workbook=workbook, write_table_props=include_props)
-
-        return workbook
-
     def get_hf_dataset(
         self,
         split,
@@ -310,14 +228,12 @@ class TabularDataset:
         num_proc=8,
     ):
         # linearize tables and convert to input_ids
-        # TODO num_proc acts weirdly in datasets 2.9.0, set temporarily to 1
-
         if linearize_params is None:
             linearize_params = {}
 
         if linearize_fn is None:
             linearize_fn = self.table_to_linear
-            linearize_params["separator"] = "structure"
+            linearize_params["style"] = "markers"
             linearize_params["highlighted_only"] = highlighted_only
 
         def process_example(example):
@@ -379,130 +295,41 @@ class TabularDataset:
             },
         ]
 
-    # def get_prompt(self, key):
-    #     breakpoint()
-    #     prompt = prompts[key]
-
-    #     if "def" in key:
-    #         definition = self.get_task_definition()
-    #         prompt = prompt.format(definition=definition)
-
-    #     if "pos" in key:
-    #         ex = self.get_positive_examples()
-    #         ex_1_in, ex_1_out, ex_2_in, ex_2_out = (
-    #             ex[0]["in"].strip(),
-    #             ex[0]["out"].strip(),
-    #             ex[1]["in"].strip(),
-    #             ex[1]["out"].strip(),
-    #         )
-    #         prompt = prompt.format(ex_1_in=ex_1_in, ex_1_out=ex_1_out, ex_2_in=ex_2_in, ex_2_out=ex_2_out)
-
-    #     return prompt
-
+    # Export methods
     def table_to_csv(self, table):
-        df = self.table_to_df(table)
-        table_csv = df.to_csv(index=False)
-        return table_csv
+        return export.table_to_csv(table)
 
     def table_to_df(self, table):
-        table_el = self._get_main_table_html(table)
-        table_html = table_el.render()
-        df = pd.read_html(table_html)[0]
-        return df
-
-    @staticmethod
-    def meta_to_html(props, displayed_props):
-        meta_tbodies = []
-        meta_buttons = []
-
-        for key, value in props.items():
-            meta_row_cls = "collapse show" if key in displayed_props else "collapse"
-            aria_expanded = "true" if key in displayed_props else "false"
-
-            # two wrappers around text required for collapsing
-            wrapper = h("div", klass=[meta_row_cls, f"row_{key}", "collapsible"])
-            cells = [h("th")(wrapper(h("div")(key))), h("td")(wrapper(h("div")(value)))]
-
-            meta_tbodies.append(h("tr")(cells))
-            meta_buttons.append(
-                h(
-                    "button",
-                    type_="button",
-                    klass="prop-btn btn btn-outline-primary btn-sm",
-                    data_bs_toggle="collapse",
-                    data_bs_target=f".row_{key}",
-                    aria_expanded=aria_expanded,
-                    aria_controls=f"row_{key}",
-                )(key)
-            )
-
-        prop_caption = h("div", id_="prop-caption")("properties")
-        meta_buttons_div = h("div", klass="prop-buttons")(meta_buttons)
-        meta_tbody_el = h("tbody")(meta_tbodies)
-        meta_table_el = h("table", klass="table table-sm table-borderless caption-top meta-table")(meta_tbody_el)
-        meta_el = h("div")(prop_caption, meta_buttons_div, meta_table_el)
-        return meta_el
-
-    @staticmethod
-    def meta_to_simple_html(props):
-        meta_trs = []
-        for key, value in props.items():
-            meta_trs.append([h("th")(key), h("td")(value)])
-
-        meta_tbodies = [h("tr")(tds) for tds in meta_trs]
-        meta_tbody_el = h("tbody")(meta_tbodies)
-        meta_table_el = h("table", klass="table table-sm caption-top meta-table")(
-            h("caption")("properties"), meta_tbody_el
-        )
-        return meta_table_el
+        return export.table_to_df(table)
 
     def table_to_html(self, table, displayed_props, include_props, html_format):
-        if html_format == "web" and table.props is not None:
-            meta_el = self.meta_to_html(table.props, displayed_props)
-        elif html_format == "export" and include_props and table.props is not None:
-            meta_el = self.meta_to_simple_html(table.props)
-        else:
-            meta_el = None
-
-        table_el = self._get_main_table_html(table)
-        area_el = h("div")(meta_el, table_el)
-
-        html = area_el.render()
-        return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
-
-    def table_to_json(self, table, include_props):
-        j = {"data": [[c.__dict__ for c in row] for row in table.get_cells()]}
-
-        if include_props and table.props is not None:
-            j["properties"] = table.props
-
-        return j
-
-    @staticmethod
-    def _get_main_table_html(table):
-        trs = []
-        for row in table.cells:
-            tds = []
-            for c in row:
-                if c.is_dummy:
-                    continue
-
-                eltype = "th" if c.is_header else "td"
-                td_el = h(eltype, colspan=c.colspan, rowspan=c.rowspan, cell_idx=c.idx)(c.value)
-
-                if c.is_highlighted:
-                    td_el.tag.attrs["class"] = "table-active"
-
-                tds.append(td_el)
-            trs.append(tds)
-
-        tbodies = [h("tr")(tds) for tds in trs]
-        tbody_el = h("tbody", id="main-table-body")(tbodies)
-        table_el = h("table", klass="table table-sm table-bordered caption-top main-table")(
-            h("caption")("data"), tbody_el
+        return export.table_to_html(
+            table, displayed_props=displayed_props, include_props=include_props, html_format=html_format
         )
 
-        return table_el
+    def table_to_json(self, table, include_props=True):
+        return export.table_to_json(table, include_props=include_props)
+
+    def table_to_excel(self, table, include_props=True):
+        return export.table_to_excel(table, include_props=include_props)
+
+    def table_to_linear(
+        self,
+        table,
+        cell_ids=None,
+        include_props_mode="factual",  # 'all', 'factual', 'none'
+        style="2d",  # 'index', 'markers', '2d'
+        highlighted_only=False,
+    ):
+        return export.table_to_linear(
+            table,
+            cell_ids=cell_ids,
+            include_props_mode=include_props_mode,
+            style=style,
+            highlighted_only=highlighted_only,
+        )
+
+    # End export methods
 
 
 class HFTabularDataset(TabularDataset):

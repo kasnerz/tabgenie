@@ -421,13 +421,14 @@ function get_highlighted_cells() {
       return $(this).attr("cell-idx");
     }).get();
 
-  // no highlighted cells -> send all cells except headers
-  if (activeCells.length == 0) {
-    activeCells = $("#tablearea").find("td").map(
-      function () {
-        return $(this).attr("cell-idx");
-      }).get();
-  }
+  // // no highlighted cells -> send all cells except headers
+  // if (activeCells.length == 0) {
+  //   activeCells = $("#tablearea").find("td").map(
+  //     function () {
+  //       return $(this).attr("cell-idx");
+  //     }).get();
+  // }
+
   return activeCells;
 }
 
@@ -457,10 +458,12 @@ function run_pipeline(pipeline) {
     "dataset": dataset,
     "split": split,
     "table_idx": table_idx,
-    "cells": cells,
     "edited_cells": JSON.stringify(editedCells),
     "custom_input": custom_inputs
   };
+  if (cells.length > 0) {
+    request["cells"] = cells;
+  }
   $(`#pipeline-${pipeline}-spinner`).show();
 
   $.ajax({
@@ -565,6 +568,7 @@ function postRequestDownload(url, request, filename) {
 
 function export_table(export_option) {
   var format = $('#export-format-select').val();
+  var linearization_style = $('#linearization-format-select').val();
   var include_props = $('#checkbox-table-props').is(":checked");
   var export_edited_cells = $('#checkbox-edited-cells').is(":checked");
 
@@ -590,6 +594,7 @@ function export_table(export_option) {
     "export_format": format,
     "export_option": export_option,
     "export_examples": export_examples,
+    "linearization_style": linearization_style,
     "include_props": include_props,
   };
 
@@ -736,7 +741,13 @@ $("#format-select").on("change", function (e) {
 });
 
 $('#export-format-select').on("change", function () {
-  $('#checkbox-table-props').prop('disabled', this.value == 'csv' || this.value == 'txt');
+  $('#checkbox-table-props').prop('disabled', this.value == 'csv');
+
+  if (this.value == 'txt') {
+    $('#linearization-format-block').css('display', 'inline-block');
+  } else {
+    $('#linearization-format-block').css('display', 'none');
+  }
 })
 
 $(".custom-prompt-input").highlightWithinTextarea({

@@ -17,7 +17,7 @@ datasets:
 - wikibio
 - wikisql
 - wikitabletext
-default_dataset: webnlg
+default_dataset: totto
 debug: false
 host_prefix: "."
 cache_dev_splits: false
@@ -27,7 +27,7 @@ pipelines:
     pipeline: model_api
     model_url: http://localhost:8981/
     config_template_file: model_api_config.html
-    default_prompt: tk-def-pos-simple
+    default_prompt: tk-def-pos-fixed
     interactive: true
     datasets:
       - cacapo

@@ -63,6 +63,13 @@ def run():
     type=click.Choice(["json", "csv", "xlsx", "html", "txt"]),
     help="Output file format",
 )
+@click.option(
+    "--linearization_style",
+    "-l",
+    required=True,
+    type=click.Choice(["index", "markers", "2d"]),
+    help="Linearization format for TXT export",
+)
 @click.option("--include_props", "-p", type=bool, is_flag=True, default=False, help="Include properties in the output")
 @click.option(
     "--table_id",
@@ -72,7 +79,7 @@ def run():
     help="Table ID to export (can be specified multiple times), all tables are exported by default",
 )
 @with_appcontext
-def export(dataset, split, out_dir, export_format, include_props, table_id):
+def export(dataset, split, out_dir, export_format, linearization_style, include_props, table_id):
     """Export input tables to a specified format."""
     from .main import export_dataset
 
@@ -81,6 +88,7 @@ def export(dataset, split, out_dir, export_format, include_props, table_id):
         split=split,
         out_dir=out_dir,
         export_format=export_format,
+        linearization_style=linearization_style,
         include_props=include_props,
         table_ids=table_id,
     )
