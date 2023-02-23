@@ -2,9 +2,9 @@ Definition: Describe structured data.
 
 Positive Example 1 -
 Input:
-===================
+===
 title: List of the busiest airports in Romania
-===================
+===
 | 4. | Iași International Airport |
 Output:
 The Lași Airport is the fourth busiest airport in Romania in terms of passenger traffic.

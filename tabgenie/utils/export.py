@@ -153,7 +153,7 @@ def _table_props_to_linear(table, style, mode):
         prop_tokens = [f"[P] {key}: {val}" for key, val in props_to_include.items()]
 
     if style == "2d":
-        prop_str = "===================\n" + "\n".join(prop_tokens) + "\n===================\n"
+        prop_str = "===\n" + "\n".join(prop_tokens) + "\n===\n"
     elif style == "markers" or "index":
         prop_str = " ".join(prop_tokens)
 
