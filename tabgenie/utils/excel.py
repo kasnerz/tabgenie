@@ -159,9 +159,9 @@ def write_annotation_to_excel(tables, prop_list, ann_columns, out_file):
 
 
 if __name__ == "__main__":
-    from src.tabgenie.loaders.e2e import E2E
-    from src.tabgenie.loaders.hitab import HiTab
-    from src.tabgenie.loaders.webnlg import WebNLG
+    from tabgenie.loaders.e2e import E2E
+    from tabgenie.loaders.hitab import HiTab
+    from tabgenie.loaders.webnlg import WebNLG
 
     ann_columns = ["is_hallucination", "notes"]
     prop_list = ["title", "reference"]

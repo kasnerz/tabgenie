@@ -1,26 +1,41 @@
-# 🧞 TabGenie
+# 🧞 TabGenie: A Toolkit for Table-to-Text Generation 
 
-A toolkit for interactve table-to-text generation.
+**Demo 👉️ https://quest.ms.mff.cuni.cz/rel2text/tabgenie**
 
-**Demo :point_right: https://quest.ms.mff.cuni.cz/rel2text/tabgenie**
+TabGenie provides tools for working with data-to-text generation datasets in a unified tabular format. 
 
-## Project overview
 
-### Main features 
-- visualization of data-to-text generation datasets
-- interactive processing pipelines
-- unified Python data loaders
-- preparing a spreadsheet for error analysis
-- exporting tables to various file formats
+TabGenie allows you to:
+  - **explore** the content of the datasets
+  - **interact** with table-to-text generation models 
+  - **load and preprocess** the datasets in a unified format
+  - **prepare spreadsheets** for error analysis
+  - **export tables** to various file formats
+
+TabGenie is equipped with user-friendly web interface, Python bindings and command-line processing tools.
+
 
  ### Frontend Preview
+![](https://raw.githubusercontent.com/kasnerz/tabgenie/main/img/preview.png)
 
-![preview](img/preview.png)
 
-### About
-TabGenie provides access to **data-to-text generation datasets** in a unified tabular format. The datasets are loaded from the [HuggingFace datasets](https://huggingface.co/datasets) and visualized in a custom web interface.
+## Quickstart
+```
+pip install tabgenie
+tabgenie run --host=127.0.0.1 --port 8890
+xdg-open http://127.0.0.1:8890
+```
 
-Each table in a dataset is displayed in a tabular format:
+Or try the demo at:
+
+**👉️ https://quest.ms.mff.cuni.cz/rel2text/tabgenie**
+
+
+## Datasets
+
+The datasets are loaded from the [HuggingFace datasets](https://huggingface.co/datasets).
+
+Input data in each dataset is preprocessed into a tabular format:
 - each table contains M rows and N columns,
 - cells may span multiple columns or rows,
 - cells may be marked as headings (indicated by bold font),
@@ -28,19 +43,6 @@ Each table in a dataset is displayed in a tabular format:
 
 Additionally, each example may contain metadata (such as title, url, etc.) which are displayed next to the main table as *properties*.
 
-
-## Quickstart
-```
-pip install tabgenie
-tabgenie run --host=127.0.0.1
-```
-### Demo
-**:point_right: https://quest.ms.mff.cuni.cz/rel2text/tabgenie**
-
-
-## Datasets
-
-See `src/loaders/data.py` for an up-to-date list of available datasets.
 | Dataset                                                                              | Source                    | Data type      | # train | # dev  | # test | License     |
 | ------------------------------------------------------------------------------------ | ------------------------- | -------------- | ------- | ------ | ------ | ----------- |
 | **[CACAPO](https://huggingface.co/datasets/kasnerz/cacapo)**                         | van der Lee et al. (2020) | Key-value      | 15,290  | 1,831  | 3,028  | CC BY       |
@@ -60,6 +62,7 @@ See `src/loaders/data.py` for an up-to-date list of available datasets.
 | **[WikiSQL](https://huggingface.co/datasets/wikisql)**                               | Zhong et al. (2017)       | Table + SQL    | 56,355  | 8,421  | 15,878 | BSD         |
 | **[WikiTableText](https://huggingface.co/datasets/kasnerz/wikitabletext)**           | Bao et al. (2018)         | Key-value      | 10,000  | 1,318  | 2,000  | CC BY       |
 
+See `loaders/data.py` for an up-to-date list of available datasets.
 
 ## Requirements
 - Python 3
@@ -75,7 +78,7 @@ See `setup.py` for the full list of requirements.
 
 ## Web interface
 - **local development**: `tabgenie [app parameters] run [--port=PORT] [--host=HOSTNAME]`
-- **deployment**: `gunicorn "src.tabgenie.cli:create_app([app parameters])"`
+- **deployment**: `gunicorn "tabgenie.cli:create_app([app parameters])"`
 
 ## Command-line Interface
 ### Export data
@@ -91,12 +94,12 @@ tabgenie export \
 ```
 Supported formats: `json`, `csv`, `xlsx`, `html`, `txt`.
 
-### Spreadsheet for error analysis
-Generates a spreadsheet with outputs and randomly selected examples for manual error analysis.
+### Generate a spreadsheet for error analysis
+Generates a spreadsheet with system outputs and randomly selected examples for manual error analysis.
 
 Usage:
 ```
-tabgenie spreadsheet \
+tabgenie sheet \
   --dataset DATASET  \
   --split SPLIT \
   --in_file IN_FILE  \
@@ -104,60 +107,44 @@ tabgenie spreadsheet \
   --count EXAMPLE_COUNT
 ```
 
-### Info
+### Show dataset details
 Displays information about the dataset in YAML format (or the list of available datasets if no argument is provided).
 
+Usage:
 ```
 tabgenie info [-d DATASET]
 ```
 
 ## Python
-If your code is based on Huggingface datasets, you can use the following snippet to get the Huggingface dataset object with linearized and tokenized tables:
 
-```python
-from transformers import AutoTokenizer
-import tabgenie as tg
+TabGenie can preprocess the datasets without dataset-specific preprocessing methods.
 
-dataset_name = "totto"
-split = "train"
-tokenizer = AutoTokenizer(...)
-
-tg_dataset = tg.load_dataset(dataset_name)
-hf_dataset = tg_dataset.get_hf_dataset(
-            split=split,
-            tokenizer=tokenizer,
-)
-```
-
-The method `get_hf_dataset()` optionally accepts a parameter `linearize_fn` which is a function taking an argument of type `data.structs.Table` and returning a `str`. This can be used for custom table linearization.
-
-By default, this uses the `table_to_linear` function of the dataset (which can be also overridden in subclasses).
+See the [examples](./examples) directory for a tutorial on using TabGenie for finetuning sequence-to-sequence models.
 
 
 
 ## HuggingFace Integration
-The datasets are stored to `HF_DATASETS_CACHE` directory which defaults to `~/.cache/huggingface/`. Set the
-environment variable before launching any tabgenie command to store the potentially very large datasets to different
-directory. However, be consistent across all usage of Tabgenie commands.
+The datasets are stored to `HF_DATASETS_CACHE` directory which defaults to `~/.cache/huggingface/`. 
+
+**Set the `HF_DATASETS_CACHE` environment variable before launching `tabgenie` if you want to store the (potentially very large) datasets in a different directory.** 
 
 
-The datasets are all loaded from [HuggingFace datasets](https://huggingface.co/datasets) instead of their original repositories. This allows to use preprocessed datasets and a single unified loader.
+The datasets are all loaded from [HuggingFace datasets](https://huggingface.co/datasets) instead of their original repositories which allows to use preprocessed datasets and a single unified loader.
 
 Note that there may be some minor changes in the data w.r.t. to the original datasets due to unification, such as adding "subject", "predicate" and "object" headings to RDF triple-to-text datasets.
-
-The metadata for each table are displayed as `properties` next to the main table.
 
 ## Adding datasets
 For adding a new dataset:
 - prepare the dataset
   - [add the dataset to Huggingface Datasets](https://huggingface.co/docs/datasets/upload_dataset)
-  - OR: download the dataset locally
-- create the dataset loader in `src/loaders`
+  - OR download the dataset locally
+- create the dataset loader in `loaders`
   - a subclass of `HFTabularDataset` for HF datasets
   - a subclass of `TabularDataset` for local datasets
-- add the dataset name to `config.yml`.
+- create a mapping between the dataset name and the class name in `loaders/__init__.py`
+- add the dataset name to `tabgenie/config.yml`.
 
-Each dataset should contain the `prepare_table(split, table_idx)` method which instantiates a `Table` object from the raw data saved in `self.data`.
+Each dataset should contain the `prepare_table(entry)` method which instantiates a `Table` object from the original `entry`.
 
 The `Table` object is automatically exported to HTML and other formats (the methods may be overridden).
 
@@ -166,24 +153,50 @@ If a dataset is an instance of `HFTabularDataset` (i.e. is loaded from Huggingfa
 ## Interactive mode
 Pipelines are used for processing the tables and producing outputs.
 
-See `src/processing/processing.py` for an up-to-date list of available pipelines.
+See `processing/processing.py` for an up-to-date list of available pipelines.
+
+Currently integrated:
 - **model_api** - a pipeline which generates a textual description of a table by calling a table-to-text generation model through API,
 - **graph** - a pipeline which creates a knowledge graph by extracting RDF triples from a table and visualizes the output using D3.js library,
 
 ### Adding pipelines
 For adding a new pipeline:
-- create a file in `src/processing/pipelines` containing the pipeline class,
-- create file(s) in `src/processing/processors` with processors needed for the pipeline,
-- add the mapping between pipeline name and class name to `get_pipeline_class_by_name()` in `src/processing/processing.py`. 
+- create a file in `processing/pipelines` containing the pipeline class,
+- create file(s) in `processing/processors` with processors needed for the pipeline,
+- add the mapping between pipeline name and class name to `get_pipeline_class_by_name()` in `processing/processing.py`. 
 
 Each pipeline should define `self.processors` in the `__init__()` method, instantiating the processors needed for the pipeline.
 
-The input to each pipeline is a `content` object containing several fields needed for table processing. This interface is subject to change (see `src/__init.py_:run_pipeline()` for more details).
+The input to each pipeline is a `content` object containing several fields needed for table processing. This interface may be subject to change (see `__init.py_:run_pipeline()` for more details).
 
 The processors serve as modules, i.e. existing processors can be combined to create new pipelines. The interface between the processors may vary, it is however expected that the last processor in the pipeline outputs HTML code which is displayed on the page.
 
+
+### Pipeline config
+This is an example pipeline configuration in `tabgenie/config.yml`:
+```
+rdf_triples:
+  pipeline: graph
+  interactive: true
+  datasets:
+    - webnlg
+    - dart
+    - e2e
+```
+The key `rdf_triples` is the name of the pipeline which will be displayed in the web interface. It should contain only letters of English alphabet, underscores `_` or dashes `-`.
+
+Required arguments:
+- `pipeline` : `str` - the name of the pipeline as defined in `processing/processing.py`, will be mapped to pipeline class
+- `interactive`: `bool` - whether the pipeline will be displayed in the interactive mode in the web interface
+
+Optional arguments:
+- `datasets` : `list` - the list of datasets for which the pipeline will be active in the web interface (all datasets by default)
+- any other argument, will be passed to the pipeline in `pipeline_args`
+
+
+
 ## Configuration
-The global configuration is stored in the `config.yml` file.
+The global configuration is stored in the `tabgenie/config.yml` file.
 
 - `datasets` - datasets which will be available in the web interface,
 - `default_dataset` - the dataset which is loaded by default,
