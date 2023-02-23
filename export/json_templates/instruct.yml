@@ -1,5 +1,0 @@
----
-table_key: data
-table_fields:
-    in: instruct
-    out: reference

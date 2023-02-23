@@ -8,7 +8,7 @@ datasets:
 - charttotext-s
 - logic2text
 - logicnlg
-- multiwoz22
+# - multiwoz22
 - numericnlg
 - scigen
 - sportsett
@@ -17,7 +17,7 @@ datasets:
 - wikibio
 - wikisql
 - wikitabletext
-default_dataset: totto
+default_dataset: webnlg
 debug: false
 host_prefix: "."
 cache_dev_splits: false
@@ -53,4 +53,3 @@ pipelines:
   export:
     pipeline: export
     interactive: false
-    default_format: json

@@ -45,9 +45,9 @@ def calc_truncated(df):
     n_truncated_inputs = 0
     n_truncated_outputs = 0
     for item in df:
-        if item['input_ids'].size[-1] == MAX_LENGTH:
+        if item['input_ids'].size()[-1] == MAX_LENGTH:
             n_truncated_inputs += 1
-        if item['labels'].size[-1] == MAX_LENGTH:
+        if item['labels'].size()[-1] == MAX_LENGTH:
             n_truncated_outputs += 1
 
     p_truncated_inputs = round(n_truncated_inputs / df.num_rows, 4)

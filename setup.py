@@ -17,7 +17,7 @@ setup(
     name="tabgenie",
     version="0.0.1",
     python_requires=">=3.8",
-    description="Tabgenie: Interaction and exploration platform for table-to-text generation datasets.",
+    description="TabGenie: A toolkit for table-to-text generation.",
     author="Zdenek Kasner, Ekaterina Garanina, Ondrej Dusek",
     author_email="kasner@ufal.mff.cuni.cz",
     long_description=(project_root / "README.md").read_text(encoding="utf-8"),
@@ -25,16 +25,17 @@ setup(
     url="https://github.com/kasnerz/tabgenie",
     license="Apache-2.0 License",
     packages=find_packages(exclude=["test", "test.*"]),
-    package_dir={"": "src"},
+    # package_dir={"": "src"},
     package_data={
         "tabgenie": ["static/css/*", "static/img/*", "static/js/*", "templates/*"],
     },
+    data_files=[("tabgenie", ["tabgenie/config.yml"])],
     include_package_data=True,
     entry_points={
         "console_scripts": [
             "tabgenie=tabgenie.cli:run",
         ],
-        "flask.commands": ["export=tabgenie.cli:export"],
+        "flask.commands": ["export=tabgenie.cli:export", "sheet=tabgenie.cli:sheet", "info=tabgenie.cli:info"],
     },
     install_requires=install_requires,
     extras_require={
