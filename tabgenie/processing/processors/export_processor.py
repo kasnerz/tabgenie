@@ -18,7 +18,11 @@ class ExportProcessor(Processor):
         )
 
         exported = dataset.export_table(
-            table, export_format=content["export_format"], html_format="export", include_props=content["include_props"]
+            table,
+            export_format=content["export_format"],
+            linearization_style=content["linearization_style"],
+            html_format="export",
+            include_props=content["include_props"],
         )
 
         return exported

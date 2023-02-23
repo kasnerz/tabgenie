@@ -565,6 +565,7 @@ function postRequestDownload(url, request, filename) {
 
 function export_table(export_option) {
   var format = $('#export-format-select').val();
+  var linearization_style = $('#linearization-format-select').val();
   var include_props = $('#checkbox-table-props').is(":checked");
   var export_edited_cells = $('#checkbox-edited-cells').is(":checked");
 
@@ -590,6 +591,7 @@ function export_table(export_option) {
     "export_format": format,
     "export_option": export_option,
     "export_examples": export_examples,
+    "linearization_style": linearization_style,
     "include_props": include_props,
   };
 
@@ -736,7 +738,13 @@ $("#format-select").on("change", function (e) {
 });
 
 $('#export-format-select').on("change", function () {
-  $('#checkbox-table-props').prop('disabled', this.value == 'csv' || this.value == 'txt');
+  $('#checkbox-table-props').prop('disabled', this.value == 'csv');
+
+  if (this.value == 'txt') {
+    $('#linearization-format-block').css('display', 'inline-block');
+  } else {
+    $('#linearization-format-block').css('display', 'none');
+  }
 })
 
 $(".custom-prompt-input").highlightWithinTextarea({
