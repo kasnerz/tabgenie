@@ -118,3 +118,13 @@ def analyze(dataset, split, in_file, out_file, count, random_seed):
     export_error_analysis(
         dataset_name=dataset, split=split, in_file=in_file, out_file=out_file, count=count, random_seed=random_seed
     )
+
+
+@click.command()
+@click.option("--dataset", "-d", type=str, default=None)
+@with_appcontext
+def info(dataset):
+    logging.disable(logging.CRITICAL)
+    from .main import get_dataset_info
+
+    get_dataset_info(dataset_name=dataset)

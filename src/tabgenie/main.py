@@ -7,6 +7,7 @@ import logging
 import linecache
 import random
 import coloredlogs
+import yaml
 from xlsxwriter import Workbook
 from flask import Flask, render_template, jsonify, request, send_file, session
 
@@ -304,6 +305,39 @@ def get_table_data(dataset_name, split, table_idx, displayed_props):
         "generated_outputs": generated_outputs,
         "session": get_session(),
     }
+
+
+def get_dataset_info(dataset_name):
+
+    if dataset_name is None:
+        print("========================================")
+        print("               TabGenie                ")
+        print("========================================")
+        datasets = app.config["datasets"]
+
+        print("Available datasets:")
+
+        for dataset in datasets:
+            print(f"- {dataset}")
+
+        print("========================================")
+        print("For more information about the dataset, type `tabgenie info -d <dataset_name>`")
+        return
+
+    dataset = get_dataset(dataset_name=dataset_name, split="dev")
+
+    info = dataset.get_info()
+
+    info_yaml = {
+        "dataset": dataset.name,
+        "description": info["description"].replace("\n", ""),
+        "examples": info["examples"],
+        "version": info["version"],
+        "license": info["license"],
+        "citation": info["citation"].replace("\n", ""),
+    }
+
+    print(yaml.dump(info_yaml, sort_keys=False))
 
 
 def load_prompts():
