@@ -224,37 +224,22 @@ class TabularDataset:
     @staticmethod
     def table_to_linear_2d(table, highlighted_only=False, separator="index"):
         tokens = []
-        cells_to_write = set()
-
-        cells = table.get_cells()
         table_has_highlights = table.has_highlights()
 
         # full table -> 2D pos encoding
-        for i, row in enumerate(cells):
+        for i, row in enumerate(table.get_cells()):
             for j, cell in enumerate(row):
-                if not highlighted_only:
-                    cells_to_write.add((i, j))
+                if highlighted_only and table_has_highlights and not cell.is_highlighted:
+                    continue
 
-                # in tables with highlights, headers are not highlighted
-                # sometimes but need to be included
-                elif table_has_highlights and cell.is_highlighted:
-                    cells_to_write.add((i, j))
-                    col_headers = {(hi, j) for hi in range(i) if cells[hi, j].is_col_header}
-                    row_headers = {(i, hj) for hj in range(j) if cells[i, hj].is_row_header}
-                    cells_to_write |= col_headers | row_headers
+                if separator == "structure":
+                    if not j:  # start of row
+                        tokens.append("[R]")
+                    tokens.append("[H]" if cell.is_header else "[C]")
+                else:
+                    tokens.append(f"[{i}][{j}]")
 
-        cells_to_write = sorted(cells_to_write)
-
-        for i, j in cells_to_write:
-            cell = cells[i][j]
-            if separator == "structure":
-                if not j:  # start of row
-                    tokens.append("[R]")
-                tokens.append("[H]" if cell.is_header else "[C]")
-            else:
-                tokens.append(f"[{i}][{j}]")
-
-            tokens.append(cell.value)
+                tokens.append(cell.value)
 
         return tokens
 
@@ -263,14 +248,10 @@ class TabularDataset:
         table,
         separator="index",  # 'index', 'structure'
         highlighted_only=False,
-        properties=None,
         cell_ids=None,
     ):
-        if properties is None:
-            properties = ["category", "title"]
-
         prop_tokens = []
-        for prop in properties:
+        for prop in ["category", "title"]:
             if prop in table.props:
                 prop_tokens.append(f"[{prop}] {table.props[prop]}")
 
