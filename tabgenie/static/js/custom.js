@@ -421,13 +421,14 @@ function get_highlighted_cells() {
       return $(this).attr("cell-idx");
     }).get();
 
-  // no highlighted cells -> send all cells except headers
-  if (activeCells.length == 0) {
-    activeCells = $("#tablearea").find("td").map(
-      function () {
-        return $(this).attr("cell-idx");
-      }).get();
-  }
+  // // no highlighted cells -> send all cells except headers
+  // if (activeCells.length == 0) {
+  //   activeCells = $("#tablearea").find("td").map(
+  //     function () {
+  //       return $(this).attr("cell-idx");
+  //     }).get();
+  // }
+
   return activeCells;
 }
 
@@ -457,10 +458,12 @@ function run_pipeline(pipeline) {
     "dataset": dataset,
     "split": split,
     "table_idx": table_idx,
-    "cells": cells,
     "edited_cells": JSON.stringify(editedCells),
     "custom_input": custom_inputs
   };
+  if (cells.length > 0) {
+    request["cells"] = cells;
+  }
   $(`#pipeline-${pipeline}-spinner`).show();
 
   $.ajax({

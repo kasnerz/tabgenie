@@ -136,11 +136,15 @@ def _table_content_to_linear(table, highlighted_only, style, cell_ids):
 
 
 def _table_props_to_linear(table, style, mode):
-    if mode == "all":
-        props_to_include = table.props
+    # TODO arbitrary list of props
+    if mode == "none" or not table.props:
+        props_to_include = {}
     elif mode == "factual":
         props_to_include = {key: val for key, val in table.props.items() if "title" in key or "category" in key}
-    elif mode == "none":
+    elif mode == "all":
+        props_to_include = table.props
+
+    if not props_to_include:
         return ""
 
     if style == "2d":
