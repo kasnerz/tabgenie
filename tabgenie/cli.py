@@ -19,7 +19,7 @@ def create_app(**kwargs):
     from .main import app, initialize_pipeline, load_prompts
 
     app.config.update(config)
-    app.config["root_dir"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir)
+    app.config["root_dir"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
 
     app.db["datasets_obj"] = {}
     app.db["pipelines_obj"] = {}
