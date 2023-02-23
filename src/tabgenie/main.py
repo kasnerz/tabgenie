@@ -5,7 +5,7 @@ import glob
 import shutil
 import logging
 import linecache
-
+import random
 import coloredlogs
 from xlsxwriter import Workbook
 from flask import Flask, render_template, jsonify, request, send_file, session
@@ -72,6 +72,36 @@ def render_table():
     table_data = get_table_data(dataset_name, split, table_idx, displayed_props)
 
     return jsonify(table_data)
+
+
+def export_error_analysis(dataset_name, split, in_file, out_file, count, random_seed):
+    dataset_obj = get_dataset(dataset_name, split)
+    references = []
+
+    with open(in_file) as f:
+        for line in f.readlines():
+            j = json.loads(line)
+            references.append(j["out"][0])
+
+    random.seed(random_seed)
+    selected_example_ids = random.sample(range(len(references)), count)
+
+    assert len(references) == dataset_obj.get_example_count(split)
+    tables = []
+
+    for example_id in selected_example_ids:
+        table = {
+            "table": dataset_obj.get_table(split, example_id),
+            "table_id": example_id,
+            "reference": references[example_id],
+        }
+        tables.append(table)
+
+    prop_list = ["reference"]
+    ann_columns = ["notes"]
+    write_annotation_to_excel(tables, prop_list, ann_columns, out_file)
+
+    logger.info(f"Exported spreasheet for error analysis to {out_file}")
 
 
 @app.route("/export_to_file", methods=["GET", "POST"])

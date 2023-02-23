@@ -34,7 +34,7 @@ setup(
         "console_scripts": [
             "tabgenie=tabgenie.cli:run",
         ],
-        "flask.commands": ["export=tabgenie.cli:export"],
+        "flask.commands": ["export=tabgenie.cli:export", "analyze=tabgenie.cli:analyze"],
     },
     install_requires=install_requires,
     extras_require={
