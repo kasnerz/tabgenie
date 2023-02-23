@@ -10,12 +10,8 @@ logger = logging.getLogger(__name__)
 
 def get_pipeline_class_by_name(pipeline_name):
     pipeline_mapping = {
-        "translate": "TranslatePipeline",
-        "reference": "ReferencePipeline",
-        "model_local": "ModelLocalPipeline",
         "model_api": "ModelAPIPipeline",
         "graph": "GraphPipeline",
-        "text_ie": "TextIEPipeline",
         "export": "ExportPipeline",
     }
     pipeline_module = __import__(
