@@ -85,3 +85,36 @@ def export(dataset, split, out_dir, export_format, include_props, table_id):
         include_props=include_props,
         table_ids=table_id,
     )
+
+
+@click.command()
+@click.option("--dataset", "-d", required=True, type=str)
+@click.option("--split", "-s", default="dev", type=str)
+@click.option(
+    "--in_file",
+    "-i",
+    default=None,
+    type=str,
+    help="Path to the file with hypotheses (JSONL format). The field 'output' has to contain a list of hypotheses. Currently only the first reference is used",
+)
+@click.option("--out_file", "-o", default=None, type=str, help="Path to the output file")
+@click.option(
+    "--count",
+    "-c",
+    type=int,
+    help="Number of randomly selected examples for the error analysis",
+)
+@click.option(
+    "--random_seed",
+    "-r",
+    type=int,
+    default=42,
+    help="Random seed.",
+)
+@with_appcontext
+def analyze(dataset, split, in_file, out_file, count, random_seed):
+    from .main import export_error_analysis
+
+    export_error_analysis(
+        dataset_name=dataset, split=split, in_file=in_file, out_file=out_file, count=count, random_seed=random_seed
+    )
