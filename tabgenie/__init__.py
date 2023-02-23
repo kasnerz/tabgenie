@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from .loaders import DATASET_CLASSES
-
 # ====================================
 # methods provided for other packages
 # usage: `from tabgenie import xyz`
@@ -9,6 +7,8 @@ from .loaders import DATASET_CLASSES
 
 
 def load_dataset(dataset_name, splits=None):
+    from .loaders import DATASET_CLASSES
+
     try:
         dataset = DATASET_CLASSES[dataset_name]()
     except ValueError:

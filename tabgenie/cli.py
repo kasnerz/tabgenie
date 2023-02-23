@@ -48,10 +48,8 @@ def create_app(**kwargs):
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)
-@click.option("--disable_pipelines", type=bool, is_flag=True, default=False)
-@pass_script_info
-def run(script_info, disable_pipelines):
-    script_info.disable_pipelines = disable_pipelines
+def run():
+    pass
 
 
 @click.command()
@@ -75,6 +73,7 @@ def run(script_info, disable_pipelines):
 )
 @with_appcontext
 def export(dataset, split, out_dir, export_format, include_props, table_id):
+    """Export input tables to a specified format."""
     from .main import export_dataset
 
     export_dataset(
@@ -113,6 +112,7 @@ def export(dataset, split, out_dir, export_format, include_props, table_id):
 )
 @with_appcontext
 def sheet(dataset, split, in_file, out_file, count, random_seed):
+    """Create a spreadsheet with examples for error analysis."""
     from .main import export_error_analysis
 
     export_error_analysis(
@@ -124,6 +124,7 @@ def sheet(dataset, split, in_file, out_file, count, random_seed):
 @click.option("--dataset", "-d", type=str, default=None)
 @with_appcontext
 def info(dataset):
+    """Display information about the dataset."""
     logging.disable(logging.CRITICAL)
     from .main import get_dataset_info
 
