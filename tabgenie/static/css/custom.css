@@ -297,12 +297,14 @@ pre {
 }
 
 .label-settings {
-    right: 50px;
+    font-size: 13px !important;
+    top: -9px !important;
+    right: 35px;
 }
 
 .label-reload {
-    right: 30px;
-    font-size: 14px !important;
+    right: 10px;
+    font-size: 15px !important;
     top: -10px !important;
 }
 

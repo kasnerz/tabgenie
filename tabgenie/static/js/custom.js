@@ -642,7 +642,7 @@ function refresh_pipelines() {
     } else {
       // activate the pipeline
       $(`#out-${pipeline}`).show();
-      $(`#pipeline-checkbox-${pipeline}`).prop("checked", true);
+      // $(`#pipeline-checkbox-${pipeline}`).prop("checked", true);
       pipelines[pipeline].active = 1;
     }
     // run the active pipelines
