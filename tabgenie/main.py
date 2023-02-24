@@ -77,28 +77,30 @@ def render_table():
 
 def export_error_analysis(dataset_name, split, in_file, out_file, count, random_seed):
     dataset_obj = get_dataset(dataset_name, split)
-    references = []
+    predictions = []
 
     with open(in_file) as f:
         for line in f.readlines():
             j = json.loads(line)
-            references.append(j["out"][0])
+            predictions.append(j["out"][0])
 
     random.seed(random_seed)
-    selected_example_ids = random.sample(range(len(references)), count)
+    selected_example_ids = random.sample(range(len(predictions)), count)
 
-    assert len(references) == dataset_obj.get_example_count(split)
+    assert len(predictions) == dataset_obj.get_example_count(split)
     tables = []
 
     for example_id in selected_example_ids:
+        table_obj = dataset_obj.get_table(split, example_id)
         table = {
-            "table": dataset_obj.get_table(split, example_id),
+            "table": table_obj,
             "table_id": example_id,
-            "reference": references[example_id],
+            "reference": table_obj.props.get('reference', ''),
+            "prediction": predictions[example_id],
         }
         tables.append(table)
 
-    prop_list = ["reference"]
+    prop_list = ["reference", "prediction"]
     ann_columns = ["notes"]
     write_annotation_to_excel(tables, prop_list, ann_columns, out_file)
 
