@@ -15,7 +15,18 @@ Parameters:
 * `--ckpt-dir` or `-c` - path to folder for storing checkpoints. Default: `PROJECT_ROOT/checkpoints`.
 * `--model-dir` or `-m` - path to folder for storing models and outputs. Default: `PROJECT_ROOT/models`.
 
-Requirements to run the example (in addition to `tabgenie`):
+## Multi-tasking
+
+The example `multitasking.py` is almost equivalent to `finetuning_transformers.py` (section above). The only parameter difference is:
+* `--datasets` or `-d` - names of the datasets (listed in `loaders.DATASET_CLASSES`) separated by comma, e.g. `e2e,webnlg`.
+
+Dataset-specific task description is prepended to each input item. <br>
+In this example, custom linearization functions are implemented for E2E and WebNLG datasets.
+
+
+## Requirements
+
+Requirements to run the examples (in addition to `tabgenie`):
 * `numpy`
 * `evaluate`
 * `transformers==4.25.1`
