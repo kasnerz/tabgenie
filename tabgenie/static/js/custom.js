@@ -537,7 +537,7 @@ function change_split() {
 }
 
 function change_mode() {
-  select_mode = $('#mode-select').val();
+  select_mode = $("input:radio[name ='interactive-mode-radio']:checked").val();
   update_cell_interactivity();
 }
 
@@ -642,7 +642,7 @@ function refresh_pipelines() {
     } else {
       // activate the pipeline
       $(`#out-${pipeline}`).show();
-      $(`#pipeline-checkbox-${pipeline}`).prop("checked", true);
+      // $(`#pipeline-checkbox-${pipeline}`).prop("checked", true);
       pipelines[pipeline].active = 1;
     }
     // run the active pipelines
@@ -733,7 +733,7 @@ $("#dataset-select").on("change", change_dataset);
 
 $("#split-select").on("change", change_split);
 
-$("#mode-select").on("change", change_mode);
+$("input:radio[name ='interactive-mode-radio']").on("change", change_mode);
 
 $("#format-select").on("change", function (e) {
   $("#dataset-spinner").show();

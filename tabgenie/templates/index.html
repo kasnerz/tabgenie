@@ -148,14 +148,35 @@
             </div>
           </div>
 
+
+
+
           <div class="selectarea" id="mode-selectarea" style="display: none;">
+            <div><b>mode</b></div>
+            <div class="btn-group d-flex" id="mode-select" role="group">
+              <input type="radio" value="select" class="btn-check" name="interactive-mode-radio" id="btn-mode-select"
+                autocomplete="off" checked>
+              <label class="btn btn-outline-secondary" for="btn-mode-select" data-bs-toggle="tooltip"
+                data-bs-placement="bottom" title="Select">🖱️</label>
+              <input type="radio" value="highlight" class="btn-check" name="interactive-mode-radio"
+                id="btn-mode-highlight" autocomplete="off">
+              <label class="btn btn-outline-secondary" for="btn-mode-highlight" data-bs-toggle="tooltip"
+                data-bs-placement="bottom" title="Highlight">👆</label>
+              <input type="radio" value="edit" class="btn-check" name="interactive-mode-radio" id="btn-mode-edit"
+                autocomplete="off">
+              <label class="btn btn-outline-secondary" for="btn-mode-edit" data-bs-toggle="tooltip"
+                data-bs-placement="bottom" title="Edit">✏️</label>
+            </div>
+          </div>
+
+          <!-- <div class="selectarea" id="mode-selectarea" style="display: none;">
             <b>mode</b>
             <select id="mode-select" class="form-select form-select-sm">
               <option value="select" selected>select</option>
               <option value="highlight">highlight</option>
               <option value="edit">edit</option>
             </select>
-          </div>
+          </div> -->
 
         </div>
 
@@ -180,11 +201,11 @@
             <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel" style="display: none;">
               {% for pipeline_name, attrs in pipelines.items() if attrs.interactive %}
               <div class="output-box pipeline-box" id="out-{{ pipeline_name }}">
-                <label class="label-name" for="pipeline-checkbox-{{ pipeline_name }}">{{ pipeline_name }}</label>
+                <label class="label-name">{{ pipeline_name }}</label>
                 <label class="label-reload" onclick="reload_pipeline('{{ pipeline_name }}');">⟳</label>
-                <label class="label-on-off"><input
+                <!-- <label class="label-on-off"><input
                     class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
-                    id="pipeline-checkbox-{{ pipeline_name }}" checked></label>
+                    id="pipeline-checkbox-{{ pipeline_name }}" checked></label> -->
 
                 {% if pipeline_name in pipelines_cfg_templates %}
                 <label class="label-settings" data-bs-toggle="modal" data-bs-target="#{{ pipeline_name }}-modal"><img
