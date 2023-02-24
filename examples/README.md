@@ -20,7 +20,7 @@ Parameters:
 The example `multitasking.py` is almost equivalent to `finetuning_transformers.py` (section above). The only parameter difference is:
 * `--datasets` or `-d` - names of the datasets (listed in `loaders.DATASET_CLASSES`) separated by comma, e.g. `e2e,webnlg`.
 
-Dataset-specific task description is prepended to each input item. <br>
+Dataset-specific task description is prepended to each input item before training. <br>
 In this example, custom linearization functions are implemented for E2E and WebNLG datasets.
 
 
