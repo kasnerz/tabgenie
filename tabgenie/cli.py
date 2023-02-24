@@ -66,7 +66,6 @@ def run():
 @click.option(
     "--linearization_style",
     "-l",
-    required=True,
     type=click.Choice(["index", "markers", "2d"]),
     help="Linearization format for TXT export",
 )
@@ -82,6 +81,10 @@ def run():
 def export(dataset, split, out_dir, export_format, linearization_style, include_props, table_id):
     """Export input tables to a specified format."""
     from .main import export_dataset
+
+    if export_format == 'txt' and linearization_style is None:
+        logger.error('For export to txt, --linearization_style (-l) parameter is required.')
+        return
 
     export_dataset(
         dataset_name=dataset,
