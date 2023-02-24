@@ -57,10 +57,6 @@ def linearize_pairs(table):
     )
 
 
-def linearize_totto(table):
-    return table.props['linearized_input']
-
-
 def table_to_linear_with_prefix(table, dataset_obj, linearize_fn=None, **kwargs):
     if linearize_fn is None:
         linearize_fn = dataset_obj.table_to_linear
@@ -88,18 +84,8 @@ def compute_bleu(eval_preds, tokenizer):
 
 
 CUSTOM_LINEARIZE_FNS = {
-    'webnlg': {
-        'func': linearize_triples,
-        'params': {}
-    },
-    'e2e': {
-        'func': linearize_pairs,
-        'params': {}
-    },
-    'totto': {
-        'func': linearize_totto,
-        'params': {}
-    }
+    'webnlg': linearize_triples,
+    'e2e': linearize_pairs
 }
 
 
@@ -125,18 +111,16 @@ def main(datasets, base_model, epochs, batch_size, ckpt_dir, output_dir):
     model = AutoModelForSeq2SeqLM.from_pretrained(base_model)
     tokenizer = AutoTokenizer.from_pretrained(base_model)
 
-    datasets = datasets.split(',')
+    datasets = [x.strip() for x in datasets.split(',')]
     hf_datasets = {}
 
     for dataset in datasets:
         tg_dataset = load_dataset(dataset)
 
-        lin_func_config = CUSTOM_LINEARIZE_FNS.get(dataset, {})
         prefix_lin_params = {
             'dataset_obj': tg_dataset,
-            'linearize_fn': lin_func_config.get('func')
+            'linearize_fn': CUSTOM_LINEARIZE_FNS.get(dataset)
         }
-        prefix_lin_params.update(lin_func_config.get('params', {}))
 
         hf_datasets[dataset] = {
             p: tg_dataset.get_hf_dataset(
