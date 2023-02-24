@@ -15,6 +15,9 @@ class ToTTo(HFTabularDataset):
         self.name = "ToTTo"
         self.extra_info = {"license": "CC BY-SA 3.0"}
 
+    def get_task_definition(self):
+        return "Give a description of the selected table cells."
+
     def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["target"]

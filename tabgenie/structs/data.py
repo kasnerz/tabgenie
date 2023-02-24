@@ -248,7 +248,7 @@ class TabularDataset:
             return tokens
 
         logger.info(f"[tabgenie] linearizing tables using {linearize_fn}")
-        lin_example = linearize_fn(self.prepare_table(self.data[split][0]))
+        lin_example = linearize_fn(self.prepare_table(self.data[split][0]), **linearize_params)
         logger.info(f"[tabgenie] linearized example ({split}/0): {lin_example}")
 
         processed_dataset = self.data[split].map(process_example, batched=False, num_proc=1)
