@@ -2,8 +2,9 @@
 
 **Demo 👉️ https://quest.ms.mff.cuni.cz/rel2text/tabgenie**
 
-TabGenie provides tools for working with data-to-text generation datasets in a unified tabular format. 
+**Work in progress**  🛠️
 
+TabGenie provides tools for working with data-to-text generation datasets in a unified tabular format. 
 
 TabGenie allows you to:
   - **explore** the content of the datasets
@@ -13,6 +14,7 @@ TabGenie allows you to:
   - **export tables** to various file formats
 
 TabGenie is equipped with user-friendly web interface, Python bindings and command-line processing tools.
+
 
 
  ### Frontend Preview
