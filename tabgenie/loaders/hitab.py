@@ -42,10 +42,14 @@ class HiTab(HFTabularDataset):
         for r in content["merged_regions"]:
             for i in range(r["first_row"], r["last_row"] + 1):
                 for j in range(r["first_column"], r["last_column"] + 1):
+                    cell = t.get_cell(i, j)
+                    if cell is None:  # out of bounds
+                        continue
+
                     if i == r["first_row"] and j == r["first_column"]:
-                        t.get_cell(i, j).rowspan = r["last_row"] - r["first_row"] + 1
-                        t.get_cell(i, j).colspan = r["last_column"] - r["first_column"] + 1
+                        cell.rowspan = r["last_row"] - r["first_row"] + 1
+                        cell.colspan = r["last_column"] - r["first_column"] + 1
                     else:
-                        t.get_cell(i, j).is_dummy = True
+                        cell.is_dummy = True
 
         return t
