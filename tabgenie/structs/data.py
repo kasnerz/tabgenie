@@ -84,7 +84,7 @@ class Table:
     def get_flat_cells(self, highlighted_only=False):
         return [x for row in self.cells for x in row if (x.is_highlighted or not highlighted_only)]
 
-    def get_highlighed_cells(self):
+    def get_highlighted_cells(self):
         return self.get_flat_cells(highlighted_only=True)
 
     def get_cells(self):
@@ -317,14 +317,14 @@ class TabularDataset:
         self,
         table,
         cell_ids=None,
-        include_props_mode="factual",  # 'all', 'factual', 'none'
+        props="factual",  # 'all', 'factual', 'none', or list of keys
         style="2d",  # 'index', 'markers', '2d'
         highlighted_only=False,
     ):
         return export.table_to_linear(
             table,
             cell_ids=cell_ids,
-            include_props_mode=include_props_mode,
+            props=props,
             style=style,
             highlighted_only=highlighted_only,
         )
