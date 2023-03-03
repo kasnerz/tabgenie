@@ -13,14 +13,14 @@ class SciGen(HFTabularDataset):
         self.hf_id = "kasnerz/scigen"
         self.name = "SciGen"
 
-    def normalize(self, s):
+    def normalize(self, s, is_header=False):
         # just ignore inline tags and italics
         s = re.sub(r"</*(italic|bold)>", "", s)
         s = re.sub(r"\[ITALIC\]", "", s)
 
         if "[BOLD]" in s:
             s = s.replace("[BOLD]", "")
-            return h("b")(s)
+            return s if is_header else h("b")(s)
 
         if "[EMPTY]" in s:
             return ""
@@ -36,7 +36,7 @@ class SciGen(HFTabularDataset):
 
         for col in ast.literal_eval(entry["table_column_names"]):
             c = Cell()
-            c.value = self.normalize(col)
+            c.value = self.normalize(col, is_header=True)
             c.is_col_header = True
             t.add_cell(c)
 
