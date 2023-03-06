@@ -55,13 +55,14 @@ class ToTTo(HFTabularDataset):
 
                 for cs in range(x["column_span"]):
                     for rs in range(x["row_span"]):
-                        if not cs and not rs:  # orig cell
+                        if not cs and not rs:  # orig cell, already added
                             continue
 
                         dc = self._create_dummy_cell(c, i, col_num)
-                        taken_cells[(i + rs, col_num + cs)] = dc
                         if not rs:  # add cells which are on the same row
                             table_obj.add_cell(dc)
+                        else:  # for subsequent rows, save them and insert in the future
+                            taken_cells[(i + rs, col_num + cs)] = dc
 
                 col_num += x["column_span"]
 
