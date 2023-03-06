@@ -29,6 +29,11 @@ class ToTTo(HFTabularDataset):
         return dc
 
     def _write_cells(self, table_obj, entry):
+        """
+        So complicated because we need to restore
+        the grid beneath the merged cells for simpler
+        further automatic processing.
+        """
         taken_cells = {}
 
         for i, row in enumerate(entry["table"]):
