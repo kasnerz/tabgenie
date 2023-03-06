@@ -96,10 +96,12 @@ class Table:
 
     def get_cells(self, highlighted_only=False):
         if highlighted_only:
-            return [
-                [c for c in row if c.is_highlighted]
-                for row in self.cells
-            ]
+            cells = []
+            for row in self.cells:
+                row_cells = [c for c in row if c.is_highlighted]
+                if row_cells:
+                    cells.append(row_cells)
+            return cells
         else:
             return self.cells
 
