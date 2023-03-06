@@ -28,46 +28,62 @@ class ToTTo(HFTabularDataset):
         dc.main_cell = (i, j)
         return dc
 
+    def _process_cell(self, table_obj, entry, raw_cell, row_num, raw_col_num, grid_col_num):
+        merged_cells = {}
+
+        c = Cell()
+        c.value = raw_cell["value"]
+        c.colspan = raw_cell["column_span"]
+        c.rowspan = raw_cell["row_span"]
+        c.is_highlighted = [row_num, raw_col_num] in entry["highlighted_cells"]
+        c.is_col_header = raw_cell["is_header"] and row_num == 0  # todo: col header annotation not in orig data?
+        c.is_row_header = raw_cell["is_header"] and row_num != 0
+        table_obj.add_cell(c)
+
+        for cs in range(raw_cell["column_span"]):
+            for rs in range(raw_cell["row_span"]):
+                if not cs and not rs:  # orig cell, already added
+                    continue
+
+                dc = self._create_dummy_cell(c, row_num, grid_col_num)
+                if not rs:  # add cells which are on the same row
+                    table_obj.add_cell(dc)
+                else:  # for subsequent rows, save them and insert in the future
+                    merged_cells[(row_num + rs, grid_col_num + cs)] = dc
+
+        return table_obj, merged_cells
+
     def _write_cells(self, table_obj, entry):
         """
         So complicated because we need to restore
         the grid beneath the merged cells for simpler
         further automatic processing.
         """
-        taken_cells = {}
+        merged_cells = {}
 
         for i, row in enumerate(entry["table"]):
             col_num = 0
-            while (i, col_num) in taken_cells:
-                c = taken_cells[(i, col_num)]
+            while (i, col_num) in merged_cells:
+                c = merged_cells[(i, col_num)]
                 table_obj.add_cell(c)
                 col_num += 1
 
             for j, x in enumerate(row):
-                while (i, col_num) in taken_cells:
-                    c = taken_cells[(i, col_num)]
+                while (i, col_num) in merged_cells:
+                    c = merged_cells[(i, col_num)]
                     table_obj.add_cell(c)
                     col_num += 1
 
-                c = Cell()
-                c.value = x["value"]
-                c.colspan = x["column_span"]
-                c.rowspan = x["row_span"]
-                c.is_highlighted = [i, j] in entry["highlighted_cells"]
-                c.is_col_header = x["is_header"] and i == 0  # todo: col header annotation not in orig data?
-                c.is_row_header = x["is_header"] and i != 0
-                table_obj.add_cell(c)
+                table_obj, curr_merged_cells = self._process_cell(
+                    table_obj=table_obj,
+                    entry=entry,
+                    raw_cell=x,
+                    row_num=i,
+                    raw_col_num=j,
+                    grid_col_num=col_num
 
-                for cs in range(x["column_span"]):
-                    for rs in range(x["row_span"]):
-                        if not cs and not rs:  # orig cell, already added
-                            continue
-
-                        dc = self._create_dummy_cell(c, i, col_num)
-                        if not rs:  # add cells which are on the same row
-                            table_obj.add_cell(dc)
-                        else:  # for subsequent rows, save them and insert in the future
-                            taken_cells[(i + rs, col_num + cs)] = dc
+                )
+                merged_cells.update(curr_merged_cells)
 
                 col_num += x["column_span"]
 
