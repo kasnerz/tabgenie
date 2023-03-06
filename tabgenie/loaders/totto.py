@@ -98,7 +98,10 @@ class ToTTo(HFTabularDataset):
                 if not c.is_highlighted:
                     continue
 
-                for cell in table_obj.get_col_headers(j) + table_obj.get_row_headers(i):
+                for cell in table_obj.get_col_headers(i, j) + table_obj.get_row_headers(i, j):
+                    if not cell.value.strip():
+                        continue
+
                     cell.is_highlighted = True
                     if cell.is_dummy:
                         main_cell = table_obj.get_cell(*cell.main_cell)

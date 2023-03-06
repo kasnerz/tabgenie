@@ -103,17 +103,29 @@ class Table:
         else:
             return self.cells
 
-    def get_row_headers(self, row_idx):
+    def get_row_headers(self, row_idx, column_idx):
         try:
-            cells_in_row = self.cells[row_idx]
-            return [x for x in cells_in_row if x.is_row_header]
+            headers = [
+                c for c in self.get_cells()[row_idx][:column_idx]
+                if c.is_row_header
+            ]
+            return headers
+
         except Exception as e:
             logger.exception(e)
 
-    def get_col_headers(self, column_idx):
+    def get_col_headers(self, row_idx, column_idx):
         try:
-            cells_in_column = [row[column_idx] for row in self.cells]
-            return [x for x in cells_in_column if x.is_col_header]
+            headers = []
+            for i, row in enumerate(self.get_cells()):
+                if i == row_idx:
+                    return headers
+
+                if row[column_idx].is_col_header:
+                    headers.append(row[column_idx])
+
+            return headers
+
         except Exception as e:
             logger.exception(e)
 

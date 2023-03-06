@@ -32,8 +32,8 @@ def table_to_triples(table, cell_ids):
             if cell.is_header():
                 continue
 
-            row_headers = table.get_row_headers(i)
-            col_headers = table.get_col_headers(j)
+            row_headers = table.get_row_headers(i, j)
+            col_headers = table.get_col_headers(i, j)
 
             if row_headers and col_headers:
                 subj = row_headers[0].value
