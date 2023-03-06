@@ -37,8 +37,13 @@ class Cell:
     def is_header(self):
         return self.is_col_header or self.is_row_header
 
+    def serializable_props(self):
+        props = copy.deepcopy(vars(self))
+        props['value'] = str(props['value'])
+        return props
+
     def __repr__(self):
-        return str(self.__dict__)
+        return str(vars(self))
 
 
 class Table:

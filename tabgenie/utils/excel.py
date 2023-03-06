@@ -27,6 +27,7 @@ STYLES = {
 
 
 def write_merged_cells(cell, row_num, col_num, merge_cells, merged_cells, worksheet, cell_format):
+    value = str(cell.value)
     end_row = row_num + cell.rowspan - 1
     end_col = col_num + cell.colspan - 1
 
@@ -37,9 +38,9 @@ def write_merged_cells(cell, row_num, col_num, merge_cells, merged_cells, worksh
                 worksheet.write(r, c, "", cell_format)
 
     if merge_cells:
-        worksheet.merge_range(row_num, col_num, end_row, end_col, cell.value, cell_format)
+        worksheet.merge_range(row_num, col_num, end_row, end_col, value, cell_format)
     else:
-        worksheet.write(row_num, col_num, cell.value, cell_format)
+        worksheet.write(row_num, col_num, value, cell_format)
 
     return merged_cells
 
@@ -99,7 +100,7 @@ def write_html_table_to_excel(
                     cell, row_num, col_num, merge_cells, merged_cells, worksheet, cell_format
                 )
             else:
-                worksheet.write(row_num, col_num, cell.value, cell_format)
+                worksheet.write(row_num, col_num, str(cell.value), cell_format)
 
             col_num += cell.colspan
         row_num += 1
@@ -156,43 +157,3 @@ def write_annotation_to_excel(tables, prop_list, ann_columns, out_file):
         start_row = end_row + 1
 
     workbook.close()
-
-
-if __name__ == "__main__":
-    from tabgenie.loaders.e2e import E2E
-    from tabgenie.loaders.hitab import HiTab
-    from tabgenie.loaders.webnlg import WebNLG
-
-    ann_columns = ["is_hallucination", "notes"]
-    prop_list = ["title", "reference"]
-    out_file = "local_test.xlsx"
-
-    h = HiTab(path=None)
-    h.load("dev")
-
-    e = E2E(path=None)
-    e.load("dev")
-
-    w = WebNLG(path=None)
-    w.load("dev")
-
-    tables = [
-        {
-            "table": h.prepare_table(h.data["dev"][675]),
-            "table_id": "hitab_dev_675",
-            "title": "overqualification rates among workers aged 25 to 34 with a university degree by sex, visible minority and immigrant status, canada, 2011",
-            "reference": "young visible minority women who were immigrants were more likely to be overqualified for their occupation than immigrant women who were not members of a visible minority group.",
-        },
-        {
-            "table": e.prepare_table(e.data["dev"][0]),
-            "table_id": "e2e_dev_0",
-            "reference": "Over by the riverside, you can choose to dine at an average customer rated Travellers Rest Beefeaters, which is located near Raja Indian Cuisine.",
-        },
-        {
-            "table": w.prepare_table(w.data["dev"][899]),
-            "table_id": "webnlg_dev_899",
-            "reference": "Arem arem originates from the country of Indonesia, where two of the leaders are, Joko Widodo and Jusuf Kalla.",
-        },
-    ]
-
-    write_annotation_to_excel(tables, prop_list, ann_columns, out_file)
