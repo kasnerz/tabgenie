@@ -109,7 +109,7 @@ def select_cells(table, highlighted_only, cell_ids):
     if cell_ids:
         return [[table.get_cell_by_id(int(idx)) for idx in cell_ids]]
     elif highlighted_only and table.has_highlights():
-        return [table.get_highlighted_cells()]  # todo: create 2d structure, include header
+        return table.get_highlighted_cells()
     else:
         return table.get_cells()
 
@@ -121,6 +121,9 @@ def table_to_2d_str(cells, props):
     cell_tokens = []
     for i, row in enumerate(cells):
         for j, cell in enumerate(row):
+            if cell.is_dummy:
+                continue
+
             cell_tokens.append(f"| {cell.value} ")
         cell_tokens.append(f"|\n")
     cell_str = "".join(cell_tokens).strip()
@@ -135,6 +138,9 @@ def table_to_markers_str(cells, props):
         tokens.append("[R]")
 
         for j, cell in enumerate(row):
+            if cell.is_dummy:
+                continue
+
             tokens.append("[H]" if cell.is_header else "[C]")
             tokens.append(cell.value)
 
@@ -145,6 +151,9 @@ def table_to_indexed_str(cells, props):
     tokens = [f"[P] {key}: {val}" for key, val in props.items()]
     for i, row in enumerate(cells):
         for j, cell in enumerate(row):
+            if cell.is_dummy:
+                continue
+
             tokens.append(f"[{i}][{j}]")
             tokens.append(cell.value)
     return " ".join(tokens)

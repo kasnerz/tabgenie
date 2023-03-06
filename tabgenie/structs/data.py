@@ -92,10 +92,16 @@ class Table:
         return [x for row in self.cells for x in row if (x.is_highlighted or not highlighted_only)]
 
     def get_highlighted_cells(self):
-        return self.get_flat_cells(highlighted_only=True)
+        return self.get_cells(highlighted_only=True)
 
-    def get_cells(self):
-        return self.cells
+    def get_cells(self, highlighted_only=False):
+        if highlighted_only:
+            return [
+                [c for c in row if c.is_highlighted]
+                for row in self.cells
+            ]
+        else:
+            return self.cells
 
     def get_row_headers(self, row_idx):
         try:
