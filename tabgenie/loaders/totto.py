@@ -19,21 +19,28 @@ class ToTTo(HFTabularDataset):
         return "Give a description of the selected table cells."
 
     @staticmethod
-    def _write_cells(table_obj, entry):
-        taken_cells = set()
+    def _create_dummy_cell(main_cell, i, j):
+        dc = Cell()
+        dc.is_dummy = True
+        dc.value = main_cell.value
+        dc.is_col_header = main_cell.is_col_header
+        dc.is_row_header = main_cell.is_row_header
+        dc.main_cell = (i, j)
+        return dc
+
+    def _write_cells(self, table_obj, entry):
+        taken_cells = {}
 
         for i, row in enumerate(entry["table"]):
             col_num = 0
             while (i, col_num) in taken_cells:
-                c = Cell()
-                c.is_dummy = True
+                c = taken_cells[(i, col_num)]
                 table_obj.add_cell(c)
                 col_num += 1
 
             for j, x in enumerate(row):
                 while (i, col_num) in taken_cells:
-                    c = Cell()
-                    c.is_dummy = True
+                    c = taken_cells[(i, col_num)]
                     table_obj.add_cell(c)
                     col_num += 1
 
@@ -42,22 +49,38 @@ class ToTTo(HFTabularDataset):
                 c.colspan = x["column_span"]
                 c.rowspan = x["row_span"]
                 c.is_highlighted = [i, j] in entry["highlighted_cells"]
-                c.is_col_header = x["is_header"] and i == 0
+                c.is_col_header = x["is_header"] and i == 0  # todo: col header annotation not in orig data?
                 c.is_row_header = x["is_header"] and i != 0
                 table_obj.add_cell(c)
 
                 for cs in range(x["column_span"]):
-                    if cs:
-                        c = Cell()
-                        c.is_dummy = True
-                        table_obj.add_cell(c)
-
                     for rs in range(x["row_span"]):
-                        taken_cells.add((i + rs, col_num + cs))
+                        if not cs and not rs:  # orig cell
+                            continue
+
+                        dc = self._create_dummy_cell(c, i, col_num)
+                        taken_cells[(i + rs, col_num + cs)] = dc
+                        if not rs:  # add cells which are on the same row
+                            table_obj.add_cell(dc)
 
                 col_num += x["column_span"]
 
             table_obj.save_row()
+
+        return table_obj
+
+    @staticmethod
+    def _add_header_highlights(table_obj):
+        for i, row in enumerate(table_obj.get_cells()):
+            for j, c in enumerate(row):
+                if not c.is_highlighted:
+                    continue
+
+                for cell in table_obj.get_col_headers(j) + table_obj.get_row_headers(i):
+                    cell.is_highlighted = True
+                    if cell.is_dummy:
+                        main_cell = table_obj.get_cell(*cell.main_cell)
+                        main_cell.is_highlighted = True
 
         return table_obj
 
@@ -78,5 +101,6 @@ class ToTTo(HFTabularDataset):
         t.props["url"] = entry["table_webpage_url"]
 
         t = self._write_cells(t, entry)
+        t = self._add_header_highlights(t)
 
         return t

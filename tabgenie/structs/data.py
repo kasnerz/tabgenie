@@ -23,6 +23,7 @@ class Cell:
         is_col_header=False,
         is_row_header=False,
         is_dummy=False,
+        main_cell=None
     ):
         self.idx = idx
         self.value = value
@@ -32,6 +33,7 @@ class Cell:
         self.is_col_header = is_col_header
         self.is_row_header = is_row_header
         self.is_dummy = is_dummy
+        self.main_cell = main_cell  # for dummy cells
 
     @property
     def is_header(self):

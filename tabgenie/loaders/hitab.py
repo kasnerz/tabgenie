@@ -51,5 +51,11 @@ class HiTab(HFTabularDataset):
                         cell.colspan = r["last_column"] - r["first_column"] + 1
                     else:
                         cell.is_dummy = True
+                        c = t.get_cell(r["first_row"], r["first_column"])
+                        cell.main_cell = (r["first_row"], r["first_column"])
+                        cell.is_col_header = c.is_col_header
+                        cell.is_row_header = c.is_row_header
+                        cell.is_highlighted = c.is_highlighted
+                        cell.value = c.value
 
         return t
