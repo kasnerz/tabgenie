@@ -26,7 +26,7 @@ def table_to_linear(
 
 
 def table_to_json(table, include_props):
-    j = {"data": [[c.__dict__ for c in row] for row in table.get_cells()]}
+    j = {"data": [[c.serializable_props() for c in row] for row in table.get_cells()]}
 
     if include_props and table.props is not None:
         j["properties"] = table.props
