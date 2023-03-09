@@ -123,7 +123,7 @@ class Table:
                 if i == row_idx:
                     return headers
 
-                if row[column_idx].is_col_header:
+                if len(row) > column_idx and row[column_idx].is_col_header:
                     headers.append(row[column_idx])
 
             return headers
