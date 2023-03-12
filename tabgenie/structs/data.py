@@ -23,6 +23,7 @@ class Cell:
         is_col_header=False,
         is_row_header=False,
         is_dummy=False,
+        main_cell=None
     ):
         self.idx = idx
         self.value = value
@@ -32,6 +33,7 @@ class Cell:
         self.is_col_header = is_col_header
         self.is_row_header = is_row_header
         self.is_dummy = is_dummy
+        self.main_cell = main_cell  # for dummy cells
 
     @property
     def is_header(self):
@@ -89,23 +91,43 @@ class Table:
     def get_flat_cells(self, highlighted_only=False):
         return [x for row in self.cells for x in row if (x.is_highlighted or not highlighted_only)]
 
-    def get_highlighed_cells(self):
-        return self.get_flat_cells(highlighted_only=True)
+    def get_highlighted_cells(self):
+        return self.get_cells(highlighted_only=True)
 
-    def get_cells(self):
-        return self.cells
+    def get_cells(self, highlighted_only=False):
+        if highlighted_only:
+            cells = []
+            for row in self.cells:
+                row_cells = [c for c in row if c.is_highlighted]
+                if row_cells:
+                    cells.append(row_cells)
+            return cells
+        else:
+            return self.cells
 
-    def get_row_headers(self, row_idx):
+    def get_row_headers(self, row_idx, column_idx):
         try:
-            cells_in_row = self.cells[row_idx]
-            return [x for x in cells_in_row if x.is_row_header]
+            headers = [
+                c for c in self.get_cells()[row_idx][:column_idx]
+                if c.is_row_header
+            ]
+            return headers
+
         except Exception as e:
             logger.exception(e)
 
-    def get_col_headers(self, column_idx):
+    def get_col_headers(self, row_idx, column_idx):
         try:
-            cells_in_column = [row[column_idx] for row in self.cells]
-            return [x for x in cells_in_column if x.is_col_header]
+            headers = []
+            for i, row in enumerate(self.get_cells()):
+                if i == row_idx:
+                    return headers
+
+                if len(row) > column_idx and row[column_idx].is_col_header:
+                    headers.append(row[column_idx])
+
+            return headers
+
         except Exception as e:
             logger.exception(e)
 
@@ -322,14 +344,14 @@ class TabularDataset:
         self,
         table,
         cell_ids=None,
-        include_props_mode="factual",  # 'all', 'factual', 'none'
+        props="factual",  # 'all', 'factual', 'none', or list of keys
         style="2d",  # 'index', 'markers', '2d'
         highlighted_only=False,
     ):
         return export.table_to_linear(
             table,
             cell_ids=cell_ids,
-            include_props_mode=include_props_mode,
+            props=props,
             style=style,
             highlighted_only=highlighted_only,
         )

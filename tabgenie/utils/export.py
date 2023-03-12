@@ -13,18 +13,6 @@ Default methods for exporting tables to various formats.
 """
 
 
-def table_to_linear(
-    table,
-    cell_ids=None,
-    include_props_mode="factual",  # 'all', 'factual', 'none'
-    style="2d",  # 'index', 'markers', '2d'
-    highlighted_only=False,
-):
-    prop_str = _table_props_to_linear(table, style=style, mode=include_props_mode)
-    table_str = _table_content_to_linear(table, highlighted_only=highlighted_only, style=style, cell_ids=cell_ids)
-    return prop_str + table_str
-
-
 def table_to_json(table, include_props):
     j = {"data": [[c.serializable_props() for c in row] for row in table.get_cells()]}
 
@@ -44,8 +32,8 @@ def table_to_triples(table, cell_ids):
             if cell.is_header():
                 continue
 
-            row_headers = table.get_row_headers(i)
-            col_headers = table.get_col_headers(j)
+            row_headers = table.get_row_headers(i, j)
+            col_headers = table.get_col_headers(i, j)
 
             if row_headers and col_headers:
                 subj = row_headers[0].value
@@ -101,63 +89,97 @@ def table_to_html(table, displayed_props, include_props, html_format):
     return lxml.etree.tostring(lxml.html.fromstring(html), encoding="unicode", pretty_print=True)
 
 
-def _table_content_to_linear(table, highlighted_only, style, cell_ids):
-    tokens = []
-    table_has_highlights = table.has_highlights()
-
-    if cell_ids:
-        cells = [[table.get_cell_by_id(int(idx)) for idx in cell_ids]]
-    elif highlighted_only and table_has_highlights:
-        cells = [table.get_highlighted_cells()]
+def select_props(table, props):
+    if props == "none" or not table.props:
+        return {}
+    elif props == "factual":
+        return {key: val for key, val in table.props.items() if "title" in key or "category" in key}
+    elif props == "all":
+        return table.props
+    elif isinstance(props, list):
+        return {key: table.props.get(key) for key in props}
     else:
-        cells = table.get_cells()
-
-    if style == "2d":
-        for i, row in enumerate(cells):
-            for j, cell in enumerate(row):
-                tokens.append(f"| {cell.value} ")
-            tokens.append(f"|\n")
-
-    elif style == "markers":
-        for i, row in enumerate(cells):
-            tokens.append("[R] ")
-
-            for j, cell in enumerate(row):
-                tokens.append("[H] " if cell.is_header else "[C] ")
-                tokens.append(cell.value + " ")
-
-    elif style == "index":
-        for i, row in enumerate(cells):
-            for j, cell in enumerate(row):
-                tokens.append(f"[{i}][{j}] ")
-                tokens.append(cell.value + " ")
-
-    return "".join(tokens)
+        raise NotImplementedError(
+            f'{props} properties mode is not recognized. '
+            f'Available options: "none", "factual", "all", or list of keys.'
+        )
 
 
-def _table_props_to_linear(table, style, mode):
-    # TODO arbitrary list of props
-    if mode == "none" or not table.props:
-        props_to_include = {}
-    elif mode == "factual":
-        props_to_include = {key: val for key, val in table.props.items() if "title" in key or "category" in key}
-    elif mode == "all":
-        props_to_include = table.props
+def select_cells(table, highlighted_only, cell_ids):
+    if cell_ids:
+        return [[table.get_cell_by_id(int(idx)) for idx in cell_ids]]
+    elif highlighted_only and table.has_highlights():
+        return table.get_highlighted_cells()
+    else:
+        return table.get_cells()
 
-    if not props_to_include:
-        return ""
 
-    if style == "2d":
-        prop_tokens = [f"{key}: {val}" for key, val in props_to_include.items()]
-    elif style == "markers" or "index":
-        prop_tokens = [f"[P] {key}: {val}" for key, val in props_to_include.items()]
+def table_to_2d_str(cells, props):
+    prop_tokens = [f"{key}: {val}" for key, val in props.items()]
+    prop_str = "===\n" + "\n".join(prop_tokens) + "\n===\n"
 
-    if style == "2d":
-        prop_str = "===\n" + "\n".join(prop_tokens) + "\n===\n"
-    elif style == "markers" or "index":
-        prop_str = " ".join(prop_tokens)
+    cell_tokens = []
+    for i, row in enumerate(cells):
+        for j, cell in enumerate(row):
+            if cell.is_dummy:
+                continue
 
-    return prop_str
+            cell_tokens.append(f"| {cell.value} ")
+        cell_tokens.append(f"|\n")
+    cell_str = "".join(cell_tokens).strip()
+
+    return prop_str + cell_str
+
+
+def table_to_markers_str(cells, props):
+    tokens = [f"[P] {key}: {val}" for key, val in props.items()]
+
+    for i, row in enumerate(cells):
+        tokens.append("[R]")
+
+        for j, cell in enumerate(row):
+            if cell.is_dummy:
+                continue
+
+            tokens.append("[H]" if cell.is_header else "[C]")
+            tokens.append(cell.value)
+
+    return " ".join(tokens)
+
+
+def table_to_indexed_str(cells, props):
+    tokens = [f"[P] {key}: {val}" for key, val in props.items()]
+    for i, row in enumerate(cells):
+        for j, cell in enumerate(row):
+            if cell.is_dummy:
+                continue
+
+            tokens.append(f"[{i}][{j}]")
+            tokens.append(cell.value)
+    return " ".join(tokens)
+
+
+def table_to_linear(
+    table,
+    cell_ids=None,
+    props="factual",  # 'all', 'factual', 'none', or list of keys
+    style="2d",  # 'index', 'markers', '2d'
+    highlighted_only=False,
+):
+    props_to_include = select_props(table, props)
+    cells_to_include = select_cells(table, highlighted_only, cell_ids)
+
+    if style == '2d':
+        return table_to_2d_str(cells_to_include, props_to_include)
+    elif style == 'markers':
+        return table_to_markers_str(cells_to_include, props_to_include)
+    elif style == 'index':
+        return table_to_indexed_str(cells_to_include, props_to_include)
+    else:
+        raise NotImplementedError(
+            f'{style} linearization style is not recognized. '
+            f'Available options: "index", "markers", or "2d".'
+        )
 
 
 def _meta_to_html(props, displayed_props):
