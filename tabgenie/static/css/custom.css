@@ -505,3 +505,10 @@ ul {
 .button-bw-icon {
     margin-right: 4px;
 }
+
+/* set max column width for headings, wrap text on the next line on overflow */
+.meta-table th {
+    width: 140px;
+    max-width: 140px;
+    overflow-wrap: break-word;
+}
