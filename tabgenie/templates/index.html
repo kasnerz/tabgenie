@@ -68,6 +68,12 @@
               ★
             </a>
           </li>
+          <li class="page-item">
+            <a class="page-link" id="permalink-btn" onclick="permalinkbtn();" data-bs-toggle="popover"
+              data-bs-title="Permalink" data-bs-content="None" data-bs-placement="bottom">
+              <img src="{{ host_prefix }}/static/img/link.png" width="12px" />
+            </a>
+          </li>
         </ul>
 
 
@@ -418,6 +424,23 @@
     </div>
   </div>
 
+  <div class="modal fade" id="permalink-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="permalink-modal-label">Permalink</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="permalink-placeholder"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="about-modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -483,6 +506,7 @@
   window.favourites = {{ session.get("favourites", {}) | tojson | safe }};
   window.notes = {{ session.get("favourites", {}) | tojson | safe }};
   window.editedCells = {{ session.get("editedCells", {}) | tojson | safe }};
+  window.display_table = {{ display_table | tojson | safe }};
 </script>
 
 <script src="{{ host_prefix }}/static/js/custom.js"></script>

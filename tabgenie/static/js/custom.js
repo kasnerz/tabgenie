@@ -1,4 +1,4 @@
-var url_prefix = window.location.href.split('#')[0];
+var url_prefix = window.location.href.split(/[?#]/)[0];
 var table_idx = 0;
 var total_examples = 1;
 var dataset = window.default_dataset;
@@ -67,6 +67,17 @@ function favouritebtn() {
   } else {
     insert_favourite(dataset, split, table_idx)
   }
+}
+
+
+function permalinkbtn() {
+  let permalink = `${url_prefix}?dataset=${dataset}&split=${split}&table_idx=${table_idx}`;
+
+  popover = bootstrap.Popover.getOrCreateInstance("#permalink-btn");
+  popover.setContent({
+    '.popover-body': permalink
+  });
+  $('#permalink-btn').popover('show');
 }
 
 function insert_favourite(dataset, split, table_idx) {
@@ -693,7 +704,7 @@ function show_generated_outputs(generated_outputs) {
   }
 }
 
-function fetch_table(dataset, split, table_idx, export_format) {
+function fetch_table(dataset, split, table_idx) {
   var pressed_props = get_pressed_props();
   $.get(`${url_prefix}/table`, {
     "dataset": dataset,
@@ -702,12 +713,14 @@ function fetch_table(dataset, split, table_idx, export_format) {
     "displayed_props": JSON.stringify(pressed_props),
     // "pipelines": JSON.stringify(pipelines)
   }, function (data) {
+
     reset_pipeline_outputs();
     reset_edited_cells();
     $("#tablearea").html(data.html);
     $("#dataset-spinner").hide();
 
     total_examples = data.total_examples;
+
     $("#total-examples").html(total_examples - 1);
 
 
@@ -802,12 +815,23 @@ $('#page-input').keypress(function (event) {
 });
 
 $(document).ready(function () {
-  $("#dataset-select").val(dataset).change();
-  $("#page-input").val(table_idx);
+  if (window.display_table != null) {
+    gotoexample(window.display_table.dataset, window.display_table.split, window.display_table.table_idx);
+    // wait until the request is returned and total_examples is set, then go to table
+    setInterval(function () {
+      if (total_examples > 1) {
+        gotopage(window.display_table.table_idx);
+        clearInterval(this);
+      }
+    }, 1000);
+  }
+  else {
+    // load default dataset
+    $("#dataset-select").val(dataset).change();
+    $("#page-input").val(table_idx);
+  }
 
   // enable tooltips
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 });
-
-
