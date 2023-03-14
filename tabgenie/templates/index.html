@@ -8,8 +8,8 @@
   <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/d3graphs.css">
   <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/jquery.highlight-within-textarea.css">
   <link rel="shortcut icon" href="{{ host_prefix }}/static/img/favicon.ico">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+  <meta name="viewport" content="width=1024">
   <script src="{{ host_prefix }}/static/js/jquery.min.js"></script>
   <script src="{{ host_prefix }}/static/js/popper.min.js"></script>
   <script src="{{ host_prefix }}/static/js/bootstrap.min.js"></script>
@@ -37,7 +37,7 @@
             <input class="form-control" id="page-input" onfocusout="gotobtn();"></a>
           </li>
           <li class="page-item">
-            <a class="page-link" id="total-examples" style="min-height: 30px;"></a>
+            <a class="page-link" id="total-examples" style="min-height: 28px;"></a>
           </li>
           <li class="page-item">
             <a class="page-link" id="next-btn" onclick="nextbtn();">›</a>
@@ -116,7 +116,9 @@
             <div class="d-grid gap-2">
               <input type="checkbox" class="btn-check" id="interactive-btn" onclick="toggle_interactive();"
                 autocomplete="off">
-              <label class="btn btn-sm btn-outline-secondary" for="interactive-btn">🗲 Interactive mode</label>
+              <label class="btn btn-sm btn-outline-secondary" for="interactive-btn"><img
+                  src="{{ host_prefix }}/static/img/unicode/lightning.png" width="12px"
+                  class="button-bw-icon" />Interactive mode</label>
               <!-- <input type="checkbox" class="btn-check" id="edit-btn" onclick="toggle_edit();" autocomplete="off"> -->
               <!-- <label class="btn btn-sm btn-outline-secondary" for="edit-btn">✎ Edit mode</label> -->
               <!-- <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
@@ -124,26 +126,30 @@
                 📝 Your edits <div id="your-edits-count"></div>
               </button> -->
               <button type="button" class="btn btn-outline-secondary  btn-sm" onclick="toggle_props();">
-                ✚ Toggle properties
+                <img src="{{ host_prefix }}/static/img/unicode/cross.png" width="10px" class="button-bw-icon" />Toggle
+                properties
               </button>
               <button type="button" class="btn btn-outline-secondary  btn-sm" onclick="toggle_view();">
-                ⇋ Toggle view
+                <img src="{{ host_prefix }}/static/img/unicode/bidir.png" width="12px" class="button-bw-icon" />Toggle
+                view
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#favourites-modal">
-                ★ Favourites
+                <img src="{{ host_prefix }}/static/img/unicode/star.png" width="12px"
+                  class="button-bw-icon" />Favourites
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#notes-modal">
-                ✎ Notes
+                <img src="{{ host_prefix }}/static/img/unicode/pencil.png" width="12px" class="button-bw-icon" />Notes
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#export-modal">
-                <b>⭳</b> Export
+                <img src="{{ host_prefix }}/static/img/unicode/arrowd.png" width="12px" class="button-bw-icon" />Export
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#info-modal">
-                ⓘ Dataset info
+                <img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px" class="button-bw-icon" />Dataset
+                info
               </button>
             </div>
           </div>
@@ -202,7 +208,7 @@
               {% for pipeline_name, attrs in pipelines.items() if attrs.interactive %}
               <div class="output-box pipeline-box" id="out-{{ pipeline_name }}">
                 <label class="label-name">{{ pipeline_name }}</label>
-                <label class="label-reload" onclick="reload_pipeline('{{ pipeline_name }}');">⟳</label>
+                <!-- <label class="label-reload" onclick="reload_pipeline('{{ pipeline_name }}');">⟳</label> -->
                 <!-- <label class="label-on-off"><input
                     class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
                     id="pipeline-checkbox-{{ pipeline_name }}" checked></label> -->
@@ -233,6 +239,9 @@
                   <span class="sr-only"></span>
                 </div>
                 <div id="out-{{ pipeline_name }}-placeholder" class="font-mono"></div>
+                <div id="out-{{ pipeline_name }}-reload" class="text-center"><button
+                    class="btn btn-sm btn-outline-secondary" onclick="reload_pipeline('{{ pipeline_name }}');">⟳
+                    Reload</button></div>
               </div>
               {% endfor %}
             </div>
@@ -298,6 +307,10 @@
               <input class="form-check-input" type="checkbox" role="switch" id="checkbox-edited-cells" disabled>
               <label class="form-check-label" for="checkbox-edited-cells">Include edited cells (current
                 only)</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="checkbox-notes" disabled>
+              <label class="form-check-label" for="checkbox-notes">Include notes (zip only)</label>
             </div>
           </div>
 
@@ -431,7 +444,7 @@
 
               <ul>
                 <li><b>Zdeněk Kasner</b> – <code>kasner (at) ufal.mff.cuni.cz</code></li>
-                <li><b>Kate Garanina</b> – <code>katgerasimenko (at) gmail.com</code></li>
+                <li><b>Kate Garanina</b> – <code>e.garanina (at) student.rug.nl</code></li>
                 <li><b>Ondřej Plátek</b> – <code>oplatek (at) ufal.mff.cuni.cz</code></li>
                 <li><b>Ondřej Dušek</b> – <code>odusek (at) ufal.mff.cuni.cz</code></li>
               </ul>
@@ -445,7 +458,7 @@
               <p>
                 © 2023 <a href="https://ufal.mff.cuni.cz/">
                   Institute of Formal and Applied
-                  Linguistics, Charles University</a>.
+                  Linguistics, Charles University</a> | <a href="https://rug.nl">University of Groningen</a>.
               </p>
 
             </div>

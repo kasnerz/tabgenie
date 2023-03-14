@@ -63,7 +63,11 @@ def table_to_excel(table, include_props=True):
 
 def table_to_csv(table):
     df = table_to_df(table)
-    table_csv = df.to_csv(index=False)
+
+    # export headers only if they are not the default integer index
+    export_headers = (type(df.columns) == pd.core.indexes.base.Index)
+
+    table_csv = df.to_csv(index=False, header=export_headers)
     return table_csv
 
 
@@ -100,7 +104,7 @@ def select_props(table, props):
         return {key: table.props.get(key) for key in props}
     else:
         raise NotImplementedError(
-            f'{props} properties mode is not recognized. '
+            f"{props} properties mode is not recognized. "
             f'Available options: "none", "factual", "all", or list of keys.'
         )
 
@@ -169,16 +173,15 @@ def table_to_linear(
     props_to_include = select_props(table, props)
     cells_to_include = select_cells(table, highlighted_only, cell_ids)
 
-    if style == '2d':
+    if style == "2d":
         return table_to_2d_str(cells_to_include, props_to_include)
-    elif style == 'markers':
+    elif style == "markers":
         return table_to_markers_str(cells_to_include, props_to_include)
-    elif style == 'index':
+    elif style == "index":
         return table_to_indexed_str(cells_to_include, props_to_include)
     else:
         raise NotImplementedError(
-            f'{style} linearization style is not recognized. '
-            f'Available options: "index", "markers", or "2d".'
+            f"{style} linearization style is not recognized. " f'Available options: "index", "markers", or "2d".'
         )
 
 

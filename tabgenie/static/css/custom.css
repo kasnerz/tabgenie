@@ -147,7 +147,7 @@ pre {
 }
 
 #page-input {
-    height: 30px;
+    height: 28px;
     width: 80px;
 }
 
@@ -299,10 +299,10 @@ pre {
 .label-settings {
     font-size: 13px !important;
     top: -9px !important;
-    right: 35px;
+    right: 10px;
 }
 
-.label-reload {
+/* .label-reload {
     right: 10px;
     font-size: 15px !important;
     top: -10px !important;
@@ -310,7 +310,7 @@ pre {
 
 .label-on-off {
     right: 10px;
-}
+} */
 
 .form-switch-panel {
     margin-right: 50px;
@@ -493,4 +493,22 @@ ul {
     margin-bottom: 20px;
     /* display: inline-block; */
     vertical-align: middle;
+}
+
+/* center icons and text on the button vertically*/
+#actions-area button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button-bw-icon {
+    margin-right: 4px;
+}
+
+/* set max column width for headings, wrap text on the next line on overflow */
+.meta-table th {
+    width: 140px;
+    max-width: 140px;
+    overflow-wrap: break-word;
 }

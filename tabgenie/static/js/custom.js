@@ -313,6 +313,9 @@ function update_notes_modal() {
 
   $("#notes-box").html("");
   for (const [note_id, note_d] of Object.entries(notes)) {
+
+    console.log(notes);
+
     var btn_remove = $("<button></button>")
       .attr("type", "button")
       .css("width", "0.5em !important")
@@ -323,12 +326,19 @@ function update_notes_modal() {
     let ndataset = note_d["dataset"];
     let nsplit = note_d["split"];
     let ntable_idx = note_d["table_idx"];
+
+    let ncontent = note_d["note"];
+
     var span_el = $("<span></span>")
       .addClass("clickable")
       .text(`${note_id}`)
       .attr("onclick", `gotoexample('${ndataset}', '${nsplit}', '${ntable_idx}');`);
 
-    span_el.append(btn_remove);
+    // show first 100 characters of the note content next to the clickable button
+    if (ncontent.length > 100) {
+      ncontent = ncontent.substring(0, 100) + "...";
+    }
+    var content_el = $("<span></span>").text(` [${ncontent}]`).css("font-style", "italic");
 
     var li_el = $("<li></li>")
       .addClass("list-group-item")
@@ -336,6 +346,8 @@ function update_notes_modal() {
       .attr("id", `note-${note_id}`);
 
     li_el.append(span_el);
+    li_el.append(content_el);
+    li_el.append(btn_remove);
 
     $("#notes-box").append(li_el);
   }
@@ -345,6 +357,7 @@ function save_note() {
   let note = $(".modalNoteInput").val();
   let note_id = get_note_id(dataset, split, table_idx);
   save_note_val(note_id, note);
+  $("#checkbox-notes").removeAttr("disabled");
 }
 
 function delete_note() {
@@ -571,6 +584,7 @@ function export_table(export_option) {
   var linearization_style = $('#linearization-format-select').val();
   var include_props = $('#checkbox-table-props').is(":checked");
   var export_edited_cells = $('#checkbox-edited-cells').is(":checked");
+  var export_notes = $('#checkbox-notes').is(":checked");
 
   if (export_option == "favourites") {
     var filename = "tabgenie_favourites.zip";
@@ -596,6 +610,7 @@ function export_table(export_option) {
     "export_examples": export_examples,
     "linearization_style": linearization_style,
     "include_props": include_props,
+    "export_notes": export_notes
   };
 
   if (export_edited_cells) {
