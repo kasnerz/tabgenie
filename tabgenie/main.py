@@ -71,7 +71,12 @@ def render_table():
     split = request.args.get("split")
     table_idx = int(request.args.get("table_idx"))
     displayed_props = json.loads(request.args.get("displayed_props"))
-    table_data = get_table_data(dataset_name, split, table_idx, displayed_props)
+
+    try:
+        table_data = get_table_data(dataset_name, split, table_idx, displayed_props)
+    except Exception as e:
+        logger.error(f"Error while getting table data: {e}")
+        table_data = {}
 
     return jsonify(table_data)
 
@@ -440,9 +445,32 @@ def favourite():
     return jsonify(favourites)
 
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     logger.info(f"Page loaded")
+
+    dataset_name = request.args.get("dataset")
+    split = request.args.get("split")
+    table_idx = request.args.get("table_idx")
+    if (
+        dataset_name
+        and split
+        and table_idx
+        and dataset_name in app.config["datasets"]
+        and split in ["train", "dev", "test"]
+        and table_idx.isdigit()
+    ):
+        display_table = {"dataset": dataset_name, "split": split, "table_idx": int(table_idx)}
+        default_dataset = display_table["dataset"]
+        logger.info(f"Serving permalink for {display_table}")
+    else:
+        default_dataset = app.config["default_dataset"]
+        display_table = None
 
     return render_template(
         "index.html",
@@ -450,6 +478,7 @@ def index():
         pipelines=app.db["pipelines_cfg"],
         pipelines_cfg_templates=app.db["cfg_templates"],
         prompts=app.db["prompts"],
-        default_dataset=app.config["default_dataset"],
+        default_dataset=default_dataset,
         host_prefix=app.config["host_prefix"],
+        display_table=display_table,
     )
