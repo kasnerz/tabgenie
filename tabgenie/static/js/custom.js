@@ -357,6 +357,7 @@ function save_note() {
   let note = $(".modalNoteInput").val();
   let note_id = get_note_id(dataset, split, table_idx);
   save_note_val(note_id, note);
+  $("#checkbox-notes").removeAttr("disabled");
 }
 
 function delete_note() {
@@ -583,6 +584,7 @@ function export_table(export_option) {
   var linearization_style = $('#linearization-format-select').val();
   var include_props = $('#checkbox-table-props').is(":checked");
   var export_edited_cells = $('#checkbox-edited-cells').is(":checked");
+  var export_notes = $('#checkbox-notes').is(":checked");
 
   if (export_option == "favourites") {
     var filename = "tabgenie_favourites.zip";
@@ -608,6 +610,7 @@ function export_table(export_option) {
     "export_examples": export_examples,
     "linearization_style": linearization_style,
     "include_props": include_props,
+    "export_notes": export_notes
   };
 
   if (export_edited_cells) {

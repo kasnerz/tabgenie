@@ -5,6 +5,7 @@ import glob
 import shutil
 import logging
 import linecache
+import pandas as pd
 import random
 import coloredlogs
 import yaml
@@ -95,7 +96,7 @@ def export_error_analysis(dataset_name, split, in_file, out_file, count, random_
         table = {
             "table": table_obj,
             "table_id": example_id,
-            "reference": table_obj.props.get('reference', ''),
+            "reference": table_obj.props.get("reference", ""),
             "prediction": predictions[example_id],
         }
         tables.append(table)
@@ -116,6 +117,7 @@ def export_to_file():
     include_props = content["include_props"]
     export_examples = json.loads(content["export_examples"])
     edited_cells = json.loads(content.get("edited_cells", "{}"))
+    export_notes = content["export_notes"]
 
     export_dir = os.path.join(app.config["root_dir"], "tmp")
 
@@ -135,6 +137,8 @@ def export_to_file():
         edited_cells=edited_cells,
         notes=session.get("notes", {}),
     )
+    if export_notes is True:
+        export_notes_to_file(notes, export_dir=os.path.join(export_dir, "files"))
 
     if export_option in ["favourites", "notes"]:
         file_to_download = os.path.join(export_dir, "export.zip")
@@ -142,6 +146,20 @@ def export_to_file():
 
     logger.info("Sending file")
     return send_file(file_to_download, mimetype="text/plain", as_attachment=True)
+
+
+def export_notes_to_file(notes, export_dir):
+    csv_data = []
+    headers = ["dataset", "split", "table_idx", "note"]
+    csv_data.append(headers)
+
+    for note in notes.values():
+        csv_data.append([note["dataset"], note["split"], note["table_idx"], note["note"]])
+
+    df = pd.DataFrame(csv_data[1:], columns=csv_data[0])
+    csv_file = os.path.join(export_dir, "notes.csv")
+
+    df.to_csv(csv_file, index=False)
 
 
 def export_examples_to_file(
@@ -165,7 +183,8 @@ def export_examples_to_file(
     os.makedirs(export_dir, exist_ok=True)
     exported = run_pipeline("export", pipeline_args=pipeline_args, force=True)
 
-    # ZK: commented this block out for now - not sure how exactly this is supposed to work and I had to resolve the merge conflict
+    # ZK: commented this block out for now
+    # for now, the notes can be exported in a ZIP file alongside other files
 
     # ========================
     # notes = notes if notes is not None else {}
