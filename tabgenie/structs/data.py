@@ -23,7 +23,7 @@ class Cell:
         is_col_header=False,
         is_row_header=False,
         is_dummy=False,
-        main_cell=None
+        main_cell=None,
     ):
         self.idx = idx
         self.value = value
@@ -41,7 +41,7 @@ class Cell:
 
     def serializable_props(self):
         props = copy.deepcopy(vars(self))
-        props['value'] = str(props['value'])
+        props["value"] = str(props["value"])
         return props
 
     def __repr__(self):
@@ -107,10 +107,7 @@ class Table:
 
     def get_row_headers(self, row_idx, column_idx):
         try:
-            headers = [
-                c for c in self.get_cells()[row_idx][:column_idx]
-                if c.is_row_header
-            ]
+            headers = [c for c in self.get_cells()[row_idx][:column_idx] if c.is_row_header]
             return headers
 
         except Exception as e:
@@ -376,7 +373,7 @@ class HFTabularDataset(TabularDataset):
             self.hf_id,
             name=self.hf_extra_config,
             split=hf_split,
-            num_proc=4,
+            # num_proc=4,
         )
         self.dataset_info = dataset.info.__dict__
         self.data[split] = dataset

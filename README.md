@@ -133,7 +133,9 @@ The datasets are stored to `HF_DATASETS_CACHE` directory which defaults to `~/.c
 
 The datasets are all loaded from [HuggingFace datasets](https://huggingface.co/datasets) instead of their original repositories which allows to use preprocessed datasets and a single unified loader.
 
-Note that there may be some minor changes in the data w.r.t. to the original datasets due to unification, such as adding "subject", "predicate" and "object" headings to RDF triple-to-text datasets.
+**Note that preparing the datasets for the first time may take some time since the datasets have to be downloaded to cache and preprocessed.** This process takes several minutes based on the dataset size. However, it only a one-time process (until the dataset is updated or the cache is deleted).
+
+Also note that there may be some minor changes in the data w.r.t. to the original datasets due to unification, such as adding "subject", "predicate" and "object" headings to RDF triple-to-text datasets.
 
 ## Adding datasets
 For adding a new dataset:
