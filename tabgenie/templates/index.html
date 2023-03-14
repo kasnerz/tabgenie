@@ -116,7 +116,9 @@
             <div class="d-grid gap-2">
               <input type="checkbox" class="btn-check" id="interactive-btn" onclick="toggle_interactive();"
                 autocomplete="off">
-              <label class="btn btn-sm btn-outline-secondary" for="interactive-btn">🗲 Interactive mode</label>
+              <label class="btn btn-sm btn-outline-secondary" for="interactive-btn"><img
+                  src="{{ host_prefix }}/static/img/unicode/lightning.png" width="12px"
+                  class="button-bw-icon" />Interactive mode</label>
               <!-- <input type="checkbox" class="btn-check" id="edit-btn" onclick="toggle_edit();" autocomplete="off"> -->
               <!-- <label class="btn btn-sm btn-outline-secondary" for="edit-btn">✎ Edit mode</label> -->
               <!-- <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
@@ -124,26 +126,30 @@
                 📝 Your edits <div id="your-edits-count"></div>
               </button> -->
               <button type="button" class="btn btn-outline-secondary  btn-sm" onclick="toggle_props();">
-                ✚ Toggle properties
+                <img src="{{ host_prefix }}/static/img/unicode/cross.png" width="10px" class="button-bw-icon" />Toggle
+                properties
               </button>
               <button type="button" class="btn btn-outline-secondary  btn-sm" onclick="toggle_view();">
-                ⇋ Toggle view
+                <img src="{{ host_prefix }}/static/img/unicode/bidir.png" width="12px" class="button-bw-icon" />Toggle
+                view
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#favourites-modal">
-                ★ Favourites
+                <img src="{{ host_prefix }}/static/img/unicode/star.png" width="12px"
+                  class="button-bw-icon" />Favourites
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#notes-modal">
-                ✎ Notes
+                <img src="{{ host_prefix }}/static/img/unicode/pencil.png" width="12px" class="button-bw-icon" />Notes
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#export-modal">
-                <b>⭳</b> Export
+                <img src="{{ host_prefix }}/static/img/unicode/arrowd.png" width="12px" class="button-bw-icon" />Export
               </button>
               <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#info-modal">
-                ⓘ Dataset info
+                <img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px" class="button-bw-icon" />Dataset
+                info
               </button>
             </div>
           </div>

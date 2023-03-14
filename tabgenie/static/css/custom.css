@@ -494,3 +494,14 @@ ul {
     /* display: inline-block; */
     vertical-align: middle;
 }
+
+/* center icons and text on the button vertically*/
+#actions-area button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button-bw-icon {
+    margin-right: 4px;
+}
