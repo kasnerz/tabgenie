@@ -376,7 +376,7 @@ class HFTabularDataset(TabularDataset):
             self.hf_id,
             name=self.hf_extra_config,
             split=hf_split,
-            num_proc=4,
+            # num_proc=4,
         )
         self.dataset_info = dataset.info.__dict__
         self.data[split] = dataset
