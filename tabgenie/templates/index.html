@@ -208,7 +208,7 @@
               {% for pipeline_name, attrs in pipelines.items() if attrs.interactive %}
               <div class="output-box pipeline-box" id="out-{{ pipeline_name }}">
                 <label class="label-name">{{ pipeline_name }}</label>
-                <label class="label-reload" onclick="reload_pipeline('{{ pipeline_name }}');">⟳</label>
+                <!-- <label class="label-reload" onclick="reload_pipeline('{{ pipeline_name }}');">⟳</label> -->
                 <!-- <label class="label-on-off"><input
                     class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
                     id="pipeline-checkbox-{{ pipeline_name }}" checked></label> -->
@@ -239,6 +239,9 @@
                   <span class="sr-only"></span>
                 </div>
                 <div id="out-{{ pipeline_name }}-placeholder" class="font-mono"></div>
+                <div id="out-{{ pipeline_name }}-reload" class="text-center"><button
+                    class="btn btn-sm btn-outline-secondary" onclick="reload_pipeline('{{ pipeline_name }}');">⟳
+                    Reload</button></div>
               </div>
               {% endfor %}
             </div>

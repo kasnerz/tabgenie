@@ -299,10 +299,10 @@ pre {
 .label-settings {
     font-size: 13px !important;
     top: -9px !important;
-    right: 35px;
+    right: 10px;
 }
 
-.label-reload {
+/* .label-reload {
     right: 10px;
     font-size: 15px !important;
     top: -10px !important;
@@ -310,7 +310,7 @@ pre {
 
 .label-on-off {
     right: 10px;
-}
+} */
 
 .form-switch-panel {
     margin-right: 50px;
