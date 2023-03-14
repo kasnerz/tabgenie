@@ -63,7 +63,11 @@ def table_to_excel(table, include_props=True):
 
 def table_to_csv(table):
     df = table_to_df(table)
-    table_csv = df.to_csv(index=False)
+
+    # export headers only if they are not the default integer index
+    export_headers = (type(df.columns) == pd.core.indexes.base.Index)
+
+    table_csv = df.to_csv(index=False, header=export_headers)
     return table_csv
 
 
