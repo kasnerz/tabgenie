@@ -1,13 +1,10 @@
 {
-    "type": "object",
-    "default": {},
     "required": [
         "data"
     ],
     "properties": {
         "data": {
             "type": "array",
-            "default": [],
             "items": {
                 "type": "array",
                 "items": {

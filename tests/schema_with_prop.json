@@ -1,6 +1,4 @@
 {
-    "type": "object",
-    "default": {},
     "required": [
         "data",
         "properties"
@@ -8,7 +6,6 @@
     "properties": {
         "data": {
             "type": "array",
-            "default": [],
             "items": {
                 "type": "array",
                 "items": {
@@ -63,52 +60,7 @@
             }
         },
         "properties": {
-            "type": "object",
-            "default": {},
-            "required": [
-                "reference",
-                "title",
-                "table_section_text",
-                "table_section_title",
-                "references",
-                "linearized_input",
-                "overlap_subset",
-                "url"
-            ],
-            "properties": {
-                "reference": {
-                    "type": "string",
-                    "default": ""
-                },
-                "title": {
-                    "type": "string",
-                    "default": ""
-                },
-                "table_section_text": {
-                    "type": "string",
-                    "default": ""
-                },
-                "table_section_title": {
-                    "type": "string",
-                    "default": ""
-                },
-                "references": {
-                    "type": "string",
-                    "default": ""
-                },
-                "linearized_input": {
-                    "type": "string",
-                    "default": ""
-                },
-                "overlap_subset": {
-                    "type": "string",
-                    "default": ""
-                },
-                "url": {
-                    "type": "string",
-                    "default": ""
-                }
-            }
+            "type": "object"
         }
     }
 }
