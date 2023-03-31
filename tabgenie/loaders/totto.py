@@ -28,7 +28,16 @@ class ToTTo(HFTabularDataset):
         dc.main_cell = (i, j)
         return dc
 
-    def _process_cell(self, table_obj, entry, raw_cell, row_num, raw_col_num, grid_col_num):
+    def _process_cell(
+            self,
+            table_obj,
+            entry,
+            raw_cell,
+            row_num,
+            raw_col_num,
+            grid_col_num,
+            row_is_header
+    ):
         merged_cells = {}
 
         c = Cell()
@@ -36,8 +45,8 @@ class ToTTo(HFTabularDataset):
         c.colspan = raw_cell["column_span"]
         c.rowspan = raw_cell["row_span"]
         c.is_highlighted = [row_num, raw_col_num] in entry["highlighted_cells"]
-        c.is_col_header = raw_cell["is_header"] and row_num == 0  # todo: col header annotation not in orig data?
-        c.is_row_header = raw_cell["is_header"] and row_num != 0
+        c.is_col_header = raw_cell["is_header"] and row_is_header
+        c.is_row_header = raw_cell["is_header"] and not row_is_header
         table_obj.add_cell(c)
 
         for cs in range(raw_cell["column_span"]):
@@ -68,6 +77,9 @@ class ToTTo(HFTabularDataset):
                 table_obj.add_cell(c)
                 col_num += 1
 
+            # if all cells in row are headers, then the row is column-wise header
+            row_is_header = all(c['is_header'] for c in row)
+
             for j, x in enumerate(row):
                 while (i, col_num) in merged_cells:
                     c = merged_cells[(i, col_num)]
@@ -80,7 +92,8 @@ class ToTTo(HFTabularDataset):
                     raw_cell=x,
                     row_num=i,
                     raw_col_num=j,
-                    grid_col_num=col_num
+                    grid_col_num=col_num,
+                    row_is_header=row_is_header
 
                 )
                 merged_cells.update(curr_merged_cells)

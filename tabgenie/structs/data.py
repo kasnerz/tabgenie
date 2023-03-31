@@ -208,7 +208,7 @@ class TabularDataset:
             exported = self.table_to_linear(
                 table,
                 cell_ids=cell_ids,
-                include_props_mode="all" if include_props else "none",
+                props="all" if include_props else "none",
                 style=linearization_style,
                 highlighted_only=False,
             )
