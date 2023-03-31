@@ -7,10 +7,10 @@ from tabgenie.utils.export import table_to_json
 '''-------------------JSON-SCHEMA-----------------------'''
 # https://python-jsonschema.readthedocs.io/en/latest/
 # need schema for testing tabs exporting into json
-with open('/tests/schemes/schema_without_prop.json') as f:
+with open('tests/schemes/schema_without_prop.json') as f:
     schema_without_prop = json.load(f)
 
-with open('/tests/schemes/schema_with_prop.json') as f:
+with open('tests/schemes/schema_with_prop.json') as f:
     schema_with_prop = json.load(f)
 '''-----------------------------------------------------'''
 
