@@ -20,7 +20,8 @@ class CACAPO(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = ast.literal_eval(entry["lex"]["text"][0])[0]
+        refs = [ast.literal_eval(item)[0] for item in entry["lex"]["text"]]
+        t.props["references"] = refs  # todo: doesn't seem that there are more than 1 but there should be, according to paper
         t.props["category"] = entry["category"]
         t.props["lang"] = entry["lang"]
         keyvals = entry["modified_triple_sets"]["mtriple_set"][0]

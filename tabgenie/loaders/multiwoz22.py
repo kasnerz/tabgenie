@@ -287,7 +287,7 @@ class MultiWOZ22(HFTabularDataset):
     def prepare_table(self, entry):
         t = Table()
         # No reference
-        t.set_generated_output("reference", "")
+        t.props["references"] = [""]
         t.props["dialogue_id"] = entry["dialogue_id"]
         t.props["services"] = " ".join(entry["services"])
         t.props["raw_turns"] = json.dumps(filter_empty_recursive(entry["turns"]))

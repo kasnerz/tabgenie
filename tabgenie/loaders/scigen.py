@@ -29,7 +29,7 @@ class SciGen(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = (entry.get("text") or "").replace("[CONTINUE]", "\n")
+        t.props["references"] = [(entry.get("text") or "").replace("[CONTINUE]", "\n")]
         t.props["title"] = entry["table_caption"].replace("[CONTINUE]", "\n")
         t.props["paper"] = entry["paper"]
         t.props["paper_id"] = entry.get("paper_id")

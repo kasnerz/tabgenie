@@ -124,7 +124,7 @@ class ToTTo(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["target"]
+        t.props["references"] = entry["references"] or [entry["target"]]
 
         t.props["title"] = entry["table_page_title"]
         if entry.get("table_section_text"):

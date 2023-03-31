@@ -20,7 +20,8 @@ class LogicNLG(HFTabularDataset):
     def prepare_table(self, entry):
         t = Table()
 
-        t.props["reference"] = entry["ref"]
+        # official BLEU takes all refs per table but everyone uses only pre-selected columns
+        t.props["references"] = [entry["ref"]]
         t.props["title"] = entry["title"]
         t.props["table_id"] = entry["table_id"]
         t.props["template"] = entry["template"]

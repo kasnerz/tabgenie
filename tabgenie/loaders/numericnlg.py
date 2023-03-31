@@ -16,7 +16,7 @@ class NumericNLG(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["description"]
+        t.props["references"] = [entry["description"]]
         t.props["header_mention"] = entry["header_mention"]
         t.props["class_sentence"] = entry["header_mention"]
         t.props["table_id_paper"] = entry.get("table_id_paper")

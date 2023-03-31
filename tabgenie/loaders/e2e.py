@@ -55,7 +55,7 @@ class E2E(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["target"]
+        t.props["references"] = entry["references"] or [entry["target"]]
         mrs = entry["meaning_representation"].split(", ")
 
         for mr in mrs:

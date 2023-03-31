@@ -17,7 +17,7 @@ class ChartToTextS(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["ref"]
+        t.props["references"] = [entry["ref"]]
         t.props["title"] = entry["title"]
 
         for i, row in enumerate(ast.literal_eval(entry["content"])):

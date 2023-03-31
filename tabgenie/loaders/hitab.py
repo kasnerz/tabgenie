@@ -39,7 +39,7 @@ class HiTab(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["sub_sentence"]
+        t.props["references"] = [entry["sub_sentence"]]
         content = ast.literal_eval(entry["table_content"])
         linked_cells = self._get_linked_cells(ast.literal_eval(entry["linked_cells"]))
 

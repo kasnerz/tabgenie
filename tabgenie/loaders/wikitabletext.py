@@ -15,7 +15,7 @@ class WikiTableText(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["reference"]
+        t.props["references"] = [entry["reference"]]
         t.props["row_number"] = entry["row_number"]
 
         headers = ast.literal_eval(entry["headers"])

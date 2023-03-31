@@ -22,7 +22,7 @@ class WikiBio(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["target_text"]
+        t.props["references"] = [self.normalize(entry["target_text"])]
         t.props["title"] = self.normalize(entry["input_text"]["context"].rstrip("\n"))
         table = entry["input_text"]["table"]
 

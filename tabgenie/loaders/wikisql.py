@@ -34,7 +34,7 @@ class WikiSQL(HFTabularDataset):
             t.props["title"] = title
 
         t.props["sql"] = entry["sql"]["human_readable"]
-        t.props["reference"] = entry["question"]
+        t.props["references"] = [entry["question"]]  # there are several questions per table but it's different SQLs
         t.props["id"] = entry["table"]["id"]
         t.props["name"] = entry["table"]["name"]
 

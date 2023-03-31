@@ -37,7 +37,7 @@ class EventNarrative(HFTabularDataset):
             reference = reference.replace(key, val)
 
         t = Table()
-        t.props["reference"] = reference
+        t.props["references"] = [reference]
         t.props["title"] = entry["Event_Name"]
         t.props["types"] = entry["types"]
         t.props["reference_delex"] = entry["narration"]

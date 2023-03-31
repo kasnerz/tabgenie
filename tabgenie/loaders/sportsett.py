@@ -23,7 +23,7 @@ class SportSettBasketball(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["target"]
+        t.props["references"] = [entry["target"]]
 
         ht = entry["teams"]["home"]
         vt = entry["teams"]["vis"]

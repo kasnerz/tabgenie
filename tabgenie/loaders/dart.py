@@ -36,7 +36,7 @@ class DART(HFTabularDataset):
     def prepare_table(self, entry):
         t = Table()
 
-        t.props["reference"] = entry["target"]
+        t.props["references"] = entry["references"] or [entry["target"]]
         t.props["target_source"] = entry["target_sources"][0]
         t.props["subtree_was_extended"] = entry["subtree_was_extended"]
 
