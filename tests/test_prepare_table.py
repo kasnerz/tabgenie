@@ -1,7 +1,6 @@
 import pytest
 
 
-@pytest.mark.dependency()
 def test_table(prepare_tests):
     tab, split, len_tab, cls = prepare_tests
     failed_nums = []
