@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import re
+
 from ..structs.data import Cell, Table, HFTabularDataset
 
 
@@ -100,6 +102,11 @@ class ToTTo(HFTabularDataset):
 
                 col_num += x["column_span"]
 
+            while (i, col_num) in merged_cells:
+                c = merged_cells[(i, col_num)]
+                table_obj.add_cell(c)
+                col_num += 1
+
             table_obj.save_row()
 
         return table_obj
@@ -122,6 +129,50 @@ class ToTTo(HFTabularDataset):
 
         return table_obj
 
+    @staticmethod
+    def _add_header_highlights_gem(table_obj):
+        gem_lin = table_obj.props['linearized_input']
+        cells = re.findall('<cell>(.+?)</cell>', gem_lin)
+        highlighted = [
+            (i, j)
+            for i, row in enumerate(table_obj.get_cells())
+            for j, cell in enumerate(row) if cell.is_highlighted
+        ]
+
+        assert len(cells) == len(highlighted)
+
+        for cell, cell_idx in zip(cells, highlighted):
+            col_headers = re.findall('<col_header>(.+?)</col_header>', cell)
+            if col_headers:
+                curr_col_header = 0
+                for row in table_obj.get_cells():
+                    col_cell = row[cell_idx[1]]
+                    if col_cell.value == col_headers[curr_col_header].strip():
+                        col_cell.is_highlighted = True
+                        if col_cell.is_dummy:
+                            main_cell = table_obj.get_cell(*col_cell.main_cell)
+                            main_cell.is_highlighted = True
+
+                        curr_col_header += 1
+                        if curr_col_header == len(col_headers):
+                            break
+
+            row_headers = re.findall('<row_header>(.+?)</row_header>', cell)
+            if row_headers:
+                curr_row_header = 0
+                for row_cell in table_obj.get_cells()[cell_idx[0]]:
+                    if row_cell.value == row_headers[curr_row_header].strip():
+                        row_cell.is_highlighted = True
+                        if row_cell.is_dummy:
+                            main_cell = table_obj.get_cell(*row_cell.main_cell)
+                            main_cell.is_highlighted = True
+
+                        curr_row_header += 1
+                        if curr_row_header == len(row_headers):
+                            break
+
+        return table_obj
+
     def prepare_table(self, entry):
         t = Table()
         t.props["reference"] = entry["target"]
@@ -139,6 +190,7 @@ class ToTTo(HFTabularDataset):
         t.props["url"] = entry["table_webpage_url"]
 
         t = self._write_cells(t, entry)
-        t = self._add_header_highlights(t)
+
+        t = self._add_header_highlights_gem(t)
 
         return t
