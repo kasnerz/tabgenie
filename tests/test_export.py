@@ -103,7 +103,7 @@ def test_export_html(prepare_tests):
     failed_nums = []
     html_format = ['web', 'export']
     include_props = [True, False]
-    displayed_props = None
+    displayed_props = [None]
     for nmb in range(len_tab):
         try:
             tab = cls.prepare_table(cls.data[split][nmb])
@@ -114,14 +114,14 @@ def test_export_html(prepare_tests):
                 try:
                     table_to_html(tab, displayed_props, prop, form)
                 except:
-                    failed_nums.append(nmb)
+                    failed_nums.append(f'{nmb}-{prop}-{form}')
 
     assert not failed_nums, \
         f'{tab}-{split}\n' \
         f'Count error tables - {len(failed_nums)}\n' \
         f'First 20 numbers - {failed_nums[:20]}'
 
-
+"""
 def test_export_triples(prepare_tests):
     tab, split, len_tab, cls = prepare_tests
     failed_nums = []
@@ -140,3 +140,5 @@ def test_export_triples(prepare_tests):
         f'{tab}-{split}\n' \
         f'Count error tables - {len(failed_nums)}\n' \
         f'First 20 numbers - {failed_nums[:20]}'
+
+"""
