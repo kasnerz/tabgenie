@@ -21,12 +21,12 @@ def test_export_json(prepare_tests):
     failed_nums = []
     for nmb in range(len_tab):
         try:
-            tab = cls.prepare_table(cls.data[split][nmb])
+            table = cls.prepare_table(cls.data[split][nmb])
         except:
             pytest.skip('test_table is failed')
         for prop in [True, False]:
             try:
-                obj_json = json.dumps(table_to_json(tab, prop))
+                obj_json = json.dumps(table_to_json(table, prop))
                 if not prop:
                     schema = schema_without_prop
                 else:
@@ -46,11 +46,11 @@ def test_export_excel(prepare_tests):
     failed_nums = []
     for nmb in range(len_tab):
         try:
-            tab = cls.prepare_table(cls.data[split][nmb])
+            table = cls.prepare_table(cls.data[split][nmb])
         except:
             pytest.skip('test_table is failed')
         try:
-            table_to_excel(tab, include_props=True)
+            table_to_excel(table, include_props=True)
         except:
             failed_nums.append(nmb)
 
@@ -65,11 +65,11 @@ def test_export_csv(prepare_tests):
     failed_nums = []
     for nmb in range(len_tab):
         try:
-            tab = cls.prepare_table(cls.data[split][nmb])
+            table = cls.prepare_table(cls.data[split][nmb])
         except:
             pytest.skip('test_table is failed')
         try:
-            table_to_csv(tab)
+            table_to_csv(table)
         except:
             failed_nums.append(nmb)
 
@@ -84,11 +84,11 @@ def test_export_df(prepare_tests):
     failed_nums = []
     for nmb in range(len_tab):
         try:
-            tab = cls.prepare_table(cls.data[split][nmb])
+            table = cls.prepare_table(cls.data[split][nmb])
         except:
             pytest.skip('test_table is failed')
         try:
-            table_to_df(tab)
+            table_to_df(table)
         except:
             failed_nums.append(nmb)
 
@@ -106,13 +106,13 @@ def test_export_html(prepare_tests):
     displayed_props = [None]
     for nmb in range(len_tab):
         try:
-            tab = cls.prepare_table(cls.data[split][nmb])
+            table = cls.prepare_table(cls.data[split][nmb])
         except:
             pytest.skip('test_table is failed')
         for form in html_format:
             for prop in include_props:
                 try:
-                    table_to_html(tab, displayed_props, prop, form)
+                    table_to_html(table, displayed_props, prop, form)
                 except:
                     failed_nums.append(f'{nmb}-{prop}-{form}')
 
@@ -128,11 +128,11 @@ def test_export_triples(prepare_tests):
     cell_ids = None
     for nmb in range(len_tab):
         try:
-            tab = cls.prepare_table(cls.data[split][nmb])
+            table = cls.prepare_table(cls.data[split][nmb])
         except:
             pytest.skip('test_table is failed')
         try:
-            table_to_triples(tab, cell_ids)
+            table_to_triples(table, cell_ids)
         except:
             failed_nums.append(nmb)
 

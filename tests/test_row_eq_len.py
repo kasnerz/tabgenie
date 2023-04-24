@@ -6,10 +6,10 @@ def test_export_json(prepare_tests):
     failed_nums = []
     for nmb in range(len_tab):
         try:
-            tab = cls.prepare_table(cls.data[split][nmb])
+            table = cls.prepare_table(cls.data[split][nmb])
         except:
             pytest.skip('test_table is failed')
-        cells = tab.get_cells()
+        cells = table.get_cells()
         same_length = all(len(row) == len(cells[0]) for row in cells)
         if not same_length:
             failed_nums.append(nmb)
