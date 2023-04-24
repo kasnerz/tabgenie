@@ -100,6 +100,11 @@ class ToTTo(HFTabularDataset):
 
                 col_num += x["column_span"]
 
+            while (i, col_num) in merged_cells:
+                c = merged_cells[(i, col_num)]
+                table_obj.add_cell(c)
+                col_num += 1
+
             table_obj.save_row()
 
         return table_obj
