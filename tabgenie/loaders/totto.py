@@ -146,6 +146,9 @@ class ToTTo(HFTabularDataset):
             if col_headers:
                 curr_col_header = 0
                 for row in table_obj.get_cells():
+                    if len(row) <= cell_idx[1]:
+                        continue
+
                     col_cell = row[cell_idx[1]]
                     if col_cell.value == col_headers[curr_col_header].strip():
                         col_cell.is_highlighted = True
@@ -173,7 +176,7 @@ class ToTTo(HFTabularDataset):
 
         return table_obj
 
-    def prepare_table(self, entry):
+    def prepare_table(self, entry, highlights='mine'):
         t = Table()
         t.props["reference"] = entry["target"]
 
@@ -191,6 +194,9 @@ class ToTTo(HFTabularDataset):
 
         t = self._write_cells(t, entry)
 
-        t = self._add_header_highlights_gem(t)
+        if highlights == 'mine':
+            t = self._add_header_highlights(t)
+        elif highlights == 'gem':
+            t = self._add_header_highlights_gem(t)
 
         return t
