@@ -1,7 +1,7 @@
 import pytest
 
 
-def test_export_json(prepare_tests):
+def test_row_eq_len(prepare_tests):
     tab, split, len_tab, cls = prepare_tests
     failed_nums = []
     for nmb in range(len_tab):
