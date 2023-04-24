@@ -77,6 +77,7 @@ def table_to_df(table):
     df = pd.read_html(table_html)[0]
     return df
 
+
 def table_to_html(table, displayed_props, include_props, html_format):
     # TODO what is argument displayed_props for?
     if html_format == "web" and table.props is not None:
