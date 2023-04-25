@@ -7,12 +7,11 @@ def test_row_eq_len(prepare_tests):
     for nmb in range(len_tab):
         try:
             table = cls.prepare_table(cls.data[split][nmb])
+            cells = table.get_cells()
+            same_length = all(len(row) == len(cells[0]) for row in cells)
         except:
-            pytest.skip('test_table is failed')
-        cells = table.get_cells()
-        same_length = all(len(row) == len(cells[0]) for row in cells)
-        if not same_length:
-            failed_nums.append(nmb)
+            if not same_length:
+                failed_nums.append(nmb)
 
     assert not failed_nums, \
         f'{tab}-{split}\n' \

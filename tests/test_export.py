@@ -1,7 +1,6 @@
 import pytest
 import json
 from jsonschema import validate
-from xlsxwriter.workbook import Workbook
 
 from tabgenie.utils.export import *
 
@@ -22,18 +21,18 @@ def test_export_json(prepare_tests):
     for nmb in range(len_tab):
         try:
             table = cls.prepare_table(cls.data[split][nmb])
+            for prop in [True, False]:
+                try:
+                    obj_json = json.dumps(table_to_json(table, prop))
+                    if not prop:
+                        schema = schema_without_prop
+                    else:
+                        schema = schema_with_prop
+                    validate(instance=obj_json, schema=schema)
+                except:
+                    failed_nums.append(nmb)
         except:
-            pytest.skip('test_table is failed')
-        for prop in [True, False]:
-            try:
-                obj_json = json.dumps(table_to_json(table, prop))
-                if not prop:
-                    schema = schema_without_prop
-                else:
-                    schema = schema_with_prop
-                validate(instance=obj_json, schema=schema)
-            except:
-                failed_nums.append(nmb)
+            failed_nums.append(nmb)
 
     assert not failed_nums, \
         f'{tab}-{split}\n' \
@@ -47,9 +46,6 @@ def test_export_excel(prepare_tests):
     for nmb in range(len_tab):
         try:
             table = cls.prepare_table(cls.data[split][nmb])
-        except:
-            pytest.skip('test_table is failed')
-        try:
             table_to_excel(table, include_props=True)
         except:
             failed_nums.append(nmb)
@@ -66,9 +62,6 @@ def test_export_csv(prepare_tests):
     for nmb in range(len_tab):
         try:
             table = cls.prepare_table(cls.data[split][nmb])
-        except:
-            pytest.skip('test_table is failed')
-        try:
             table_to_csv(table)
         except:
             failed_nums.append(nmb)
@@ -85,9 +78,6 @@ def test_export_df(prepare_tests):
     for nmb in range(len_tab):
         try:
             table = cls.prepare_table(cls.data[split][nmb])
-        except:
-            pytest.skip('test_table is failed')
-        try:
             table_to_df(table)
         except:
             failed_nums.append(nmb)
@@ -107,14 +97,14 @@ def test_export_html(prepare_tests):
     for nmb in range(len_tab):
         try:
             table = cls.prepare_table(cls.data[split][nmb])
+            for form in html_format:
+                for prop in include_props:
+                    try:
+                        table_to_html(table, displayed_props, prop, form)
+                    except:
+                        failed_nums.append(f'{nmb}-{prop}-{form}')
         except:
-            pytest.skip('test_table is failed')
-        for form in html_format:
-            for prop in include_props:
-                try:
-                    table_to_html(table, displayed_props, prop, form)
-                except:
-                    failed_nums.append(f'{nmb}-{prop}-{form}')
+            failed_nums.append(nmb)
 
     assert not failed_nums, \
         f'{tab}-{split}\n' \
@@ -129,9 +119,6 @@ def test_export_triples(prepare_tests):
     for nmb in range(len_tab):
         try:
             table = cls.prepare_table(cls.data[split][nmb])
-        except:
-            pytest.skip('test_table is failed')
-        try:
             table_to_triples(table, cell_ids)
         except:
             failed_nums.append(nmb)
