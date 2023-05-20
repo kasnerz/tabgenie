@@ -183,7 +183,6 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
         learning_rate=1e-4,
         num_train_epochs=epochs,
         save_strategy='epoch',
-        save_total_limit=2,
         predict_with_generate=True,
         generation_max_length=512,
         metric_for_best_model='eval_bleu',
