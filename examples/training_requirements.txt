@@ -1,0 +1,6 @@
+numpy
+evaluate
+transformers==4.25.1
+torch==1.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
+sacrebleu
+tqdm
