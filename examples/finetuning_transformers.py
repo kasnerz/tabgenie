@@ -222,9 +222,12 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
             num_beams=NUM_BEAMS
         )
         score_vals[ckpt_path] = {'score': score, 'preds': preds}
+        print(f'BLEU score for {ckpt_name}: {score}')
 
     # saving best model and its dev results
     max_ckpt_path, max_ckpt_results = max(score_vals.items(), key=lambda x: x[1]['score'])
+    print(f"Max BLEU score: {max_ckpt_results['score']} for {max_ckpt_path}")
+
     best_ckpt_model = AutoModelForSeq2SeqLM.from_pretrained(max_ckpt_path).to(DEVICE)
     best_ckpt_model.save_pretrained(os.path.join(save_dir, "model"))
 
