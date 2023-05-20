@@ -284,11 +284,11 @@ class TabularDataset:
         logger.info(f"[tabgenie] linearized example ({split}/0): {lin_example}")
 
         processed_dataset = self.data[split].map(process_example, batched=False, num_proc=1)
-        extra_columns = [
-            col for col in processed_dataset.features.keys() if col not in ["labels", "input_ids", "attention_mask"]
-        ]
-        processed_dataset = processed_dataset.remove_columns(extra_columns)
-        processed_dataset.set_format(type="torch")
+        processed_dataset.set_format(
+            type="torch",
+            columns=["labels", "input_ids", "attention_mask"],
+            output_all_columns=True
+        )
 
         return processed_dataset
 
