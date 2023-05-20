@@ -77,10 +77,13 @@ def compute_bleu_on_one_reference(eval_preds, tokenizer):
 def compute_bleu_on_all_references(preds, references):
     # padding references
     max_ref_len = max(len(x) for x in references)
+    min_ref_len = min(len(x) for x in references)
     if max_ref_len == 0:
         return None
 
-    references = [[x] + ['' for _ in range(max_ref_len - len(x))] for x in references]
+    print(f'Number of refs for one table: max {max_ref_len}, min {min_ref_len}')
+
+    references = [x + ['' for _ in range(max_ref_len - len(x))] for x in references]
     result = BLEU_METRIC.compute(predictions=preds, references=references)
 
     return result["score"]
