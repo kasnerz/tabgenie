@@ -26,6 +26,12 @@ STYLES = {
 }
 
 
+def prepare_prop(prop):
+    if isinstance(prop, (list, set)):
+        prop = '; '.join(prop)
+    return prop
+
+
 def write_merged_cells(cell, row_num, col_num, merge_cells, merged_cells, worksheet, cell_format):
     value = str(cell.value)
     end_row = row_num + cell.rowspan - 1
@@ -64,8 +70,9 @@ def write_html_table_to_excel(
         start_row += 1
 
         for prop_name in table.props.keys():
+            prop = prepare_prop(table.props.get(prop_name, ""))
             worksheet.write(start_row, start_col, prop_name, style_objs["bold"])
-            worksheet.write(start_row, start_col + 1, table.props.get(prop_name, ""))
+            worksheet.write(start_row, start_col + 1, prop)
             start_row += 1
 
         worksheet.write(start_row, start_col, "")
@@ -138,10 +145,7 @@ def write_annotation_to_excel(tables, prop_list, ann_columns, out_file):
         # writing properties
         props_end_row = start_row + len(prop_list)
         for i, prop_name in enumerate(prop_list):
-            prop = table_info.get(prop_name, "")
-            if isinstance(prop, (list, set)):
-                prop = '; '.join(prop)
-
+            prop = prepare_prop(table_info.get(prop_name, ""))
             worksheet.write(start_row + i, start_col, prop_name, style_objs["bold"])
             worksheet.write(start_row + i, start_col + 1, prop)
 
