@@ -159,6 +159,7 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
         p: tg_dataset.get_hf_dataset(split=p, tokenizer=tokenizer, max_length=MAX_LENGTH)
         for p in tg_dataset.splits
     }
+    print(hf_datasets)
 
     # to control if the data fits into the predefined length limit
     p_truncated_inputs, p_truncated_outputs = calc_truncated(hf_datasets['train'])
