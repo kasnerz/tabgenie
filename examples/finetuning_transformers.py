@@ -226,7 +226,7 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
     # saving best model and its dev results
     max_ckpt_path, max_ckpt_results = max(score_vals.items(), key=lambda x: x[1]['score'])
     best_ckpt_model = AutoModelForSeq2SeqLM.from_pretrained(max_ckpt_path)
-    best_ckpt_model.save(os.path.join(save_dir, "model"))
+    best_ckpt_model.save_pretrained(os.path.join(save_dir, "model"))
 
     write_results(
         save_dir,
