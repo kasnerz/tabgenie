@@ -207,7 +207,7 @@ def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
     ckpts = os.listdir(model_ckpt_dir)
     score_vals = {}
 
-    for ckpt_name, ckpt_num in ckpts:
+    for ckpt_name in ckpts:
         ckpt_path = os.path.join(model_ckpt_dir, ckpt_name)
         os.makedirs(os.path.join(ckpt_path, 'preds'), exist_ok=True)
         print(f'Running prediction of {ckpt_name} on dev')
