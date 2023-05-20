@@ -512,3 +512,7 @@ ul {
     max-width: 140px;
     overflow-wrap: break-word;
 }
+
+p.intable {
+    margin-bottom: 0.25rem
+}

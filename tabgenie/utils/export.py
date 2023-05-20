@@ -95,18 +95,24 @@ def table_to_html(table, displayed_props, include_props, html_format):
 
 def select_props(table, props):
     if props == "none" or not table.props:
-        return {}
+        out_props = {}
     elif props == "factual":
-        return {key: val for key, val in table.props.items() if "title" in key or "category" in key}
+        out_props = {key: val for key, val in table.props.items() if "title" in key or "category" in key}
     elif props == "all":
-        return table.props
+        out_props = table.props
     elif isinstance(props, list):
-        return {key: table.props.get(key) for key in props}
+        out_props = {key: table.props.get(key) for key in props}
     else:
         raise NotImplementedError(
             f"{props} properties mode is not recognized. "
             f'Available options: "none", "factual", "all", or list of keys.'
         )
+
+    for k, v in out_props.items():  # at least for references
+        if isinstance(v, (list, set)):
+            out_props[k] = '; '.join(v)
+
+    return out_props
 
 
 def select_cells(table, highlighted_only, cell_ids):
@@ -190,6 +196,9 @@ def _meta_to_html(props, displayed_props):
     meta_buttons = []
 
     for key, value in props.items():
+        if isinstance(value, (list, set)):
+            value = [h("p", klass="intable")(v) for v in value]
+
         meta_row_cls = "collapse show" if key in displayed_props else "collapse"
         aria_expanded = "true" if key in displayed_props else "false"
 
@@ -221,6 +230,9 @@ def _meta_to_html(props, displayed_props):
 def _meta_to_simple_html(props):
     meta_trs = []
     for key, value in props.items():
+        if isinstance(value, (list, set)):
+            value = [h("p")(v) for v in value]
+
         meta_trs.append([h("th")(key), h("td")(value)])
 
     meta_tbodies = [h("tr")(tds) for tds in meta_trs]

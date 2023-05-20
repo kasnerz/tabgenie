@@ -27,7 +27,7 @@ class CustomInputProcessor(Processor):
         for x in rand_ex:
             prompt = re.sub(rf"\[PROMPTVAR:RAND{x}_TABLE_CSV\]", dataset.table_to_csv(rand_tables[x]), prompt)
             prompt = re.sub(rf"\[PROMPTVAR:RAND{x}_HL_CELLS\]", dataset.table_to_linear(rand_tables[x]), prompt)
-            prompt = re.sub(rf"\[PROMPTVAR:RAND{x}_REF\]", dataset.get_reference(rand_tables[x]), prompt)
+            prompt = re.sub(rf"\[PROMPTVAR:RAND{x}_REF\]", dataset.get_reference(rand_tables[x])[0], prompt)
 
         return prompt
 

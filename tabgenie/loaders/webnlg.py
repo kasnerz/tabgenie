@@ -34,7 +34,7 @@ class WebNLG(HFTabularDataset):
 
     def prepare_table(self, entry):
         t = Table()
-        t.props["reference"] = entry["references"] or [entry["target"]]
+        t.props["references"] = entry["references"] or [entry["target"]]
         t.props["category"] = entry["category"]
         t.props["webnlg_id"] = entry["webnlg_id"]
 

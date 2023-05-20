@@ -159,8 +159,8 @@ class TabularDataset:
         raise NotImplementedError
 
     @staticmethod
-    def get_reference(table):
-        return table.props.get("reference")
+    def get_references(table):
+        return table.props.get("references")
 
     def get_example_count(self, split):
         return len(self.data[split])
@@ -222,8 +222,8 @@ class TabularDataset:
             exported = self.table_to_excel(table, include_props)
         elif export_format == "json":
             exported = self.table_to_json(table, include_props)
-        elif export_format == "reference":
-            exported = self.get_reference(table)
+        elif export_format == "reference":  # todo: what is it for?
+            exported = '\n'.join(self.get_references(table))
         else:
             raise NotImplementedError(export_format)
 
@@ -263,10 +263,18 @@ class TabularDataset:
         def process_example(example):
             table_obj = self.prepare_table(example)
             linearized = linearize_fn(table_obj, **linearize_params)
-            ref = self.get_reference(table_obj)
+
+            # ASSUMING THAT dataset has pairs table-text for train (without multiple references),
+            # and we cannot tokenize all references for dev and test anyway
+            refs = self.get_references(table_obj)
+            if split == 'train' and len(refs) > 1:
+                logger.warning((
+                    '[tabgenie] references for train set contain more than one element.'
+                    'Taking the first reference.'
+                ))
 
             tokens = tokenizer(linearized, max_length=max_length, truncation=True)
-            ref_tokens = tokenizer(ref, max_length=max_length, truncation=True)
+            ref_tokens = tokenizer(text_target=refs[0], max_length=max_length, truncation=True)
             tokens["labels"] = ref_tokens["input_ids"]
 
             return tokens
@@ -285,15 +293,15 @@ class TabularDataset:
         return processed_dataset
 
     def get_linearized_pairs(self, split, linearize_fn=None):
+        # todo: what is it for? not used
         if linearize_fn is None:
             linearize_fn = self.table_to_linear
 
         data = []
         for i, entry in enumerate(self.data[split]):
-            ex = [
-                linearize_fn(self.prepare_table(entry)),
-                self.get_reference(self.get_table(split, i)),
-            ]
+            table_obj = self.prepare_table(entry)
+            table_lin = linearize_fn(table_obj)
+            ex = [(table_lin, ref) for ref in self.get_references(table_obj)]
             data.append(ex)
 
         return data
@@ -303,6 +311,7 @@ class TabularDataset:
         return "Describe the following structured data in one sentence."
 
     def get_positive_examples(self):
+        # todo: what is it for? not used
         # TODO implement for individual datasets
         # TODO fix - split may not be loaded
         table_ex_1 = self.get_table("dev", 0)
@@ -311,11 +320,11 @@ class TabularDataset:
         return [
             {
                 "in": self.table_to_linear(table_ex_1),
-                "out": self.get_reference(table_ex_1),
+                "out": self.get_references(table_ex_1),
             },
             {
                 "in": self.table_to_linear(table_ex_2),
-                "out": self.get_reference(table_ex_2),
+                "out": self.get_references(table_ex_2),
             },
         ]
 

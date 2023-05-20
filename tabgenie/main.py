@@ -101,12 +101,12 @@ def export_error_analysis(dataset_name, split, in_file, out_file, count, random_
         table = {
             "table": table_obj,
             "table_id": example_id,
-            "reference": table_obj.props.get("reference", ""),
+            "references": table_obj.props.get("references", ""),
             "prediction": predictions[example_id],
         }
         tables.append(table)
 
-    prop_list = ["reference", "prediction"]
+    prop_list = ["references", "prediction"]
     ann_columns = ["notes"]
     write_annotation_to_excel(tables, prop_list, ann_columns, out_file)
 

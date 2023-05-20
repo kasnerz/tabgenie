@@ -138,8 +138,12 @@ def write_annotation_to_excel(tables, prop_list, ann_columns, out_file):
         # writing properties
         props_end_row = start_row + len(prop_list)
         for i, prop_name in enumerate(prop_list):
+            prop = table_info.get(prop_name, "")
+            if isinstance(prop, (list, set)):
+                prop = '; '.join(prop)
+
             worksheet.write(start_row + i, start_col, prop_name, style_objs["bold"])
-            worksheet.write(start_row + i, start_col + 1, table_info.get(prop_name, ""))
+            worksheet.write(start_row + i, start_col + 1, prop)
 
         # writing table
         table_end_row = write_html_table_to_excel(
