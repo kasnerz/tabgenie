@@ -9,12 +9,11 @@ import pandas as pd
 import random
 import coloredlogs
 import yaml
-from xlsxwriter import Workbook
 from flask import Flask, render_template, jsonify, request, send_file, session
 
 from .loaders import DATASET_CLASSES
 from .processing.processing import get_pipeline_class_by_name
-from .utils.excel import write_html_table_to_excel, write_annotation_to_excel
+from .utils.excel import write_annotation_to_excel
 
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
