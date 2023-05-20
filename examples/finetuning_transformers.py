@@ -74,16 +74,15 @@ def compute_bleu_on_one_reference(eval_preds, tokenizer):
     return result
 
 
-def compute_bleu_on_all_references(preds, references, tokenizer):
+def compute_bleu_on_all_references(preds, references):
     # padding references
     max_ref_len = max(len(x) for x in references)
     if max_ref_len == 0:
         return None
 
     references = [[x] + ['' for _ in range(max_ref_len - len(x))] for x in references]
+    result = BLEU_METRIC.compute(predictions=preds, references=references)
 
-    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-    result = BLEU_METRIC.compute(predictions=decoded_preds, references=references)
     return result["score"]
 
 
@@ -111,8 +110,8 @@ def run_prediction(dataset, model, tokenizer, batch_size, num_beams=1):
             decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
             all_preds.extend(decoded_preds)
 
-    if 'references' in dataset:
-        score = compute_bleu_on_all_references(all_preds, dataset['references'], tokenizer)
+    if 'references' in dataset.column_names:
+        score = compute_bleu_on_all_references(all_preds, dataset['references'])
     else:
         score = None
 
