@@ -25,5 +25,4 @@ def prepare_tests(request):
     dataset_name, split = request.param
     cls = DATASET_CLASSES[dataset_name]()
     cls.load(split)
-    len_tab = len(cls.data[split])
-    return dataset_name, split, len_tab, cls
+    return dataset_name, split, cls
