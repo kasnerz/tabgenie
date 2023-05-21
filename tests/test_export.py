@@ -94,14 +94,15 @@ def test_export_html(prepare_tests):
     for nmb, raw_table in enumerate(cls.data[split]):
         try:
             table = cls.prepare_table(raw_table)
-            for form in html_format:
-                for prop in include_props:
-                    try:
-                        table_to_html(table, displayed_props, prop, form)
-                    except:
-                        failed_nums.append(f'{nmb}-{prop}-{form}')
         except:
             failed_nums.append(nmb)
+            continue
+        for form in html_format:
+            for prop in include_props:
+                try:
+                    table_to_html(table, displayed_props, prop, form)
+                except:
+                    failed_nums.append(f'{nmb}-{prop}-{form}')
 
     assert not failed_nums, \
         f'{name}-{split}\n' \
