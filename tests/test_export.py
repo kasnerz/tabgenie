@@ -15,7 +15,7 @@ with open('tests/schemes/schema_with_prop.json') as f:
 '''-----------------------------------------------------'''
 
 
-def test_export_json(prepare_tests):
+def test_export_json(prepare_tests):  # prepare_tests is a fixture, the argument must have the same name as the fixture
     name, split, cls = prepare_tests
     failed_nums = []
     for nmb, raw_table in enumerate(cls.data[split]):
@@ -108,6 +108,7 @@ def test_export_html(prepare_tests):
         f'{name}-{split}\n' \
         f'Count error tables - {len(failed_nums)}\n' \
         f'First 20 numbers - {failed_nums[:20]}'
+
 
 """
 def test_export_triples(prepare_tests):

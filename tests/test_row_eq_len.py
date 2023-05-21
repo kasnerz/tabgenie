@@ -1,7 +1,7 @@
 import pytest
 
 
-def test_row_eq_len(prepare_tests):
+def test_row_eq_len(prepare_tests):  # prepare_tests is a fixture, the argument must have the same name as the fixture
     name, split, cls = prepare_tests
     failed_nums = []
     for nmb, raw_table in enumerate(cls.data[split]):

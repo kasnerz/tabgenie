@@ -1,8 +1,5 @@
-import pytest
+import pytest  # pip install pytest==7.2.2
 from tabgenie.loaders import DATASET_CLASSES
-#pip install pytest==7.2.2
-
-
 
 
 splits = [
@@ -15,6 +12,7 @@ tabs = [
     for key in DATASET_CLASSES
     for spl in splits
 ]
+
 
 def id_func(data):
     return [f'{key}-{spl}' for key, spl in data]
