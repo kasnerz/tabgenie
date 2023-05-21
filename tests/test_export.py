@@ -22,15 +22,12 @@ def test_export_json(prepare_tests):
         try:
             table = cls.prepare_table(raw_table)
             for prop in [True, False]:
-                try:
-                    obj_json = json.dumps(table_to_json(table, prop))
-                    if not prop:
-                        schema = schema_without_prop
-                    else:
-                        schema = schema_with_prop
-                    validate(instance=obj_json, schema=schema)
-                except:
-                    failed_nums.append(nmb)
+                obj_json = json.dumps(table_to_json(table, prop))
+                if not prop:
+                    schema = schema_without_prop
+                else:
+                    schema = schema_with_prop
+                validate(instance=obj_json, schema=schema)
         except:
             failed_nums.append(nmb)
 
