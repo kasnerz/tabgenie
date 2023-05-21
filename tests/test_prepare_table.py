@@ -2,11 +2,11 @@ import pytest
 
 
 def test_table(prepare_tests):
-    name, split, len_tab, cls = prepare_tests
+    name, split, cls = prepare_tests
     failed_nums = []
-    for nmb in range(len_tab):
+    for nmb, raw_table in enumerate(cls.data[split]):
         try:
-            cls.prepare_table(cls.data[split][nmb])
+            cls.prepare_table(raw_table)
         except:
             failed_nums.append(nmb)
 
