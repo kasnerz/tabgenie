@@ -16,7 +16,7 @@ with open('tests/schemes/schema_with_prop.json') as f:
 
 
 def test_export_json(prepare_tests):
-    tab, split, len_tab, cls = prepare_tests
+    name, split, len_tab, cls = prepare_tests
     failed_nums = []
     for nmb in range(len_tab):
         try:
@@ -35,13 +35,13 @@ def test_export_json(prepare_tests):
             failed_nums.append(nmb)
 
     assert not failed_nums, \
-        f'{tab}-{split}\n' \
+        f'{name}-{split}\n' \
         f'Count error tables - {len(failed_nums)}\n' \
         f'First 20 numbers - {failed_nums[:20]}'
 
 
 def test_export_excel(prepare_tests):
-    tab, split, len_tab, cls = prepare_tests
+    name, split, len_tab, cls = prepare_tests
     failed_nums = []
     for nmb in range(len_tab):
         try:
@@ -51,13 +51,13 @@ def test_export_excel(prepare_tests):
             failed_nums.append(nmb)
 
     assert not failed_nums, \
-        f'{tab}-{split}\n' \
+        f'{name}-{split}\n' \
         f'Count error tables - {len(failed_nums)}\n' \
         f'First 20 numbers - {failed_nums[:20]}'
 
 
 def test_export_csv(prepare_tests):
-    tab, split, len_tab, cls = prepare_tests
+    name, split, len_tab, cls = prepare_tests
     failed_nums = []
     for nmb in range(len_tab):
         try:
@@ -67,13 +67,13 @@ def test_export_csv(prepare_tests):
             failed_nums.append(nmb)
 
     assert not failed_nums, \
-        f'{tab}-{split}\n' \
+        f'{name}-{split}\n' \
         f'Count error tables - {len(failed_nums)}\n' \
         f'First 20 numbers - {failed_nums[:20]}'
 
 
 def test_export_df(prepare_tests):
-    tab, split, len_tab, cls = prepare_tests
+    name, split, len_tab, cls = prepare_tests
     failed_nums = []
     for nmb in range(len_tab):
         try:
@@ -83,13 +83,13 @@ def test_export_df(prepare_tests):
             failed_nums.append(nmb)
 
     assert not failed_nums, \
-        f'{tab}-{split}\n' \
+        f'{name}-{split}\n' \
         f'Count error tables - {len(failed_nums)}\n' \
         f'First 20 numbers - {failed_nums[:20]}'
 
 
 def test_export_html(prepare_tests):
-    tab, split, len_tab, cls = prepare_tests
+    name, split, len_tab, cls = prepare_tests
     failed_nums = []
     html_format = ['web', 'export']
     include_props = [True, False]
@@ -107,13 +107,13 @@ def test_export_html(prepare_tests):
             failed_nums.append(nmb)
 
     assert not failed_nums, \
-        f'{tab}-{split}\n' \
+        f'{name}-{split}\n' \
         f'Count error tables - {len(failed_nums)}\n' \
         f'First 20 numbers - {failed_nums[:20]}'
 
 """
 def test_export_triples(prepare_tests):
-    tab, split, len_tab, cls = prepare_tests
+    name, split, len_tab, cls = prepare_tests
     failed_nums = []
     cell_ids = None
     for nmb in range(len_tab):
@@ -124,7 +124,7 @@ def test_export_triples(prepare_tests):
             failed_nums.append(nmb)
 
     assert not failed_nums, \
-        f'{tab}-{split}\n' \
+        f'{name}-{split}\n' \
         f'Count error tables - {len(failed_nums)}\n' \
         f'First 20 numbers - {failed_nums[:20]}'
 

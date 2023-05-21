@@ -10,10 +10,11 @@ splits = [
     'test',
     'train'
 ]
-tabs = [(key, spl)
-        for key in DATASET_CLASSES
-        for spl in splits
-        ]
+tabs = [
+    (key, spl)
+    for key in DATASET_CLASSES
+    for spl in splits
+]
 
 def id_func(data):
     return [f'{key}-{spl}' for key, spl in data]
@@ -21,8 +22,8 @@ def id_func(data):
 
 @pytest.fixture(scope="session", params=tabs, ids=id_func(tabs))
 def prepare_tests(request):
-    tab, split = request.param
-    cls = DATASET_CLASSES[tab]()
+    dataset_name, split = request.param
+    cls = DATASET_CLASSES[dataset_name]()
     cls.load(split)
     len_tab = len(cls.data[split])
-    return tab, split, len_tab, cls
+    return dataset_name, split, len_tab, cls
