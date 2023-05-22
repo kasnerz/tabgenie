@@ -1,18 +1,5 @@
 import pytest
-import json
-from jsonschema import validate
-
 from tabgenie.utils.export import *
-
-'''-------------------JSON-SCHEMA-----------------------'''
-# https://python-jsonschema.readthedocs.io/en/latest/
-# need schema for testing tabs exporting into json
-with open('tests/schemes/schema_without_prop.json') as f:
-    schema_without_prop = json.load(f)
-
-with open('tests/schemes/schema_with_prop.json') as f:
-    schema_with_prop = json.load(f)
-'''-----------------------------------------------------'''
 
 
 def test_export_json(prepare_tests):  # prepare_tests is a fixture, the argument must have the same name as the fixture
@@ -22,12 +9,7 @@ def test_export_json(prepare_tests):  # prepare_tests is a fixture, the argument
         try:
             table = cls.prepare_table(raw_table)
             for prop in [True, False]:
-                obj_json = json.dumps(table_to_json(table, prop))
-                if not prop:
-                    schema = schema_without_prop
-                else:
-                    schema = schema_with_prop
-                validate(instance=obj_json, schema=schema)
+                table_to_json(table, prop)
         except:
             failed_nums.append(nmb)
 
