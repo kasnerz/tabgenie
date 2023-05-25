@@ -266,7 +266,7 @@ class TabularDataset:
             ref = self.get_reference(table_obj)
 
             tokens = tokenizer(linearized, max_length=max_length, truncation=True)
-            ref_tokens = tokenizer(ref, max_length=max_length, truncation=True)
+            ref_tokens = tokenizer(text_target=ref, max_length=max_length, truncation=True)
             tokens["labels"] = ref_tokens["input_ids"]
 
             return tokens
