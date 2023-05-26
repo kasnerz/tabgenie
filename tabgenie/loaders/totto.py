@@ -13,7 +13,14 @@ class ToTTo(HFTabularDataset):
         super().__init__(*args, **kwargs)
         self.hf_id = "GEM/totto"
         self.name = "ToTTo"
-        self.extra_info = {"license": "CC BY-SA 3.0"}
+        self.extra_info = {
+            "license": "CC BY-SA 3.0",
+            "changes": (
+                "We provide our version of header highlighting. We restore the rectangular structure of the table, "
+                "divide header cells into column and row headers, and take column headers above the cell "
+                "and row headers to the left."
+            )
+        }
 
     def get_task_definition(self):
         return "Give a description of the selected table cells."
