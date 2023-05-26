@@ -369,6 +369,9 @@ def get_dataset_info(dataset_name):
         "citation": info["citation"].replace("\n", ""),
     }
 
+    if "changes":
+        info_yaml["changes"] = info["changes"]
+
     print(yaml.dump(info_yaml, sort_keys=False))
 
 
