@@ -79,6 +79,7 @@ def table_to_df(table):
 
 
 def table_to_html(table, displayed_props, include_props, html_format):
+    # TODO what is argument displayed_props for?
     if html_format == "web" and table.props is not None:
         meta_el = _meta_to_html(table.props, displayed_props)
     elif html_format == "export" and include_props and table.props is not None:
