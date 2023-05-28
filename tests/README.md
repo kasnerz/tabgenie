@@ -14,13 +14,16 @@ To run the test, enter into the terminal:
    ✅ table_to_html  
    ❌ table_to_triples  
    To run the test, enter into the terminal:  
-   ```pytest tests/test_export.py```
+   ```pytest tests/test_export.py```  
+   if you want to run only one test, enter into the terminal:  
+   ```pytest -k *name* tests/test_export.py```  
+   Example:  ```pytest -k json tests/test_export.py``` 
   - **test_row_eq_len** It checks that all table rows have the same length, i.e. squareness check.    
 To run the test, enter into the terminal:  
    ```pytest tests/test_row_eq_len.py```
 
 **Quickstart**
 ```
-pip install pytest
+pip install pytest==7.2.2
 pytest tests/
 ```
