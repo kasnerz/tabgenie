@@ -19,23 +19,23 @@ class HiTab(HFTabularDataset):
         cells = [eval(x) for x in re.findall(r"\(\d+, \d+\)", s)]
         return cells
 
-    @staticmethod
-    def _add_header_highlights(table_obj):
-        for i, row in enumerate(table_obj.get_cells()):
-            for j, c in enumerate(row):
-                if not c.is_highlighted:
-                    continue
-
-                for cell in table_obj.get_col_headers(i, j) + table_obj.get_row_headers(i, j):
-                    if not cell.value.strip():
-                        continue
-
-                    cell.is_highlighted = True
-                    if cell.is_dummy:
-                        main_cell = table_obj.get_cell(*cell.main_cell)
-                        main_cell.is_highlighted = True
-
-        return table_obj
+    # @staticmethod
+    # def _add_header_highlights(table_obj):
+    #     for i, row in enumerate(table_obj.get_cells()):
+    #         for j, c in enumerate(row):
+    #             if not c.is_highlighted:
+    #                 continue
+    #
+    #             for cell in table_obj.get_col_headers(i, j) + table_obj.get_row_headers(i, j):
+    #                 if not cell.value.strip():
+    #                     continue
+    #
+    #                 cell.is_highlighted = True
+    #                 if cell.is_dummy:
+    #                     main_cell = table_obj.get_cell(*cell.main_cell)
+    #                     main_cell.is_highlighted = True
+    #
+    #     return table_obj
 
     def prepare_table(self, entry):
         t = Table()
@@ -76,6 +76,8 @@ class HiTab(HFTabularDataset):
                         cell.is_highlighted = c.is_highlighted
                         cell.value = c.value
 
-        t = self._add_header_highlights(t)
+        # we can add more header highlights with heuristic but
+        # this will change the original data, so turning this off so far
+        # t = self._add_header_highlights(t)
 
         return t

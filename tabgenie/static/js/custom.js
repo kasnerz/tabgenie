@@ -431,6 +431,8 @@ function set_dataset_info(info) {
       $("<ul/>").append(links_array)),
     $("<h5/>").text("Version"),
     $("<p/>").text(info.version),
+    $("<h5/>").text("Changes in our version"),
+    $("<p/>").text(info.changes),
     $("<h5/>").text("License"),
     $("<p/>").text(info.license),
     $("<h5/>").text("Citation"),

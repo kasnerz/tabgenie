@@ -77,6 +77,7 @@ def table_to_df(table):
     df = pd.read_html(table_html)[0]
     return df
 
+
 def table_to_html(table, displayed_props, include_props, html_format):
     if html_format == "web" and table.props is not None:
         meta_el = _meta_to_html(table.props, displayed_props)
