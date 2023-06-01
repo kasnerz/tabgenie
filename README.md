@@ -47,22 +47,22 @@ Additionally, each example may contain metadata (such as title, url, etc.) which
 
 | Dataset                                                                              | Source                    | Data type      | # train | # dev  | # test | License     |
 | ------------------------------------------------------------------------------------ | ------------------------- | -------------- | ------- | ------ | ------ | ----------- |
-| **[CACAPO](https://huggingface.co/datasets/kasnerz/cacapo)**                         | van der Lee et al. (2020) | Key-value      | 15,290  | 1,831  | 3,028  | CC BY       |
-| **[DART](https://huggingface.co/datasets/GEM/dart)**                                 | Nan et al. (2021)         | Graph          | 62,659  | 2,768  | 5,097  | MIT         |
-| **[E2E](https://huggingface.co/datasets/GEM/e2e_nlg)**                               | Dušek et al. (2019)       | Key-value      | 33,525  | 1,484  | 1,847  | CC BY-SA    |
-| **[EventNarrative](https://huggingface.co/datasets/kasnerz/eventnarrative)**         | Colas et al. (2021)       | Graph          | 179,544 | 22,442 | 22,442 | CC BY       |
-| **[HiTab](https://huggingface.co/datasets/kasnerz/hitab)**                           | Cheng et al. (2021)       | Table          | 7,417   | 1,671  | 1,584  | C-UDA       |
-| **[Chart-to-text](https://huggingface.co/datasets/kasnerz/charttotext-s)**           | Kantharaj et al. (2022)   | Chart          | 24,368  | 5,221  | 5,222  | GNU GPL     |
-| **[Logic2Text](https://huggingface.co/datasets/kasnerz/logic2text)**                 | Chen et al. (2020b)       | Table  + Logic | 8,566   | 1,095  | 1,092  | MIT         |
-| **[LogicNLG](https://huggingface.co/datasets/kasnerz/logicnlg)**                     | Chen et al. (2020a)       | Table          | 28,450  | 4,260  | 4,305  | MIT         |
-| **[NumericNLG](https://huggingface.co/datasets/kasnerz/numericnlg)**                 | Suadaa et al. (2021)      | Table          | 1,084   | 136    | 135    | CC BY-SA    |
-| **[SciGen](https://huggingface.co/datasets/kasnerz/scigen)**                         | Moosavi et al. (2021)     | Table          | 13,607  | 3,452  | 492    | CC BY-NC-SA |
-| **[SportSett:Basketball](https://huggingface.co/datasets/GEM/sportsett_basketball)** | Thomson et al. (2020)     | Table          | 3,690   | 1,230  | 1,230  | MIT         |
-| **[ToTTo](https://huggingface.co/datasets/totto)**                                   | Parikh et al. (2020)      | Table          | 121,153 | 7,700  | 7,700  | CC BY-SA    |
-| **[WebNLG](https://huggingface.co/datasets/GEM/web_nlg)**                            | Ferreira et al. (2020)    | Graph          | 35,425  | 1,666  | 1,778  | CC BY-NC    |
-| **[WikiBio](https://huggingface.co/datasets/wiki_bio)**                              | Lebret et al. (2016)      | Key-value      | 582,659 | 72,831 | 72,831 | CC BY-SA    |
-| **[WikiSQL](https://huggingface.co/datasets/wikisql)**                               | Zhong et al. (2017)       | Table + SQL    | 56,355  | 8,421  | 15,878 | BSD         |
-| **[WikiTableText](https://huggingface.co/datasets/kasnerz/wikitabletext)**           | Bao et al. (2018)         | Key-value      | 10,000  | 1,318  | 2,000  | CC BY       |
+| **[CACAPO](https://huggingface.co/datasets/kasnerz/cacapo)**                         | [van der Lee et al. (2020)]() | Key-value      | 15,290  | 1,831  | 3,028  | CC BY       |
+| **[DART](https://huggingface.co/datasets/GEM/dart)**                                 | [Nan et al. (2021)]()         | Graph          | 62,659  | 2,768  | 5,097  | MIT         |
+| **[E2E](https://huggingface.co/datasets/GEM/e2e_nlg)**                               | [Dušek et al. (2019)]()       | Key-value      | 33,525  | 1,484  | 1,847  | CC BY-SA    |
+| **[EventNarrative](https://huggingface.co/datasets/kasnerz/eventnarrative)**         | [Colas et al. (2021)]()       | Graph          | 179,544 | 22,442 | 22,442 | CC BY       |
+| **[HiTab](https://huggingface.co/datasets/kasnerz/hitab)**                           | [Cheng et al. (2021)]()       | Table          | 7,417   | 1,671  | 1,584  | C-UDA       |
+| **[Chart-to-text](https://huggingface.co/datasets/kasnerz/charttotext-s)**           | [Kantharaj et al. (2022)]()   | Chart          | 24,368  | 5,221  | 5,222  | GNU GPL     |
+| **[Logic2Text](https://huggingface.co/datasets/kasnerz/logic2text)**                 | [Chen et al. (2020b)]()       | Table  + Logic | 8,566   | 1,095  | 1,092  | MIT         |
+| **[LogicNLG](https://huggingface.co/datasets/kasnerz/logicnlg)**                     | [Chen et al. (2020a)]()       | Table          | 28,450  | 4,260  | 4,305  | MIT         |
+| **[NumericNLG](https://huggingface.co/datasets/kasnerz/numericnlg)**                 | [Suadaa et al. (2021)]()      | Table          | 1,084   | 136    | 135    | CC BY-SA    |
+| **[SciGen](https://huggingface.co/datasets/kasnerz/scigen)**                         | [Moosavi et al. (2021)]()     | Table          | 13,607  | 3,452  | 492    | CC BY-NC-SA |
+| **[SportSett:Basketball](https://huggingface.co/datasets/GEM/sportsett_basketball)** | [Thomson et al. (2020)](https://aclanthology.org/2020.intellang-1.4)     | Table          | 3,690   | 1,230  | 1,230  | MIT         |
+| **[ToTTo](https://huggingface.co/datasets/totto)**                                   | [Parikh et al. (2020)]()      | Table          | 121,153 | 7,700  | 7,700  | CC BY-SA    |
+| **[WebNLG](https://huggingface.co/datasets/GEM/web_nlg)**                            | [Ferreira et al. (2020)]()    | Graph          | 35,425  | 1,666  | 1,778  | CC BY-NC    |
+| **[WikiBio](https://huggingface.co/datasets/wiki_bio)**                              | [Lebret et al. (2016)]()      | Key-value      | 582,659 | 72,831 | 72,831 | CC BY-SA    |
+| **[WikiSQL](https://huggingface.co/datasets/wikisql)**                               | [Zhong et al. (2017)]()       | Table + SQL    | 56,355  | 8,421  | 15,878 | BSD         |
+| **[WikiTableText](https://huggingface.co/datasets/kasnerz/wikitabletext)**           | [Bao et al. (2018)]()         | Key-value      | 10,000  | 1,318  | 2,000  | CC BY       |
 
 See `loaders/data.py` for an up-to-date list of available datasets.
 
