@@ -5,12 +5,14 @@ from tabgenie.utils.export import *
 
 
 def test_export_json(prepare_split):  # prepare_split is a fixture, the argument must have the same name as the fixture
-    name, split, tables = prepare_split
+    name, split, tables= prepare_split
     failed_nums = []
-    for nmb, table in tables:
+    for nmb in range(len(tables)):
+        if tables[nmb] is None:
+            continue
         try:
             for prop in [True, False]:
-                json.dumps(table_to_json(table, prop))
+                json.dumps(table_to_json(tables[nmb], prop))
         except:
             failed_nums.append(nmb)
 
@@ -21,11 +23,13 @@ def test_export_json(prepare_split):  # prepare_split is a fixture, the argument
 
 
 def test_export_excel(prepare_split):
-    name, split, tables = prepare_split
+    name, split, tables= prepare_split
     failed_nums = []
-    for nmb, table in tables:
+    for nmb in range(len(tables)):
+        if tables[nmb] is None:
+            continue
         try:
-            table_to_excel(table, include_props=True)
+            table_to_excel(tables[nmb], include_props=True)
         except:
             failed_nums.append(nmb)
 
@@ -36,11 +40,13 @@ def test_export_excel(prepare_split):
 
 
 def test_export_csv(prepare_split):
-    name, split, tables = prepare_split
+    name, split, tables= prepare_split
     failed_nums = []
-    for nmb, table in tables:
+    for nmb in range(len(tables)):
+        if tables[nmb] is None:
+            continue
         try:
-            table_to_csv(table)
+            table_to_csv(tables[nmb])
         except:
             failed_nums.append(nmb)
 
@@ -53,9 +59,11 @@ def test_export_csv(prepare_split):
 def test_export_df(prepare_split):
     name, split, tables = prepare_split
     failed_nums = []
-    for nmb, table in tables:
+    for nmb in range(len(tables)):
+        if tables[nmb] is None:
+            continue
         try:
-            table_to_df(table)
+            table_to_df(tables[nmb])
         except:
             failed_nums.append(nmb)
 
@@ -71,11 +79,13 @@ def test_export_html(prepare_split):
     html_format = ['web', 'export']
     include_props = [True, False]
     displayed_props = [None]
-    for nmb, table in tables:
+    for nmb in range(len(tables)):
+        if tables[nmb] is None:
+            continue
         for form in html_format:
             for prop in include_props:
                 try:
-                    table_to_html(table, displayed_props, prop, form)
+                    table_to_html(tables[nmb], displayed_props, prop, form)
                 except:
                     failed_nums.append(f'{nmb}-{prop}-{form}')
 
@@ -90,9 +100,11 @@ def test_export_triples(prepare_split):
     name, split, tables = prepare_split
     failed_nums = []
     cell_ids = None
-    for nmb, table in tables:
+    for nmb in range(len(tables)):
+        if tables[nmb] is None:
+            continue
         try:
-            table_to_triples(table, cell_ids)
+            table_to_triples(tables[nmb], cell_ids)
         except:
             failed_nums.append(nmb)
 
