@@ -2,11 +2,11 @@ import pytest
 
 
 def test_table(prepare_tests):  # prepare_tests is a fixture, the argument must have the same name as the fixture
-    name, split, cls = prepare_tests
+    name, split, cls, num_of_tbl = prepare_tests
     failed_nums = []
-    for nmb, raw_table in enumerate(cls.data[split]):
+    for nmb in range(num_of_tbl):
         try:
-            cls.prepare_table(raw_table)
+            cls.prepare_table(cls.data[split][nmb])
         except:
             failed_nums.append(nmb)
 
