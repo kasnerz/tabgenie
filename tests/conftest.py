@@ -4,8 +4,8 @@ from tabgenie.loaders import DATASET_CLASSES
 
 splits = [
     'dev',
-    # 'test',
-    # 'train'
+    'test',
+    'train'
 ]
 tabs = [
     (key, spl)
