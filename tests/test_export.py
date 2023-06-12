@@ -5,7 +5,7 @@ from tabgenie.utils.export import *
 
 
 def test_export_json(prepare_split):  # prepare_split is a fixture, the argument must have the same name as the fixture
-    name, split, tables= prepare_split
+    name, split, tables = prepare_split
     failed_nums = []
     for nmb in range(len(tables)):
         if tables[nmb] is None:
@@ -23,7 +23,7 @@ def test_export_json(prepare_split):  # prepare_split is a fixture, the argument
 
 
 def test_export_excel(prepare_split):
-    name, split, tables= prepare_split
+    name, split, tables = prepare_split
     failed_nums = []
     for nmb in range(len(tables)):
         if tables[nmb] is None:
@@ -40,7 +40,7 @@ def test_export_excel(prepare_split):
 
 
 def test_export_csv(prepare_split):
-    name, split, tables= prepare_split
+    name, split, tables = prepare_split
     failed_nums = []
     for nmb in range(len(tables)):
         if tables[nmb] is None:

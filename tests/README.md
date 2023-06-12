@@ -27,3 +27,5 @@ To run the test, enter into the terminal:
 pip install pytest==7.2.2
 pytest tests/
 ```
+If you want to run a limited number of examples, enter the key ```--num-examples *number*``` in the terminal. For example:   
+```pytest --num-examples 10 tests/test_prepare_table.py ```
