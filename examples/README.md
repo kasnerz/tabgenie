@@ -2,6 +2,10 @@
 
 You can load the datasets in a unified way for training the models.
 
+
+## Requirements
+Please, first install the additional requirements listed in `./requirements.txt`.
+
 ## Fine-tuning using `transformers` library
 `finetuning_transformers.py` is an example of fine-tuning a seq2seq model and running inference using `transformers` library. It can be run from the command line, e.g. :
 ```
@@ -23,12 +27,3 @@ The example `multitasking.py` is almost equivalent to `finetuning_transformers.p
 Dataset-specific task description is prepended to each input item before training. <br>
 In this example, custom linearization functions are implemented for E2E and WebNLG datasets.
 
-
-## Requirements
-
-Requirements to run the examples (in addition to `tabgenie`):
-* `numpy`
-* `evaluate`
-* `transformers==4.25.1`
-* `torch==1.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113`
-* `sacrebleu`

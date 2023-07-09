@@ -16,14 +16,6 @@ from transformers import (
 from tabgenie import load_dataset
 
 
-# extra requirements:
-# numpy
-# evaluate
-# transformers==4.25.1
-# torch==1.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
-# sacrebleu
-
-
 SEED = 42
 random.seed(SEED)
 np.random.seed(SEED)
@@ -36,7 +28,7 @@ ROOT_DIR = Path(__file__).parent.parent
 
 MAX_LENGTH = 512
 LABEL_PAD_TOKEN_ID = -100
-PATIENCE = 5
+PATIENCE = 3
 
 BLEU_METRIC = evaluate.load("sacrebleu")
 
@@ -77,8 +69,8 @@ def compute_bleu(eval_preds, tokenizer):
 @click.command()
 @click.option("--dataset", "-d", required=True, type=str, help="Dataset to train on")
 @click.option("--base-model", "-m", default="t5-small", type=str, help="Base model to finetune")
-@click.option("--epochs", "-e", default=30, type=int, help="Maximum number of epochs")
-@click.option("--batch-size", "-b", default=16, type=int, help="Path to the output directory")
+@click.option("--epochs", "-e", default=10, type=int, help="Maximum number of epochs")
+@click.option("--batch-size", "-b", default=16, type=int, help="Number of examples in a batch")
 @click.option("--ckpt-dir", "-c", default=os.path.join(ROOT_DIR, "checkpoints"), type=str, help="Directory to store checkpoints")
 @click.option("--output-dir", "-o", default=os.path.join(ROOT_DIR, "models"), type=str, help="Directory to store models and their outputs")
 def main(dataset, base_model, epochs, batch_size, ckpt_dir, output_dir):
