@@ -2,8 +2,6 @@
 
 **Demo 👉️ https://quest.ms.mff.cuni.cz/rel2text/tabgenie**
 
-**Work in progress**  🛠️
-
 TabGenie provides tools for working with data-to-text generation datasets in a unified tabular format. 
 
 TabGenie allows you to:
@@ -208,3 +206,22 @@ The global configuration is stored in the `tabgenie/config.yml` file.
 - `cache_dev_splits` - whether to preload all available dev sets after startup,
 - `generated_outputs_dir` - directory from which the generated outputs are loaded,
 - `pipelines` - pipelines which will be available in the web interface (see the *Interactive mode* section for more info).
+
+## Paper & Citation
+For citing our work, please use the following:
+```
+@inproceedings{kasner-etal-2023-tabgenie,
+    title = "{T}ab{G}enie: A Toolkit for Table-to-Text Generation",
+    author = "Kasner, Zden{\v{e}}k  and
+      Garanina, Ekaterina  and
+      Platek, Ondrej  and
+      Dusek, Ondrej",
+    booktitle = "Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 3: System Demonstrations)",
+    year = "2023",
+    address = "Toronto, Canada",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2023.acl-demo.42",
+    pages = "444--455",
+}
+```
+- Link for the paper: https://aclanthology.org/2023.acl-demo.42/
