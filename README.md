@@ -1,6 +1,6 @@
 # 🧞 TabGenie: A Toolkit for Table-to-Text Generation 
 
-**Demo 👉️ https://quest.ms.mff.cuni.cz/rel2text/tabgenie**
+**Demo 👉️ https://quest.ms.mff.cuni.cz/nlg/tabgenie**
 
 TabGenie provides tools for working with data-to-text generation datasets in a unified tabular format. 
 
@@ -28,7 +28,7 @@ xdg-open http://127.0.0.1:8890
 
 Or try the demo at:
 
-**👉️ https://quest.ms.mff.cuni.cz/rel2text/tabgenie**
+**👉️ https://quest.ms.mff.cuni.cz/nlg/tabgenie**
 
 
 ## Datasets
