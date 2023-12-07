@@ -14,6 +14,14 @@
   <script src="{{ host_prefix }}/static/js/popper.min.js"></script>
   <script src="{{ host_prefix }}/static/js/bootstrap.min.js"></script>
   <script src="{{ host_prefix }}/static/js/jquery.highlight-within-textarea.js"></script>
+  <script src="{{ host_prefix }}/static/js/jsonview.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/windbarb.js"></script>
+  <script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
+  <script src="https://code.highcharts.com/modules/data.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+  <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.3.5/split.min.js"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
@@ -21,11 +29,31 @@
 
 <body class="body">
   <nav class="navbar navbar-light bg-light">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">
-        <img src="{{ host_prefix }}/static/img/genie.png" width="25px"> <b>TabGenie</b>
-      </a>
+    <div class="container navbar-left">
       <div class="navblock">
+        <!-- <a class="navbar-brand" href="#"> -->
+        <!-- <img src="{{ host_prefix }}/static/img/genie.png" width="25px"> -->
+        <!-- </a> -->
+        <ul class="navblock pagination">
+          <li class="nav-item">
+            <select id="dataset-select" class="form-select form-select-sm"
+              style="display: inline-block; margin-right: 10px; max-width: 250px;">
+              {% for dataset_name in datasets %}
+              <option value="{{ dataset_name }}">{{ dataset_name }}</option>
+              {% endfor %}
+            </select>
+          </li>
+          <li class="nav-item">
+            <select id="split-select" class="form-select form-select-sm"
+              style="display: inline-block; margin-right: 10px; max-width: 200px;">
+              <option value="dev" selected>dev</option>
+              <option value="test">test</option>
+              <option value="train">train</option>
+            </select>
+          </li>
+        </ul>
+      </div>
+      <div class="navblock" id="actions-area">
         <ul class="pagination" id="nav-example-cnt">
           <li class="page-item">
             <a class="page-link" id="start-btn" onclick="startbtn();">«</a>
@@ -47,13 +75,8 @@
           </li>
         </ul>
 
-        <ul class="pagination" id="nav-examples">
-          <li class="page-item">
-            <a class="page-link" id="random-btn" onclick="randombtn();" data-bs-toggle="tooltip"
-              data-bs-placement="bottom" title="Go to a random example">
-              🎲
-            </a>
-          </li>
+        <!-- <ul class="pagination" id="nav-examples">
+          
           <li class="page-item">
             <span data-bs-toggle="modal" data-bs-target="#note-modal">
               <a class="page-link" id="note-btn" class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip"
@@ -74,21 +97,48 @@
               <img src="{{ host_prefix }}/static/img/link.png" width="12px" />
             </a>
           </li>
-        </ul>
-
-
+        </ul> -->
       </div>
       <div class="navblock">
-        <div style="font-size: 15px">
-          <b>Table-to-Text Generation Playground</b>
-        </div>
         <ul class="pagination" style="margin-left: 10px;">
           <li class="page-item">
+            <a class="page-link" id="random-btn" onclick="randombtn();" data-bs-toggle="tooltip"
+              data-bs-placement="bottom" title="Go to a random example">
+              🎲
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" id="interactive-btn" onclick="toggle_interactive();" autocomplete="off">
+              <img src="{{ host_prefix }}/static/img/unicode/lightning.png" width="12px" class="button-bw-icon" />
+            </a>
+          </li>
+          <!-- <li class="page-item">
+            <a class="page-link" data-bs-toggle="modal" data-bs-target="#favourites-modal">
+              <img src="{{ host_prefix }}/static/img/unicode/star.png" width="12px" class="button-bw-icon" />
+            </a>
+          </li> -->
+          <!-- <li class="page-item">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                  data-bs-target="#notes-modal">
+                  <img src="{{ host_prefix }}/static/img/unicode/pencil.png" width="12px" class="button-bw-icon" />
+                </button>
+              </li> -->
+          <li class="page-item">
+            <a class="page-link" data-bs-toggle="modal" data-bs-target="#export-modal">
+              <img src="{{ host_prefix }}/static/img/unicode/arrowd.png" width="12px" class="button-bw-icon" />
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" data-bs-toggle="modal" data-bs-target="#info-modal">
+              <img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px" class="button-bw-icon" />
+            </a>
+          </li>
+          <!-- <li class="page-item">
             <a class="page-link" id="about-btn" onclick="show_info();" data-bs-toggle="modal"
               data-bs-target="#about-modal" title="About">
               <img src="{{ host_prefix }}/static/img/about.png" id="about-icon" />
             </a>
-          </li>
+          </li> -->
         </ul>
       </div>
     </div>
@@ -97,72 +147,10 @@
 
   <div class="large-container container">
     <div class="row">
-      <div id="leftpanel" class="col-2">
-        <div class="infoarea">
+      <!-- <div id="leftpanel" class="col-2">
+        <div class="infoarea"> -->
 
-          <div class="selectarea">
-            <b>dataset</b>
-            <select id="dataset-select" class="form-select form-select-sm">
-              {% for dataset_name in datasets %}
-              <option value="{{ dataset_name }}">{{ dataset_name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="selectarea">
-            <b>split</b>
-            <select id="split-select" class="form-select form-select-sm">
-              <option value="dev" selected>dev</option>
-              <option value="test">test</option>
-              <option value="train">train</option>
-            </select>
-          </div>
-
-
-          <div class="selectarea" id="actions-area">
-            <div class="d-grid gap-2">
-              <input type="checkbox" class="btn-check" id="interactive-btn" onclick="toggle_interactive();"
-                autocomplete="off">
-              <label class="btn btn-sm btn-outline-secondary" for="interactive-btn"><img
-                  src="{{ host_prefix }}/static/img/unicode/lightning.png" width="12px"
-                  class="button-bw-icon" />Interactive mode</label>
-              <!-- <input type="checkbox" class="btn-check" id="edit-btn" onclick="toggle_edit();" autocomplete="off"> -->
-              <!-- <label class="btn btn-sm btn-outline-secondary" for="edit-btn">✎ Edit mode</label> -->
-              <!-- <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                data-bs-target="#your-edits-modal">
-                📝 Your edits <div id="your-edits-count"></div>
-              </button> -->
-              <button type="button" class="btn btn-outline-secondary  btn-sm" onclick="toggle_props();">
-                <img src="{{ host_prefix }}/static/img/unicode/cross.png" width="10px" class="button-bw-icon" />Toggle
-                properties
-              </button>
-              <button type="button" class="btn btn-outline-secondary  btn-sm" onclick="toggle_view();">
-                <img src="{{ host_prefix }}/static/img/unicode/bidir.png" width="12px" class="button-bw-icon" />Toggle
-                view
-              </button>
-              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                data-bs-target="#favourites-modal">
-                <img src="{{ host_prefix }}/static/img/unicode/star.png" width="12px"
-                  class="button-bw-icon" />Favourites
-              </button>
-              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                data-bs-target="#notes-modal">
-                <img src="{{ host_prefix }}/static/img/unicode/pencil.png" width="12px" class="button-bw-icon" />Notes
-              </button>
-              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                data-bs-target="#export-modal">
-                <img src="{{ host_prefix }}/static/img/unicode/arrowd.png" width="12px" class="button-bw-icon" />Export
-              </button>
-              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                data-bs-target="#info-modal">
-                <img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px" class="button-bw-icon" />Dataset
-                info
-              </button>
-            </div>
-          </div>
-
-
-
-
+      <!-- 
           <div class="selectarea" id="mode-selectarea" style="display: none;">
             <div><b>mode</b></div>
             <div class="btn-group d-flex" id="mode-select" role="group">
@@ -179,9 +167,9 @@
               <label class="btn btn-outline-secondary" for="btn-mode-edit" data-bs-toggle="tooltip"
                 data-bs-placement="bottom" title="Edit">✏️</label>
             </div>
-          </div>
+          </div> -->
 
-          <!-- <div class="selectarea" id="mode-selectarea" style="display: none;">
+      <!-- <div class="selectarea" id="mode-selectarea" style="display: none;">
             <b>mode</b>
             <select id="mode-select" class="form-select form-select-sm">
               <option value="select" selected>select</option>
@@ -190,10 +178,10 @@
             </select>
           </div> -->
 
-        </div>
+      <!-- </div> -->
 
-      </div>
-      <div class="split col-10">
+      <!-- </div> -->
+      <div class="split col-12">
         <div id="centerpanel" class="collapse show">
           <div class="tab-content">
             <div id='tabulararea' class="tab-pane sidepanel-panel active" role="tabpanel">
@@ -202,13 +190,12 @@
                   <span class="sr-only"></span>
                 </div>
               </div>
-              <div id='tablearea' class='table-responsive font-mono'> </div>
+              <div id='tablearea'> </div>
             </div>
           </div>
         </div>
 
         <div id="rightpanel" class="collapse show">
-
           <div id='sidepanel-content' class="tab-content">
             <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel" style="display: none;">
               {% for pipeline_name, attrs in pipelines.items() if attrs.interactive %}

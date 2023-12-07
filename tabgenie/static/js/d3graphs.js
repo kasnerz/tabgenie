@@ -118,7 +118,7 @@ function update_graph() {
 
     var simulation = d3.forceSimulation(graph.nodes)
         .force('charge', d3.forceManyBody().strength(-50))
-        .force('center', d3.forceCenter(($("#rightpanel").width() / 2) - 50, rdf_graph_window_height / 2))
+        .force('center', d3.forceCenter(($("#centerpanel").width() / 2) - 50, rdf_graph_window_height / 2))
         .force('collision', d3.forceCollide().radius(function (d) {
             return d.radius
         }))

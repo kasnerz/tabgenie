@@ -9,6 +9,7 @@ import pandas as pd
 import random
 import coloredlogs
 import yaml
+import traceback
 from xlsxwriter import Workbook
 from flask import Flask, render_template, jsonify, request, send_file, session
 
@@ -75,6 +76,7 @@ def render_table():
     try:
         table_data = get_table_data(dataset_name, split, table_idx, displayed_props)
     except Exception as e:
+        traceback.print_exc()
         logger.error(f"Error while getting table data: {e}")
         table_data = {}
 
@@ -307,27 +309,11 @@ def get_dataset(dataset_name, split):
     return dataset
 
 
-def get_generated_outputs(dataset_name, split, output_idx):
-    outputs = {}
-
-    out_dir = os.path.join(app.config["root_dir"], app.config["generated_outputs_dir"], dataset_name, split)
-    if not os.path.isdir(out_dir):
-        return outputs
-
-    for filename in glob.glob(out_dir + "/" + "*.jsonl"):
-        line = linecache.getline(filename, output_idx + 1)  # 1-based indexing
-        j = json.loads(line)
-        model_name = os.path.basename(filename).rsplit(".", 1)[0]
-        outputs[model_name] = j
-
-    return outputs
-
-
 def get_table_data(dataset_name, split, table_idx, displayed_props):
     dataset = get_dataset(dataset_name=dataset_name, split=split)
     table = dataset.get_table(split=split, table_idx=table_idx)
-    html = dataset.export_table(table=table, export_format="html", displayed_props=displayed_props)
-    generated_outputs = get_generated_outputs(dataset_name=dataset_name, split=split, output_idx=table_idx)
+    html = dataset.render(table=table)
+    generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
     dataset_info = dataset.get_info()
 
     return {

@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 import copy
 import logging
-
+import json2table
 import datasets
 from ..utils import export
 
+import sys
+sys.path.append('../')
 logger = logging.getLogger(__name__)
+
 
 
 class Cell:
@@ -354,6 +357,38 @@ class TabularDataset:
         )
 
     # End export methods
+
+class D2TDataset(TabularDataset):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, path=None, **kwargs)
+
+        self.dataset_info = {}
+        self.extra_info = {}
+        self.dataset = None #TODO load
+
+    def load(self, split=None, max_examples=None):
+        if max_examples is not None:
+            raise NotImplementedError
+
+        logger.info(f"Loading {self.dataset.name}")
+
+        if split is None:
+            for split in ["dev", "test"]:
+                self._load_split(split)
+        else:
+            self._load_split(split)
+
+    def prepare_table(self, entry):
+        return entry
+    
+
+    def render(self, table):
+        return self.dataset.render(table)
+    
+    def get_generated_outputs(self, split, output_idx):
+        return self.dataset.get_generated_outputs(split, output_idx)
+
+   
 
 
 class HFTabularDataset(TabularDataset):

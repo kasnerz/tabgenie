@@ -65,7 +65,7 @@ pre {
 }
 
 #tablearea {
-    margin-top: 5px;
+    margin-top: 40px;
     padding-left: 30px;
 }
 
@@ -210,6 +210,12 @@ pre {
 
     color: rgb(17, 24, 39) !important;
     font-size: 14px !important;
+}
+
+.subtable {
+    color: rgb(17, 24, 39) !important;
+    font-size: 14px !important;
+    max-width: 50%;
 }
 
 .font-mono {

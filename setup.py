@@ -11,6 +11,7 @@ install_requires = [
     "tinyhtml",
     "xlsxwriter",
     "coloredlogs",
+    "json2table",
 ]
 
 setup(
