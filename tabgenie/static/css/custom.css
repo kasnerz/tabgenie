@@ -2,7 +2,7 @@ body {
     color: #3c4149;
     /* max-width: 1200px; */
     /* margin: 20px auto; */
-    padding: 0 10px;
+    /* padding: 0 10px; */
     /* font: 18px/1.4 'Open Sans', sans-serif;
     color: #495057;
     background-color: #FFFFFF; */
@@ -517,4 +517,28 @@ ul {
     width: 140px;
     max-width: 140px;
     overflow-wrap: break-word;
+}
+
+#selectboxarea {
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.navbar-left {
+    max-width: 1920px;
+    padding-left: 80px;
+    padding-right: 20px;
+}
+
+.bg-light {
+    background-color: rgb(245, 245, 245) !important;
+}
+
+.nav-item {
+    margin-right: 5px;
+}
+
+#rawarea {
+    margin-top: 20px;
+    background-color: #f8f9fa;
 }

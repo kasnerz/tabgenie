@@ -262,6 +262,12 @@ function toggle_view() {
   update_svg_width();
 }
 
+function toggle_raw() {
+  // toggle display: none on rawarea and tablearea
+  $("#rawarea").toggle();
+  $("#tablearea").toggle();
+}
+
 
 function clear_notes() {
   function local_clear_notes() {
@@ -568,6 +574,13 @@ function change_mode() {
   update_cell_interactivity();
 }
 
+function change_task() {
+  const task = $("input:radio[name ='task-toggle-radio']:checked").val();
+  // unhide box-${task} and hide others
+  $(".generated-output-box").hide();
+  $(".box-" + task).show();
+}
+
 function postRequestDownload(url, request, filename) {
   // https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
   xhttp = new XMLHttpRequest();
@@ -684,17 +697,31 @@ function refresh_pipelines() {
 function show_generated_outputs(generated_outputs) {
   $(".generated-output-box").remove();
 
-  for (out_obj of generated_outputs) {
-    const name = out_obj.model;
-    var placeholder = $('<div>', { id: `out-${name}-placeholder`, class: "font-mono" });
-    var label = $('<label>', { class: "label-name" }).text(name);
-    var content = out_obj.generated.out;
-    placeholder.html(content);
-    $('<div>', {
-      id: `out-${name}`,
-      class: 'output-box generated-output-box',
-    }).append(label).append(placeholder).appendTo('#outputarea');
+  for (const [task, task_outputs] of Object.entries(generated_outputs)) {
+    // sort task_outputs by model name
+    task_outputs.sort(function (a, b) {
+      return a.model.localeCompare(b.model);
+    });
+    for (out_obj of task_outputs) {
+      const name = out_obj.model;
+      var placeholder = $('<div>', { id: `out-${name}-placeholder`, class: "font-mono" });
+      var label = $('<label>', { class: "label-name" }).text(name);
+      if (!out_obj.generated) {
+        continue;
+      }
+      var content = out_obj.generated.out;
+      placeholder.html(content);
+      $('<div>', {
+        id: `out-${name}`,
+        class: `output-box generated-output-box box-${task}`,
+        style: 'display: none;'
+      }).append(label).append(placeholder).appendTo('#outputarea');
+    }
   }
+  $("input:radio[name ='task-toggle-radio']").on("change", change_task);
+  // set the first task as active
+  $("input:radio[name ='task-toggle-radio']").first().prop("checked", true);
+  change_task();
 }
 
 function fetch_table(dataset, split, table_idx) {
@@ -710,6 +737,9 @@ function fetch_table(dataset, split, table_idx) {
     reset_pipeline_outputs();
     reset_edited_cells();
     $("#tablearea").html(data.html);
+    // use <pre> to preserve whitespace
+    const rawDataStr = JSON.stringify(data.raw_data, null, 2);
+    $("#rawarea").html(`<pre>${rawDataStr}</pre>`);
     $("#dataset-spinner").hide();
 
     total_examples = data.total_examples;
@@ -936,7 +966,8 @@ Meteogram.prototype.getChartOptions = function (cityName) {
       alignTicks: false,
       scrollablePlotArea: {
         minWidth: 720
-      }
+      },
+      animation: false
     },
 
     defs: {
@@ -1074,7 +1105,8 @@ Meteogram.prototype.getChartOptions = function (cityName) {
 
     plotOptions: {
       series: {
-        pointPlacement: 'between'
+        pointPlacement: 'between',
+        animation: false
       }
     },
 

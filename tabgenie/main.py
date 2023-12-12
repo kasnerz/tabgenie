@@ -318,6 +318,7 @@ def get_table_data(dataset_name, split, table_idx, displayed_props):
 
     return {
         "html": html,
+        "raw_data" : table,
         "total_examples": dataset.get_example_count(split),
         "dataset_info": dataset_info,
         "generated_outputs": generated_outputs,
@@ -470,4 +471,5 @@ def index():
         default_dataset=default_dataset,
         host_prefix=app.config["host_prefix"],
         display_table=display_table,
+        task_names=app.config["task_names"],
     )

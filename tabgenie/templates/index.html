@@ -51,6 +51,11 @@
               <option value="train">train</option>
             </select>
           </li>
+          <li class="page-item">
+            <a class="page-link" id="raw-btn" onclick="toggle_raw();" autocomplete="off">
+              <img src="{{ host_prefix }}/static/img/code.png" width="15px" class="button-bw-icon" />
+            </a>
+          </li>
         </ul>
       </div>
       <div class="navblock" id="actions-area">
@@ -107,11 +112,11 @@
               🎲
             </a>
           </li>
-          <li class="page-item">
+          <!-- <li class="page-item">
             <a class="page-link" id="interactive-btn" onclick="toggle_interactive();" autocomplete="off">
               <img src="{{ host_prefix }}/static/img/unicode/lightning.png" width="12px" class="button-bw-icon" />
             </a>
-          </li>
+          </li> -->
           <!-- <li class="page-item">
             <a class="page-link" data-bs-toggle="modal" data-bs-target="#favourites-modal">
               <img src="{{ host_prefix }}/static/img/unicode/star.png" width="12px" class="button-bw-icon" />
@@ -123,11 +128,11 @@
                   <img src="{{ host_prefix }}/static/img/unicode/pencil.png" width="12px" class="button-bw-icon" />
                 </button>
               </li> -->
-          <li class="page-item">
+          <!-- <li class="page-item">
             <a class="page-link" data-bs-toggle="modal" data-bs-target="#export-modal">
               <img src="{{ host_prefix }}/static/img/unicode/arrowd.png" width="12px" class="button-bw-icon" />
             </a>
-          </li>
+          </li> -->
           <li class="page-item">
             <a class="page-link" data-bs-toggle="modal" data-bs-target="#info-modal">
               <img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px" class="button-bw-icon" />
@@ -191,12 +196,23 @@
                 </div>
               </div>
               <div id='tablearea'> </div>
+              <div id='rawarea' style="display: none"> </div>
             </div>
           </div>
         </div>
 
         <div id="rightpanel" class="collapse show">
           <div id='sidepanel-content' class="tab-content">
+            <!-- selectbox to select outputs -->
+            <div id='selectboxarea' class="tab-pane sidepanel-panel active" role="tabpanel">
+              <div class="btn-group btn-group-sm task-toggle" id="task-toggle" role="group">
+                {% for task in task_names %}
+                <input type="radio" class="btn-check" name="task-toggle-radio" id="btnradio-{{ task }}"
+                  value="{{ task }}" autocomplete="off">
+                <label class="btn btn-outline-secondary" for="btnradio-{{ task }}">{{ task }} </label>
+                {% endfor %}
+              </div>
+            </div>
             <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel" style="display: none;">
               {% for pipeline_name, attrs in pipelines.items() if attrs.interactive %}
               <div class="output-box pipeline-box" id="out-{{ pipeline_name }}">

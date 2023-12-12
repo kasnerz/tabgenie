@@ -58,3 +58,11 @@ pipelines:
   export:
     pipeline: export
     interactive: false
+task_names:
+  - direct
+  - cot
+  - topic-centric
+  - stylized
+  - multilingual
+  - qa
+  - insights
