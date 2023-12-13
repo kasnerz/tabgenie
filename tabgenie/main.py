@@ -315,7 +315,6 @@ def get_table_data(dataset_name, split, table_idx, displayed_props):
     html = dataset.render(table=table)
     generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
     dataset_info = dataset.get_info()
-
     return {
         "html": html,
         "raw_data" : table,

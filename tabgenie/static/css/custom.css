@@ -86,7 +86,7 @@ pre {
 #tabulararea {
     margin-right: 30px;
     min-height: 100px;
-    /* overflow-x: scroll; */
+    overflow-x: hidden;
 }
 
 #rightpanel {
@@ -541,4 +541,14 @@ ul {
 #rawarea {
     margin-top: 20px;
     background-color: #f8f9fa;
+}
+
+#task-toggle {
+    /* make centered */
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
 }
