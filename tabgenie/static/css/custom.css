@@ -90,8 +90,8 @@ pre {
 }
 
 #rightpanel {
-    height: 100vh;
-    margin: 0px 0px 0px 20px;
+    /* height: 100%; */
+    margin: 0px 10px 0px 20px;
 }
 
 
@@ -109,6 +109,10 @@ pre {
 
 .nav-tabs {
     margin-bottom: 0;
+}
+
+#text-type {
+    margin-bottom: 10px;
 }
 
 .highlightable-cell {
@@ -293,12 +297,14 @@ pre {
 }
 
 .annotate-box {
-    padding: 20px;
-    /* border: 1px solid #ddd; */
+    padding: 30px;
+    border: 1px solid #ddd;
     border-radius: 2%;
-    margin: 10px;
+    /* margin: 10px; */
     position: relative;
     font-size: normal;
+    user-select: none;
+    /* monospace */
 }
 
 
@@ -363,8 +369,7 @@ ul {
 }
 
 .accordion-button {
-    font-size: small;
-
+    font-size: large;
 }
 
 .wildcards {
@@ -393,6 +398,77 @@ ul {
     /* wrap into the next row if necessary */
     flex-wrap: wrap;
 
+}
+
+.bg-incomplete {
+    background-color: white;
+    color: grey;
+}
+
+.bg-incomplete:hover {
+    background-color: inherit;
+}
+
+.bg-complete {
+    background-color: #198754;
+    color: white;
+}
+
+.bg-complete:hover {
+    background-color: #198754;
+    color: white;
+}
+
+.bg-active {
+    background-color: #555555;
+    color: white;
+}
+
+.bg-active:hover {
+    background-color: #555555;
+    color: white;
+}
+
+a:hover {
+    color: inherit !important;
+}
+
+/* Add your custom styles here */
+.overlay {
+    /* display: none; */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.overlay-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* text-align: center; */
+    color: #1d1d1d;
+    font-size: large;
+}
+
+#output-instructions {
+    margin-top: 20px;
+    margin-bottom: 30px;
+    background-color: #ebebeb;
+    color: rgb(80, 80, 80);
+    padding: 30px;
+    /* font-style: italic; */
+}
+
+
+#submit-annotation-box {
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 #page-input {

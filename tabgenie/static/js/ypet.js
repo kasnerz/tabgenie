@@ -198,7 +198,7 @@ WordView = Backbone.Marionette.ItemView.extend({
     this.listenTo(this.model, 'change:neighbor', this.render);
     this.listenTo(this.model, 'change:latest', function (model, value, options) {
       if (this.model.get('latest')) {
-        this.model.trigger('highlight', { 'color': '#7FE5FF' });
+        this.model.trigger('highlight', { 'color': '#FFBCBC' });
       }
       if (options.force) {
         this.model.trigger('highlight', { 'color': '#fff' });
@@ -375,8 +375,8 @@ WordCollectionView = Backbone.Marionette.CollectionView.extend({
 });
 
 YPet = new Backbone.Marionette.Application();
-YPet.AnnotationTypes = new AnnotationTypeList([
-  { name: 'Disease', color: '#00ccff' },
-  { name: 'Gene', color: '#22A301' },
-  { name: 'Protein', color: 'yellow' }
-]);
+// YPet.AnnotationTypes = new AnnotationTypeList([
+//   { name: 'Disease', color: '#00ccff' },
+//   { name: 'Gene', color: '#22A301' },
+//   { name: 'Protein', color: 'yellow' }
+// ]);

@@ -15,7 +15,6 @@ var sizes = mode == "annotate" ? [50, 50] : [70, 30];
 if (mode == "annotate") {
   var annotation_set = window.annotation_set;
   total_examples = annotation_set.length;
-  var annotations = [];
 }
 
 function update_svg_width() {
@@ -59,27 +58,22 @@ function randombtn() {
 }
 
 function gotoannotation(page) {
-  table_idx = annotation_set[page].table_idx;
-  // const dataset = annotation_set[page].dataset;
-  // const split = annotation_set[page].split;
-
-  // fetch_annotation(dataset, split, table_idx);
-  // $("#page-input").val(table_idx);
-  $(".page-link").removeClass("bg-light");
-  $(`#page-link-${page}`).addClass("bg-light");
-
+  $(".page-link").removeClass("bg-active");
+  $(`#page-link-${page}`).addClass("bg-active");
+  // table_idx = annotation_set[page].table_idx;
+  // table_idx = page;
   show_annotation();
 }
 
 function gotoview(page) {
-  table_idx = page;
-  table_idx = mod(table_idx, total_examples);
-
   fetch_table(dataset, split, table_idx);
   $("#page-input").val(table_idx);
 }
 
 function gotopage(page) {
+  table_idx = page;
+  table_idx = mod(table_idx, total_examples);
+
   if (mode == "annotate") {
     gotoannotation(page);
   } else {
@@ -128,8 +122,10 @@ function load_annotations() {
         /* Configure the # and colors of Annotation types (minimum 1 required) */
         YPet.AnnotationTypes = new AnnotationTypeList([
           { name: 'Incorrect', color: '#FFBCBC' },
-          { name: 'Context', color: '#FFF79F' },
-          { name: 'Not checkable', color: '#DDDDDD' }
+          { name: 'Not checkable', color: '#e9d2ff' },
+          { name: 'Misleading', color: '#FFF79F' },
+          { name: 'Irrelevant', color: '#ffd99f' },
+          { name: 'Other', color: '#bbbbbb' }
         ]);
         var regions = {};
         var paragraphs = {};
@@ -146,13 +142,13 @@ function load_annotations() {
           regions[`p${annotation_idx}`] = `#out-text-${annotation_idx}`;
 
           const li = $('<li>', { class: "page-item" });
-          const a = $('<a>', { class: "page-link", style: "min-height: 28px;", id: `page-link-${annotation_idx}` }).text(annotation_idx);
+          const a = $('<a>', { class: "page-link bg-incomplete", style: "min-height: 28px;", id: `page-link-${annotation_idx}` }).text(annotation_idx);
           li.append(a);
           $("#nav-example-cnt").append(li);
 
           // switch to the corresponding example when clicking on the page number
           $(`#page-link-${annotation_idx}`).click(function () {
-            gotoannotation(annotation_idx);
+            gotopage(annotation_idx);
           });
         }
         YPet.addRegions(regions);
@@ -161,16 +157,15 @@ function load_annotations() {
           YPet[p].show(new WordCollectionView({ collection: p_obj.get('words') }));
 
           YPet[p].currentView.collection.parentDocument.get('annotations').on('change', function (model,) {
-            var collection = this.parentDocument.get('annotations').toJSON();
-            annotations[table_idx] = collection;
-            console.log(annotations);
+            // var collection = this.parentDocument.get('annotations').toJSON();
+            // annotation_set[table_idx]["annotations"] = collection;
           });
           YPet[p].currentView.collection.parentDocument.get('annotations').on('remove', function (model, collection) {
             if (collection.length == 0) {
               collection = [];
             }
-            annotations[table_idx] = collection;
-            console.log(annotations);
+            // annotations[table_idx] = collection;
+            // console.log(annotations);
           });
           gotoannotation(table_idx);
         }
@@ -188,6 +183,37 @@ function load_annotations() {
     });
 }
 
+function submit_annotations() {
+  console.log(annotation_set);
+  $.post({
+    url: `${url_prefix}/submit_annotations`,
+    contentType: 'application/json', // Specify JSON content type
+    data: JSON.stringify(annotation_set),
+    success: function (data) {
+      $("#overlay-end").show();
+    }
+  });
+}
+
+
+function mark_annotation_as_complete() {
+  $('#page-link-' + table_idx).removeClass("bg-incomplete");
+  $('#page-link-' + table_idx).addClass("bg-complete");
+
+
+  var collection = YPet[`p${table_idx}`].currentView.collection.parentDocument.get('annotations').toJSON();
+  annotation_set[table_idx]["annotations"] = collection;
+  console.log(annotation_set[table_idx]);
+
+  // if all the examples are annotated, post the annotations
+  if ($(".bg-incomplete").length == 0) {
+    // show the `submit` button
+    $("#submit-annotations-btn").show();
+
+  } else if (table_idx < total_examples - 1) {
+    nextbtn();
+  }
+}
 
 function show_annotation() {
   $(".annotate-box").hide();
@@ -199,6 +225,22 @@ function show_annotation() {
   // use <pre> to preserve whitespace
   const rawDataStr = JSON.stringify(data.raw_data, null, 2);
   $("#rawarea").html(`<pre>${rawDataStr}</pre>`);
+
+  const dataset = annotation_set[table_idx].dataset;
+  let textType;
+  // ["openweather", "basketball", "gsmarena", "wikidata", "owid"]
+  if (dataset == "openweather") {
+    textType = "Weather forecast";
+  } else if (dataset == "basketball") {
+    textType = "Basketball game summary";
+  } else if (dataset == "gsmarena") {
+    textType = "Product description";
+  } else if (dataset == "wikidata") {
+    textType = "Graph description";
+  } else if (dataset == "owid") {
+    textType = "Chart caption";
+  }
+  $("#text-type").html(`<b>${textType}</b>`);
 
 }
 
@@ -410,6 +452,10 @@ $('#page-input').keypress(function (event) {
   if (event.keyCode == 13) {
     gotobtn();
   }
+});
+
+$("#hideOverlayBtn").click(function () {
+  $("#overlay-start").fadeOut();
 });
 
 $(document).ready(function () {

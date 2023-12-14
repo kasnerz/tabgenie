@@ -282,13 +282,34 @@ def get_dataset_info(dataset_name):
 # def page_not_found(error):
     # return render_template("404.html"), 404
 
+@app.route("/submit_annotations", methods=["POST"])
+def submit_annotations():
+    logger.info(f"Received annotations")
+    data = request.get_json()
+
+    with open("annotations.jsonl", "w") as f:
+        for row in data:
+            f.write(json.dumps(row) + "\n")
+    
+    return jsonify({"status": "success"})
+
+
 
 @app.route("/annotate", methods=["GET", "POST"])
 def annotate():
     logger.info(f"Annotate page loaded")
 
+    models = ["mistral-7b-instruct", "zephyr-7b-beta", "llama2-7b-chat"]
+    dataset = ["openweather", "basketball", "gsmarena", "wikidata", "owid"]
+
+    random.seed(42)
     annotation_set = [
-        { "dataset": "basketball", "split": "dev", "task" : "direct", "model": "mistral-7b-instruct", "table_idx": x } for x in range(20)
+        { "dataset": random.choice(dataset),
+         "model": random.choice(models), 
+         "split": "dev", 
+         "task" : "direct", 
+         "table_idx": random.randint(0,99) } 
+         for _ in range(10)
     ]
     return render_template(
         "annotate.html",
