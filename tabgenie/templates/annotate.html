@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>D2T Annotation</title>
+  <link rel="stylesheet" media="screen" href="{{ host_prefix }}/static/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/custom.css">
+  <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/d3graphs.css">
+  <!-- <link rel="shortcut icon" href="{{ host_prefix }}/static/img/favicon.ico"> -->
+  <meta name="viewport" content="width=1024">
+  <script src="{{ host_prefix }}/static/js/jquery.min.js"></script>
+  <script src="{{ host_prefix }}/static/js/popper.min.js"></script>
+  <script src="{{ host_prefix }}/static/js/bootstrap.min.js"></script>
+  <script src="{{ host_prefix }}/static/js/jquery.highlight-within-textarea.js"></script>
+  <script src="{{ host_prefix }}/static/js/jsonview.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/windbarb.js"></script>
+  <script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
+  <script src="https://code.highcharts.com/modules/data.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+  <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.3.5/split.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="{{ host_prefix }}/static/js/meteogram.js"></script>
+  <script src="{{ host_prefix }}/static/js/d3graphs.js"></script>
+  <script src="//underscorejs.org/underscore-min.js"></script>
+  <script src="//backbonejs.org/backbone-min.js"></script>
+  <script src="{{ host_prefix }}/static/js/backbone-relational.js"></script>
+  <script src="{{ host_prefix }}/static/js/backbone.marionette.min.js"></script>
+  <script src="{{ host_prefix }}/static/js/underscore.string.min.js"></script>
+  <script src="{{ host_prefix }}/static/js/ypet.js"></script>
+</head>
+
+
+<body class="body">
+  <nav class="navbar navbar-light bg-annotate">
+    <div class="container navbar-left">
+      <a class="navbar-brand" href="#">
+        <!-- <img src="{{ host_prefix }}/static/img/genie.png" width="25px"> -->
+        <!-- Data-to-text Annotation -->
+      </a>
+      <!-- <div class="navblock">
+        <ul class="navblock pagination">
+          
+        </ul>
+      </div> -->
+      <div class="navblock" id="actions-area">
+        <ul class="pagination" id="nav-example-cnt">
+        </ul>
+
+      </div>
+      <div class="navblock">
+
+        <ul class="pagination" style="margin-left: 10px;">
+          <li class="page-item">
+            <a class="page-link" id="raw-btn" onclick="toggle_raw();" autocomplete="off">
+              <img src="{{ host_prefix }}/static/img/code.png" width="15px" class="button-bw-icon" />
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" data-bs-toggle="modal" data-bs-target="#info-modal">
+              <img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px" class="button-bw-icon" />
+            </a>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+  <div class="large-container container">
+    <div class="row">
+      <div class="split col-12">
+        <div id="centerpanel" class="collapse show">
+          <div class="tab-content">
+            <div id='tabulararea' class="tab-pane sidepanel-panel active" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-center">
+                <div id="dataset-spinner" class="spinner-border" role="status" style="display: none">
+                  <span class="sr-only"></span>
+                </div>
+              </div>
+              <div id='tablearea'> </div>
+              <div id='rawarea' style="display: none"> </div>
+            </div>
+          </div>
+        </div>
+        <div id="rightpanel" class="collapse show">
+          <div id='sidepanel-content' class="tab-content">
+            <div id='outputarea'></div>
+
+            <div class="annotation-type-list"> </div>
+            <div class="annotation-list"> </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+</body>
+
+
+<script>
+  window.url_prefix = "{{ host_prefix }}";
+  window.annotation_set = {{ annotation_set | tojson | safe }};
+  window.mode = "annotate";
+</script>
+
+<script src="{{ host_prefix }}/static/js/custom.js"></script>

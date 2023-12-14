@@ -151,8 +151,15 @@ pre {
     width: 80px;
 }
 
+.bg-annotate {
+    background-color: white !important;
+    /* dashed bottom border */
+    border-bottom: 1px solid #ddd;
+    min-height: 60px;
+}
+
 .pagination {
-    line-height: 15px;
+    line-height: 14px;
 }
 
 .navbar-brand {
@@ -279,11 +286,21 @@ pre {
 .output-box {
     padding: 20px;
     border: 1px solid #ddd;
-    border-radius: 5%;
+    border-radius: 2%;
     margin: 10px;
     position: relative;
     font-size: smaller;
 }
+
+.annotate-box {
+    padding: 20px;
+    /* border: 1px solid #ddd; */
+    border-radius: 2%;
+    margin: 10px;
+    position: relative;
+    font-size: normal;
+}
+
 
 .output-box>label {
     position: absolute;
@@ -372,6 +389,10 @@ ul {
 
 #nav-example-cnt {
     margin-right: 40px;
+    max-width: 1200px;
+    /* wrap into the next row if necessary */
+    flex-wrap: wrap;
+
 }
 
 #page-input {

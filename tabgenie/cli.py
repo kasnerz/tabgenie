@@ -16,21 +16,22 @@ def create_app(**kwargs):
 
     # Imports from main slow down flask CLI
     # since main have very time-consuming libraries to import
-    from .main import app, initialize_pipeline, load_prompts
+    # from .main import app, initialize_pipeline, load_prompts
+    from .main import app
 
     app.config.update(config)
     app.config["root_dir"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
 
     app.db["datasets_obj"] = {}
-    app.db["pipelines_obj"] = {}
-    app.db["prompts"] = load_prompts()
-    app.db["pipelines_cfg"] = app.config["pipelines"]
+    # app.db["pipelines_obj"] = {}
+    # app.db["prompts"] = load_prompts()
+    # # app.db["pipelines_cfg"] = app.config["pipelines"]
 
-    if app.config.get("pipelines"):
-        for pipeline_name in app.config["pipelines"].keys():
-            initialize_pipeline(pipeline_name)
-    else:
-        app.db["pipelines_cfg"] = {}
+    # if app.config.get("pipelines"):
+    #     for pipeline_name in app.config["pipelines"].keys():
+    #         initialize_pipeline(pipeline_name)
+    # else:
+        # app.db["pipelines_cfg"] = {}
 
     # preload
     if config["cache_dev_splits"]:

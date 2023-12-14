@@ -215,47 +215,7 @@
                 {% endfor %}
               </div>
             </div>
-            <div id='pipelinearea' class="tab-pane sidepanel-panel active" role="tabpanel" style="display: none;">
-              {% for pipeline_name, attrs in pipelines.items() if attrs.interactive %}
-              <div class="output-box pipeline-box" id="out-{{ pipeline_name }}">
-                <label class="label-name">{{ pipeline_name }}</label>
-                <!-- <label class="label-reload" onclick="reload_pipeline('{{ pipeline_name }}');">⟳</label> -->
-                <!-- <label class="label-on-off"><input
-                    class="form-check-input custom-checkbox pipeline-checkbox output-checkbox" type="checkbox"
-                    id="pipeline-checkbox-{{ pipeline_name }}" checked></label> -->
 
-                {% if pipeline_name in pipelines_cfg_templates %}
-                <label class="label-settings" data-bs-toggle="modal" data-bs-target="#{{ pipeline_name }}-modal"><img
-                    src="{{ host_prefix }}/static/img/settings.png" width="12px" /></label>
-                <div class="modal fade" id="{{ pipeline_name }}-modal" tabindex="-1">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="{{ pipeline_name }}-modal-label">Settings: {{ pipeline_name }}
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        {{ pipelines_cfg_templates[pipeline_name]|safe }}
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {% endif %}
-                <div id="pipeline-{{ pipeline_name }}-spinner" class="spinner-border" role="status"
-                  style="display: none">
-                  <span class="sr-only"></span>
-                </div>
-                <div id="out-{{ pipeline_name }}-placeholder" class="font-mono"></div>
-                <div id="out-{{ pipeline_name }}-reload" class="text-center"><button
-                    class="btn btn-sm btn-outline-secondary" onclick="reload_pipeline('{{ pipeline_name }}');">⟳
-                    Reload</button></div>
-              </div>
-              {% endfor %}
-            </div>
 
             <div id='outputarea'></div>
           </div>
@@ -506,8 +466,6 @@
   // variable to be used in custom.js
   window.url_prefix = "{{ host_prefix }}";
   window.default_dataset = "{{ default_dataset }}";
-  window.pipelines = {{ pipelines | tojson | safe }};
-  window.prompts = {{ prompts | tojson | safe }};
   window.favourites = {{ session.get("favourites", {}) | tojson | safe }};
   window.notes = {{ session.get("favourites", {}) | tojson | safe }};
   window.editedCells = {{ session.get("editedCells", {}) | tojson | safe }};
