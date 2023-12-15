@@ -184,7 +184,7 @@ function load_annotations() {
 }
 
 function submit_annotations() {
-  console.log(annotation_set);
+  // console.log(annotation_set);
   $.post({
     url: `${url_prefix}/submit_annotations`,
     contentType: 'application/json', // Specify JSON content type
@@ -203,7 +203,7 @@ function mark_annotation_as_complete() {
 
   var collection = YPet[`p${table_idx}`].currentView.collection.parentDocument.get('annotations').toJSON();
   annotation_set[table_idx]["annotations"] = collection;
-  console.log(annotation_set[table_idx]);
+  // console.log(annotation_set[table_idx]);
 
   // if all the examples are annotated, post the annotations
   if ($(".bg-incomplete").length == 0) {
@@ -228,17 +228,16 @@ function show_annotation() {
 
   const dataset = annotation_set[table_idx].dataset;
   let textType;
-  // ["openweather", "basketball", "gsmarena", "wikidata", "owid"]
   if (dataset == "openweather") {
-    textType = "Weather forecast";
+    textType = "weather forecast";
   } else if (dataset == "basketball") {
-    textType = "Basketball game summary";
+    textType = "basketball game summary";
   } else if (dataset == "gsmarena") {
-    textType = "Product description";
+    textType = "product description";
   } else if (dataset == "wikidata") {
-    textType = "Graph description";
+    textType = "graph description";
   } else if (dataset == "owid") {
-    textType = "Chart caption";
+    textType = "chart caption";
   }
   $("#text-type").html(`<b>${textType}</b>`);
 

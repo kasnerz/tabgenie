@@ -361,16 +361,33 @@ ul {
 
 }
 
-.accordion {
+/* .accordion {
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 10px;
     padding-bottom: 20px;
-}
+} */
 
 .accordion-button {
-    font-size: large;
+    font-size: normal;
 }
+
+.instructions-accordion {
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+.instructions-accordion-body {
+    background-color: #eeeeee !important;
+}
+
+.instructions-accordion-button {
+    /* background-color: #d3d3d3 !important; */
+    background-color: #eeeeee !important;
+    /* color: rgb(240, 240, 240) !important; */
+    max-height: 40px;
+}
+
 
 .wildcards {
     margin-top: 10px;
@@ -446,6 +463,10 @@ a:hover {
     overflow-y: auto;
 }
 
+.panel-heading {
+    padding: 0px;
+}
+
 .overlay-content {
     position: absolute;
     top: 50%;
@@ -456,14 +477,6 @@ a:hover {
     font-size: large;
 }
 
-#output-instructions {
-    margin-top: 20px;
-    margin-bottom: 30px;
-    background-color: #ebebeb;
-    color: rgb(80, 80, 80);
-    padding: 30px;
-    /* font-style: italic; */
-}
 
 
 #submit-annotation-box {

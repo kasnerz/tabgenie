@@ -95,41 +95,59 @@
         <div id="rightpanel" class="collapse show">
           <div id='sidepanel-content' class="tab-content">
 
-            <div id='output-content'>
-              <div id='output-instructions'>
-                Annotate all the <b>errors</b> in the following text <b>given the data on the left side</b>. <br>
-                <br>Use your mouse to <b>highlight specific parts of the text</b> containing the errors. Repeatedly
-                click
-                on the highlighted text to switch between the following error
-                categories:
+            <div class="accordion instructions-accordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed instructions-accordion-button btn-dark" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#hint">
+                    <b>Instructions</b>
+                  </button>
+                </h2>
+                <div id="hint" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                  <div class="accordion-body instructions-accordion-body">
+                    <!-- <div id='output-instructions'> -->
+                    Annotate all the <b>errors</b> in the following text <b>given the data on the left side</b>. <br>
+                    <br>Use your mouse to <b>highlight specific parts of the text</b> containing the errors.
+                    Repeatedly
+                    click
+                    on the highlighted text to switch between the following error
+                    categories:
 
-                <ol>
-                  <li><span style="background-color: #FFBCBC"><b>Incorrect fact</b></span> (mouse drag): The fact
-                    in the
-                    text contradicts the data.</li>
-                  <li><span style="background-color: #e9d2ff"><b>Not checkable</b></span> (mouse drag + 1
-                    click):
-                    The
-                    fact in the text cannot be checked given the data.</li>
-                  <li><span style="background-color: #FFF79F"><b>Misleading</b></span> (mouse drag + 2 clicks):
-                    The fact in the text is misleading in the given context. </li>
-                  <li><span style="background-color: #ffd99f"><b>Irrelevant</b></span> (mouse drag + 3 clicks):
-                    The text is irrelevant. </li>
-                  <li><span style="background-color: #bbbbbb"><b>Other</b></span> (mouse drag + 4 clicks):
-                    An error which does not fit any previous category. </li>
+                    <ol>
+                      <li><span style="background-color: #FFBCBC"><b>Incorrect fact</b></span> (mouse drag): The fact
+                        in the
+                        text contradicts the data.</li>
+                      <li><span style="background-color: #e9d2ff"><b>Not checkable</b></span> (mouse drag + 1
+                        click):
+                        The
+                        fact in the text cannot be checked given the data.</li>
+                      <li><span style="background-color: #FFF79F"><b>Misleading</b></span> (mouse drag + 2 clicks):
+                        The fact in the text is misleading in the given context. </li>
+                      <li><span style="background-color: #ffd99f"><b>Irrelevant</b></span> (mouse drag + 3 clicks):
+                        The text is irrelevant given the purpose of the text. </li>
+                      <li><span style="background-color: #bbbbbb"><b>Other</b></span> (mouse drag + 4 clicks):
+                        An error which does not fit any previous category. </li>
 
-                </ol>
-                <br>If you are in doubts, select the shortest span that contains the error.
-                Once you think you have marked all the errors present in the text, click the <b> ✅ Mark example as
-                  complete</b>
-                button (you can still update the annotation later). You will be able to submit the annotations once they
-                are all are
-                marked
-                as complete.
+                    </ol>
+                    <br>If you are in doubts, select the shortest span that contains the error.
+                    Once you think you have marked all the errors present in the text, click the <b> ✅ Mark example as
+                      complete</b>
+                    button (you can still update the annotation later). You will be able to submit the annotations
+                    once they
+                    are all are
+                    marked
+                    as complete.
 
+                    <!-- </div> -->
+                  </div>
+                </div>
               </div>
+            </div>
+
+            <div id='output-content'>
               <div id='outputarea'>
-                <div id='text-type'><b>Weather forecast</b></div>
+                <div id='text-type-info'>The following text is a <span id='text-type'></span>:
+                </div>
               </div>
 
               <div class="annotation-type-list"> </div>
@@ -152,8 +170,9 @@
     <div id="overlay-start-content" class="overlay-content">
       <h1>Welcome!</h1>
 
-      <p>Your task is to <b>annotate errors</b> in the text describing the data. You will see the data on the
-        left side of the screen and the text on the right side of the screen.
+      <p>In this task, you will see <b>data</b> on the
+        left side and a <b>text</b> on the right side. Your task is to <b>annotate errors</b> in
+        the text with respect to the data.
       </p>
       <p>
         There are five
@@ -167,7 +186,7 @@
       <li><span style="background-color: #FFF79F"><b>Misleading</b></span>:
         The fact in the text is misleading in the given context. </li>
       <li><span style="background-color: #ffd99f"><b>Irrelevant</b></span>:
-        The text is irrelevant. </li>
+        The text is irrelevant given the purpose of the text. </li>
       <li><span style="background-color: #bbbbbb"><b>Other</b></span>:
         An error which does not fit any previous category. </li>
       <br>
@@ -211,7 +230,7 @@
               The research is conducted by the NLP research group at Charles University in Prague. Your annotations will
               help
               evaluating and
-              improving data-to-text generation systems based on open-access language models.
+              improving data-to-text generation systems based on open-access large language models.
             </div>
           </div>
         </div>

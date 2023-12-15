@@ -1,0 +1,10 @@
+{"dataset": "openweather", "model": "mistral-7b-instruct", "split": "dev", "table_idx": 94, "task": "direct", "annotations": []}
+{"dataset": "gsmarena", "model": "mistral-7b-instruct", "split": "dev", "table_idx": 28, "task": "direct", "annotations": []}
+{"dataset": "basketball", "model": "llama2-7b-chat", "split": "dev", "table_idx": 13, "task": "direct", "annotations": [{"type": 0, "text": "team", "start": 130, "words": [{"text": "team", "start": 130, "latest": null, "neighbor": true}]}]}
+{"dataset": "owid", "model": "mistral-7b-instruct", "split": "dev", "table_idx": 75, "task": "direct", "annotations": []}
+{"dataset": "wikidata", "model": "mistral-7b-instruct", "split": "dev", "table_idx": 3, "task": "direct", "annotations": []}
+{"dataset": "openweather", "model": "mistral-7b-instruct", "split": "dev", "table_idx": 29, "task": "direct", "annotations": []}
+{"dataset": "owid", "model": "llama2-7b-chat", "split": "dev", "table_idx": 3, "task": "direct", "annotations": []}
+{"dataset": "owid", "model": "mistral-7b-instruct", "split": "dev", "table_idx": 91, "task": "direct", "annotations": []}
+{"dataset": "owid", "model": "zephyr-7b-beta", "split": "dev", "table_idx": 28, "task": "direct", "annotations": []}
+{"dataset": "wikidata", "model": "llama2-7b-chat", "split": "dev", "table_idx": 35, "task": "direct", "annotations": []}
