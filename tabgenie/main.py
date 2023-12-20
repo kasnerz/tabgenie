@@ -12,7 +12,7 @@ import yaml
 import traceback
 from xlsxwriter import Workbook
 from flask import Flask, render_template, jsonify, request, send_file, session
-
+from collections import defaultdict
 from .loaders import DATASET_CLASSES
 from .processing.processing import get_pipeline_class_by_name
 from .utils.excel import write_html_table_to_excel, write_annotation_to_excel
@@ -20,12 +20,13 @@ from .utils.excel import write_html_table_to_excel, write_annotation_to_excel
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
-
+ANNOTATIONS_DIR = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "annotations")
 
 app = Flask("tabgenie", template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.config.update(SECRET_KEY=os.urandom(24))
 app.db = {}
 app.db["cfg_templates"] = {}
+app.db["annotation_index"] = {}
 
 file_handler = logging.FileHandler("error.log")
 file_handler.setLevel(logging.ERROR)
@@ -45,15 +46,15 @@ def success():
 
 @app.route('/save_annotations', methods=['POST'])
 def save_annotations():
-    global annotations
     data = request.get_json()
     annotations = data['annotations']
+
+    with open(os.path.join(ANNOTATIONS_DIR, "annotations.jsonl"), "w") as f:
+        for row in annotations:
+            f.write(json.dumps(row) + "\n")
+
     return jsonify({'status': 'success'})
 
-@app.route('/get_annotations')
-def get_annotations():
-    global annotations
-    return jsonify({'annotations': annotations})
 
 
 # @app.route("/pipeline", methods=["GET", "POST"])
@@ -152,19 +153,37 @@ def get_dataset(dataset_name, split):
 
     return dataset
 
+def generate_annotation_index():
+    with open(os.path.join(ANNOTATIONS_DIR, "annotations.jsonl"), "r") as f:
+        annotations = [json.loads(line) for line in f.readlines()]
+
+    app.db["annotation_index"] = defaultdict(list)
+
+    for annotation in annotations:
+        dataset_name = annotation["dataset"]
+        split = annotation["split"]
+        table_idx = annotation["table_idx"]
+        app.db["annotation_index"][(dataset_name, split, table_idx)].append(annotation)
+
+def get_annotations(dataset_name, split, table_idx):
+    return app.db["annotation_index"].get((dataset_name, split, table_idx), [])
+
 
 def get_table_data(dataset_name, split, table_idx):
     dataset = get_dataset(dataset_name=dataset_name, split=split)
     table = dataset.get_table(split=split, table_idx=table_idx)
     html = dataset.render(table=table)
     generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
+    annotations = get_annotations(dataset_name, split, table_idx)
     dataset_info = dataset.get_info()
+
     return {
         "html": html,
         "raw_data" : table,
         "total_examples": dataset.get_example_count(split),
         "dataset_info": dataset_info,
         "generated_outputs": generated_outputs,
+        "annotations": annotations,
         "session": get_session(),
     }
 
@@ -299,18 +318,28 @@ def submit_annotations():
 def annotate():
     logger.info(f"Annotate page loaded")
 
-    models = ["mistral-7b-instruct", "zephyr-7b-beta", "llama2-7b-chat"]
+    models = ["mistral-7b-instruct", "zephyr-7b-beta", "llama2-7b-32k"]
     dataset = ["openweather", "basketball", "gsmarena", "wikidata", "owid"]
 
     random.seed(42)
+    # annotation_set = [
+    #     { "dataset": random.choice(dataset),
+    #      "model": random.choice(models), 
+    #      "split": "dev", 
+    #      "task" : "direct", 
+    #      "table_idx": random.randint(0,99) } 
+    #      for _ in range(10)
+    # ]
     annotation_set = [
-        { "dataset": random.choice(dataset),
-         "model": random.choice(models), 
+        { "dataset": "basketball",
+         "model": models[i], 
          "split": "dev", 
          "task" : "direct", 
-         "table_idx": random.randint(0,99) } 
-         for _ in range(10)
+         "parameters_name" : "sampling",
+         "table_idx": 0 } 
+         for i in range(3)
     ]
+
     return render_template(
         "annotate.html",
         datasets=app.config["datasets"],
@@ -322,6 +351,8 @@ def annotate():
 @app.route("/", methods=["GET", "POST"])
 def index():
     logger.info(f"Page loaded")
+
+    generate_annotation_index()
 
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")

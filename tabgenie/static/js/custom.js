@@ -12,6 +12,14 @@ var mode = window.mode;
 var examples_cached = {};
 var sizes = mode == "annotate" ? [50, 50] : [70, 30];
 
+const error_colors = [
+  { name: 'Incorrect', color: '#FFBCBC' },
+  { name: 'Not checkable', color: '#e9d2ff' },
+  { name: 'Misleading', color: '#FFF79F' },
+  { name: 'Irrelevant', color: '#ffd99f' },
+  { name: 'Other', color: '#bbbbbb' }
+]
+
 if (mode == "annotate") {
   var annotation_set = window.annotation_set;
   total_examples = annotation_set.length;
@@ -120,21 +128,16 @@ function load_annotations() {
     .then(() => {
       YPet.addInitializer(function (options) {
         /* Configure the # and colors of Annotation types (minimum 1 required) */
-        YPet.AnnotationTypes = new AnnotationTypeList([
-          { name: 'Incorrect', color: '#FFBCBC' },
-          { name: 'Not checkable', color: '#e9d2ff' },
-          { name: 'Misleading', color: '#FFF79F' },
-          { name: 'Irrelevant', color: '#ffd99f' },
-          { name: 'Other', color: '#bbbbbb' }
-        ]);
+        YPet.AnnotationTypes = new AnnotationTypeList(error_colors);
         var regions = {};
         var paragraphs = {};
 
         for (const [annotation_idx, data] of Object.entries(examples_cached)) {
           const task = annotation_set[annotation_idx].task;
           const model = annotation_set[annotation_idx].model;
+          var parameters_name = annotation_set[annotation_idx].parameters_name;
           var task_outputs = data.generated_outputs[task];
-          var content = task_outputs.find(o => o.model === model).generated.out;
+          var content = task_outputs.find(o => o.model === model && o.parameters_name === parameters_name).generated.out;
 
           var p = new Paragraph({ 'text': content });
 
@@ -215,6 +218,12 @@ function mark_annotation_as_complete() {
   }
 }
 
+function show_raw_data(data) {
+  // use <pre> to preserve whitespace
+  const rawDataStr = JSON.stringify(data.raw_data, null, 2).replace(/\\n/g, '<br>');
+  $("#rawarea").html(`<pre>${rawDataStr}</pre>`);
+}
+
 function show_annotation() {
   $(".annotate-box").hide();
   $(`#out-text-${table_idx}`).show();
@@ -222,9 +231,7 @@ function show_annotation() {
   data = examples_cached[table_idx];
 
   $("#tablearea").html(data.html);
-  // use <pre> to preserve whitespace
-  const rawDataStr = JSON.stringify(data.raw_data, null, 2);
-  $("#rawarea").html(`<pre>${rawDataStr}</pre>`);
+  show_raw_data(data);
 
   const dataset = annotation_set[table_idx].dataset;
   let textType;
@@ -359,35 +366,74 @@ function postRequestDownload(url, request, filename) {
   xhttp.send(JSON.stringify(request));
 }
 
+function highlight_annotations(annotations) {
+
+  annotations.forEach(annotationSet => {
+    const model = annotationSet.model;
+    const parameters_name = annotationSet.parameters_name;
+
+    let offset = 0; // Track cumulative offset
+
+    // sort by start
+    annotationSet.annotations.sort(function (a, b) {
+      return a.start - b.start;
+    });
+
+    annotationSet.annotations.forEach(annotation => {
+      const annotationType = annotation.type;
+      const color = error_colors[annotationType].color;
+      const text = annotation.text;
+
+      const start = annotation.start + offset;
+      const end = start + text.length;
+
+      const spanId = `span-${start}-${end}`;
+      const spanContent = `<span id="${spanId}" style="margin-right: 0px;background-color: ${color};">${text}</span>`;
+
+      // Replace the text content with the highlighted span
+      $(`#out-${model}-${parameters_name}-placeholder`).html((i, html) => {
+        return html.slice(0, start) + spanContent + html.slice(end);
+      });
+
+      // Update the offset
+      offset += spanContent.length - text.length;
+
+    });
+  });
+}
+
 
 function show_generated_outputs(generated_outputs) {
   $(".generated-output-box").remove();
 
-  for (const [task, task_outputs] of Object.entries(generated_outputs)) {
-    // sort task_outputs by model name
-    task_outputs.sort(function (a, b) {
-      return a.model.localeCompare(b.model);
-    });
-    for (out_obj of task_outputs) {
-      const name = out_obj.model;
-      var placeholder = $('<div>', { id: `out-${name}-placeholder`, class: "font-mono" });
-      var label = $('<label>', { class: "label-name" }).text(name);
-      if (!out_obj.generated) {
-        continue;
-      }
-      var content = out_obj.generated.out;
-      placeholder.html(content);
-      $('<div>', {
-        id: `out-${name}`,
-        class: `output-box generated-output-box box-${task}`,
-        style: 'display: none;'
-      }).append(label).append(placeholder).appendTo('#outputarea');
+  const task = "direct"
+  var task_outputs = generated_outputs[task];
+  // for (const [task, task_outputs] of Object.entries(generated_outputs)) {
+  // sort task_outputs by model name
+  task_outputs.sort(function (a, b) {
+    return a.model.localeCompare(b.model);
+  });
+  for (out_obj of task_outputs) {
+    const name = out_obj.model + "-" + out_obj.parameters_name;
+    var placeholder = $('<div>', { id: `out-${name}-placeholder`, class: "font-mono" });
+    var label = $('<label>', { class: "label-name" }).text(name);
+    if (!out_obj.generated) {
+      continue;
     }
+    var content = out_obj.generated.out;
+    placeholder.html(content);
+    $('<div>', {
+      id: `out-${name}`,
+      class: `output-box generated-output-box box-${task}`,
+      // style: 'display: none;'
+    }).append(label).append(placeholder).appendTo('#outputarea');
   }
-  $("input:radio[name ='task-toggle-radio']").on("change", change_task);
-  // set the first task as active
-  $("input:radio[name ='task-toggle-radio']").first().prop("checked", true);
-  change_task();
+
+  // }
+  // $("input:radio[name ='task-toggle-radio']").on("change", change_task);
+  // // set the first task as active
+  // $("input:radio[name ='task-toggle-radio']").first().prop("checked", true);
+  // change_task();
 }
 
 function fetch_table(dataset, split, table_idx) {
@@ -399,15 +445,15 @@ function fetch_table(dataset, split, table_idx) {
   }, function (data) {
     // reset_edited_cells();
     $("#tablearea").html(data.html);
-    // use <pre> to preserve whitespace
-    const rawDataStr = JSON.stringify(data.raw_data, null, 2);
-    $("#rawarea").html(`<pre>${rawDataStr}</pre>`);
+
+    show_raw_data(data);
     $("#dataset-spinner").hide();
 
     total_examples = data.total_examples;
 
     $("#total-examples").html(total_examples - 1);
     show_generated_outputs(data.generated_outputs);
+    highlight_annotations(data.annotations);
   });
 }
 
