@@ -335,7 +335,7 @@ def annotate():
          "model": models[i], 
          "split": "dev", 
          "setup" : "direct", 
-         "parameters_name" : "sampling",
+         "parameters_name" : "deterministic",
          "table_idx": 0 } 
          for i in range(3)
     ]
@@ -372,6 +372,7 @@ def index():
         default_dataset = app.config["default_dataset"]
         display_table = None
 
+
     return render_template(
         "index.html",
         datasets=app.config["datasets"],
@@ -381,5 +382,4 @@ def index():
         default_dataset=default_dataset,
         host_prefix=app.config["host_prefix"],
         display_table=display_table,
-        setup_names=app.config["setup_names"],
     )

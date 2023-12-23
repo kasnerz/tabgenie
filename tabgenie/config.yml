@@ -58,11 +58,3 @@ pipelines:
   export:
     pipeline: export
     interactive: false
-setup_names:
-  - direct
-  - cot
-  - topic-centric
-  - stylized
-  - multilingual
-  - qa
-  - insights

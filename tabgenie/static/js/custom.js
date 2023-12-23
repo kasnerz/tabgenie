@@ -135,9 +135,8 @@ function load_annotations() {
         for (const [annotation_idx, data] of Object.entries(examples_cached)) {
           const setup = annotation_set[annotation_idx].setup;
           const model = annotation_set[annotation_idx].model;
-          var parameters_name = annotation_set[annotation_idx].parameters_name;
           var setup_outputs = data.generated_outputs[setup];
-          var content = setup_outputs.find(o => o.model === model && o.parameters_name === parameters_name).generated.out;
+          var content = setup_outputs.find(o => o.model === model).generated.out;
 
           var p = new Paragraph({ 'text': content });
 
@@ -346,13 +345,6 @@ function change_split() {
 }
 
 
-function change_setup() {
-  const setup = $("input:radio[name ='setup-toggle-radio']:checked").val();
-  // unhide box-${setup} and hide others
-  $(".generated-output-box").hide();
-  $(".box-" + setup).show();
-}
-
 function postRequestDownload(url, request, filename) {
   // https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
   xhttp = new XMLHttpRequest();
@@ -381,7 +373,6 @@ function highlight_annotations(annotations) {
 
   annotations.forEach(annotationSet => {
     const model = annotationSet.model;
-    const parameters_name = annotationSet.parameters_name;
 
     let offset = 0; // Track cumulative offset
 
@@ -402,7 +393,7 @@ function highlight_annotations(annotations) {
       const spanContent = `<span id="${spanId}" style="margin-right: 0px;background-color: ${color};">${text}</span>`;
 
       // Replace the text content with the highlighted span
-      $(`#out-${model}-${parameters_name}-placeholder`).html((i, html) => {
+      $(`#out-${model}-placeholder`).html((i, html) => {
         return html.slice(0, start) + spanContent + html.slice(end);
       });
 
@@ -414,37 +405,88 @@ function highlight_annotations(annotations) {
 }
 
 
+
+function update_outputs() {
+  const setups = $("#setup-toggle").val();
+  const models = $("#model-toggle").val();
+
+  // unhide relevant setups and models hide others
+  $(".generated-output-box").hide();
+
+  for (const setup of setups) {
+    for (const model of models) {
+      $(`.box-${model}-${setup}`).show();
+    }
+  }
+}
+
+function create_selectbox(generated_outputs, id, options) {
+  var selectbox = $('<select>', { id: `${id}-toggle`, class: "form-select", multiple: true, "data-placeholder": `Select a ${id}` });
+  for (const option of options) {
+    var optionEl = $('<option>', { value: option }).text(option);
+    selectbox.append(optionEl);
+  }
+  $(`#${id}-toggle-placeholder`).html(selectbox);
+  selectbox.select2({
+    theme: "bootstrap-5",
+    width: '100%',
+    dropdownAutoWidth: true,
+    placeholder: "Select a setup",
+    closeOnSelect: false,
+    containerCssClass: 'select2--small',
+    dropdownCssClass: 'select2--small',
+    allowClear: true,
+    // minimumResultsForSearch: -1
+  });
+  // update outputs on any change
+  selectbox.on('change', function () {
+    update_outputs();
+  });
+}
+
+
 function show_generated_outputs(generated_outputs) {
   $(".generated-output-box").remove();
 
-  const setup = "direct"
-  var setup_outputs = generated_outputs[setup];
-  // for (const [setup, setup_outputs] of Object.entries(generated_outputs)) {
-  // sort setup_outputs by model name
-  setup_outputs.sort(function (a, b) {
-    return a.model.localeCompare(b.model);
-  });
-  for (out_obj of setup_outputs) {
-    const name = out_obj.model + "-" + out_obj.parameters_name;
-    var placeholder = $('<div>', { id: `out-${name}-placeholder`, class: "font-mono" });
-    var label = $('<label>', { class: "label-name" }).text(name);
-    if (!out_obj.generated) {
-      continue;
+  // create a selectbox in #setup-toggle with the setup names (keys in `generated_outputs`)
+  create_selectbox(generated_outputs, "setup", Object.keys(generated_outputs));
+
+  // get model names from the first setup
+  const setup = Object.keys(generated_outputs)[0];
+  const setup_outputs = generated_outputs[setup];
+  const models = setup_outputs.map(o => o.model).sort();
+
+  create_selectbox(generated_outputs, "model", models);
+
+  // set the first setup and all models as active
+  $("#setup-toggle").val(setup).trigger('change');
+  $("#model-toggle").val(models).trigger('change');
+
+
+  for (const [setup, setup_outputs] of Object.entries(generated_outputs)) {
+    // sort setup_outputs by model name
+    setup_outputs.sort(function (a, b) {
+      return a.model.localeCompare(b.model);
+    });
+    for (out_obj of setup_outputs) {
+      const model = out_obj.model;
+      const name = model + "-" + setup;
+      var placeholder = $('<div>', { id: `out-${name}-placeholder`, class: "font-mono" });
+      var label = $('<label>', { class: "label-name" }).text(name);
+      if (!out_obj.generated) {
+        continue;
+      }
+      var content = out_obj.generated.out;
+      placeholder.html(content);
+      $('<div>', {
+        id: `out-${name}`,
+        class: `output-box generated-output-box box-${model}-${setup}`,
+        // style: 'display: none;'
+      }).append(label).append(placeholder).appendTo('#outputarea');
     }
-    var content = out_obj.generated.out;
-    placeholder.html(content);
-    $('<div>', {
-      id: `out-${name}`,
-      class: `output-box generated-output-box box-${setup}`,
-      // style: 'display: none;'
-    }).append(label).append(placeholder).appendTo('#outputarea');
   }
 
-  // }
-  // $("input:radio[name ='setup-toggle-radio']").on("change", change_setup);
-  // // set the first setup as active
-  // $("input:radio[name ='setup-toggle-radio']").first().prop("checked", true);
-  // change_setup();
+  update_outputs();
 }
 
 function fetch_table(dataset, split, table_idx) {

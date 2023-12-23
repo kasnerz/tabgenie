@@ -311,18 +311,31 @@ pre {
 .output-box>label {
     position: absolute;
     font-size: smaller;
-    top: -8px;
+    top: -17px;
     padding-left: 3px;
     padding-right: 3px;
     background-color: white;
+}
+
+
+.select2-search--inline {
+    display: none !important;
 }
 
 .pipeline-box {
     border: 1px solid #0175ac !important;
 }
 
+
+/* .multiselect.form-select {
+    line-height: 1 !important;
+} */
+
+
 .label-name {
     left: 20px;
+
+    margin-top: 10px;
 }
 
 .label-settings {
@@ -330,6 +343,13 @@ pre {
     top: -9px !important;
     right: 10px;
 }
+
+.label-multiselect {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
 
 /* .label-reload {
     right: 10px;
@@ -661,4 +681,12 @@ a:hover {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+}
+
+#sidepanel-content {
+    /* display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center; */
+    padding: 15px;
 }

@@ -4,8 +4,12 @@
 <head>
   <title>TabGenie</title>
   <link rel="stylesheet" media="screen" href="{{ host_prefix }}/static/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" media="screen" href="{{ host_prefix }}/static/css/bootstrap-multiselect.min.css"> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
   <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/custom.css">
-  <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/d3graphs.css">
+  <!-- <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/d3graphs.css"> -->
   <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/jquery.highlight-within-textarea.css">
   <link rel="shortcut icon" href="{{ host_prefix }}/static/img/favicon.ico">
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
@@ -13,6 +17,8 @@
   <script src="{{ host_prefix }}/static/js/jquery.min.js"></script>
   <script src="{{ host_prefix }}/static/js/popper.min.js"></script>
   <script src="{{ host_prefix }}/static/js/bootstrap.min.js"></script>
+  <!-- <script src="{{ host_prefix }}/static/js/bootstrap-multiselect.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
   <script src="{{ host_prefix }}/static/js/jquery.highlight-within-textarea.js"></script>
   <script src="{{ host_prefix }}/static/js/jsonview.js"></script>
   <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -23,9 +29,9 @@
   <script src="https://code.highcharts.com/modules/accessibility.js"></script>
   <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.3.5/split.min.js"></script>
-  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
   <script src="{{ host_prefix }}/static/js/meteogram.js"></script>
-  <script src="{{ host_prefix }}/static/js/d3graphs.js"></script>
+  <!-- <script src="{{ host_prefix }}/static/js/d3graphs.js"></script> -->
 </head>
 
 
@@ -205,23 +211,19 @@
 
         <div id="rightpanel" class="collapse show">
           <div id='sidepanel-content' class="tab-content">
-            <!-- selectbox to select outputs -->
-            <!-- <div id='selectboxarea' class="tab-pane sidepanel-panel active" role="tabpanel">
-              <div class="btn-group btn-group-sm setup-toggle" id="setup-toggle" role="group">
-                {% for setup in setup_names %}
-                <input type="radio" class="btn-check" name="setup-toggle-radio" id="btnradio-{{ setup }}"
-                  value="{{ setup }}" autocomplete="off">
-                <label class="btn btn-outline-secondary" for="btnradio-{{ setup }}">{{ setup }} </label>
-                {% endfor %}
-              </div>
-            </div> -->
-
-
-            <div id='outputarea'></div>
+            <label for="model-toggle" class="label-multiselect"> Model </label>
+            <div id="model-toggle-placeholder">
+            </div>
+            <label for="setup-toggle" class="label-multiselect"> Setup </label>
+            <div id="setup-toggle-placeholder">
+            </div>
           </div>
+
+          <div id='outputarea'></div>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- modal windows -->
