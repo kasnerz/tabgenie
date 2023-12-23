@@ -108,7 +108,9 @@ Meteogram.prototype.getChartOptions = function (cityName) {
             },
             animation: false
         },
-
+        credits: {
+            enabled: false
+        },
         defs: {
             patterns: [{
                 id: 'precipitation-error',
