@@ -58,7 +58,7 @@ pipelines:
   export:
     pipeline: export
     interactive: false
-task_names:
+setup_names:
   - direct
   - cot
   - topic-centric

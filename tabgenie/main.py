@@ -326,7 +326,7 @@ def annotate():
     #     { "dataset": random.choice(dataset),
     #      "model": random.choice(models), 
     #      "split": "dev", 
-    #      "task" : "direct", 
+    #      "setup" : "direct", 
     #      "table_idx": random.randint(0,99) } 
     #      for _ in range(10)
     # ]
@@ -334,7 +334,7 @@ def annotate():
         { "dataset": "basketball",
          "model": models[i], 
          "split": "dev", 
-         "task" : "direct", 
+         "setup" : "direct", 
          "parameters_name" : "sampling",
          "table_idx": 0 } 
          for i in range(3)
@@ -381,5 +381,5 @@ def index():
         default_dataset=default_dataset,
         host_prefix=app.config["host_prefix"],
         display_table=display_table,
-        task_names=app.config["task_names"],
+        setup_names=app.config["setup_names"],
     )

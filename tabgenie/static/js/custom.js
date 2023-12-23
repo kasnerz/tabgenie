@@ -133,11 +133,11 @@ function load_annotations() {
         var paragraphs = {};
 
         for (const [annotation_idx, data] of Object.entries(examples_cached)) {
-          const task = annotation_set[annotation_idx].task;
+          const setup = annotation_set[annotation_idx].setup;
           const model = annotation_set[annotation_idx].model;
           var parameters_name = annotation_set[annotation_idx].parameters_name;
-          var task_outputs = data.generated_outputs[task];
-          var content = task_outputs.find(o => o.model === model && o.parameters_name === parameters_name).generated.out;
+          var setup_outputs = data.generated_outputs[setup];
+          var content = setup_outputs.find(o => o.model === model && o.parameters_name === parameters_name).generated.out;
 
           var p = new Paragraph({ 'text': content });
 
@@ -213,6 +213,11 @@ function mark_annotation_as_complete() {
     // show the `submit` button
     $("#submit-annotations-btn").show();
 
+    // scroll to the top
+    $('html, body').animate({
+      scrollTop: $("#submit-annotations-btn").offset().top
+    }, 500);
+
   } else if (table_idx < total_examples - 1) {
     nextbtn();
   }
@@ -220,7 +225,13 @@ function mark_annotation_as_complete() {
 
 function show_raw_data(data) {
   // use <pre> to preserve whitespace
-  const rawDataStr = JSON.stringify(data.raw_data, null, 2).replace(/\\n/g, '<br>');
+  var rawDataStr = JSON.stringify(data.raw_data, null, 2).replace(/\\n/g, '<br>');
+
+  if (rawDataStr[0] == '"') {
+    // remove the first and last double quotes
+    rawDataStr = rawDataStr.slice(1, -1);
+  }
+
   $("#rawarea").html(`<pre>${rawDataStr}</pre>`);
 }
 
@@ -335,11 +346,11 @@ function change_split() {
 }
 
 
-function change_task() {
-  const task = $("input:radio[name ='task-toggle-radio']:checked").val();
-  // unhide box-${task} and hide others
+function change_setup() {
+  const setup = $("input:radio[name ='setup-toggle-radio']:checked").val();
+  // unhide box-${setup} and hide others
   $(".generated-output-box").hide();
-  $(".box-" + task).show();
+  $(".box-" + setup).show();
 }
 
 function postRequestDownload(url, request, filename) {
@@ -406,14 +417,14 @@ function highlight_annotations(annotations) {
 function show_generated_outputs(generated_outputs) {
   $(".generated-output-box").remove();
 
-  const task = "direct"
-  var task_outputs = generated_outputs[task];
-  // for (const [task, task_outputs] of Object.entries(generated_outputs)) {
-  // sort task_outputs by model name
-  task_outputs.sort(function (a, b) {
+  const setup = "direct"
+  var setup_outputs = generated_outputs[setup];
+  // for (const [setup, setup_outputs] of Object.entries(generated_outputs)) {
+  // sort setup_outputs by model name
+  setup_outputs.sort(function (a, b) {
     return a.model.localeCompare(b.model);
   });
-  for (out_obj of task_outputs) {
+  for (out_obj of setup_outputs) {
     const name = out_obj.model + "-" + out_obj.parameters_name;
     var placeholder = $('<div>', { id: `out-${name}-placeholder`, class: "font-mono" });
     var label = $('<label>', { class: "label-name" }).text(name);
@@ -424,16 +435,16 @@ function show_generated_outputs(generated_outputs) {
     placeholder.html(content);
     $('<div>', {
       id: `out-${name}`,
-      class: `output-box generated-output-box box-${task}`,
+      class: `output-box generated-output-box box-${setup}`,
       // style: 'display: none;'
     }).append(label).append(placeholder).appendTo('#outputarea');
   }
 
   // }
-  // $("input:radio[name ='task-toggle-radio']").on("change", change_task);
-  // // set the first task as active
-  // $("input:radio[name ='task-toggle-radio']").first().prop("checked", true);
-  // change_task();
+  // $("input:radio[name ='setup-toggle-radio']").on("change", change_setup);
+  // // set the first setup as active
+  // $("input:radio[name ='setup-toggle-radio']").first().prop("checked", true);
+  // change_setup();
 }
 
 function fetch_table(dataset, split, table_idx) {
