@@ -409,6 +409,8 @@ function change_setup() {
   // unhide box-${setup} and hide others
   $(".generated-output-box").hide();
   $(".box-" + setup).show();
+  $("#setup-name-placeholder").html(setup);
+  $("#setup-info-placeholder").html("<pre>" + JSON.stringify(setups[setup], null, 2) + "</pre>");
 }
 
 

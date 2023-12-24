@@ -673,14 +673,20 @@ a:hover {
     background-color: #f8f9fa;
 }
 
-#setup-toggle {
+#setuparea {
     /* make centered */
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    display: block;
+    /* flex-wrap: wrap; */
+    /* align-items: center; */
+    /* justify-content: center; */
+}
+
+.btn-setup-info {
+    /* right-align */
+    float: right;
+    margin-left: 10px;
 }
 
 #sidepanel-content {
@@ -689,4 +695,8 @@ a:hover {
     align-items: center;
     justify-content: center; */
     padding: 15px;
+}
+
+#setuparea {
+    /* background: #F5F5F5; */
 }

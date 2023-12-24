@@ -234,6 +234,12 @@ def index():
     table_idx = request.args.get("table_idx")
     setup_names = [x.stem for x in Path(SETUP_DIR).glob("*.yaml")]
 
+    # load the yamls, create a dict
+    setups = {}
+    for setup_name in setup_names:
+        with open(os.path.join(SETUP_DIR, f"{setup_name}.yaml"), "r") as f:
+            setups[setup_name] = yaml.safe_load(f)
+
     if (
         dataset_name
         and split
@@ -255,5 +261,5 @@ def index():
         default_dataset=default_dataset,
         host_prefix=app.config["host_prefix"],
         display_table=display_table,
-        setup_names=setup_names
+        setups=setups
     )

@@ -141,11 +141,11 @@
               <img src="{{ host_prefix }}/static/img/unicode/arrowd.png" width="12px" class="button-bw-icon" />
             </a>
           </li> -->
-          <li class="page-item">
+          <!-- <li class="page-item">
             <a class="page-link" data-bs-toggle="modal" data-bs-target="#info-modal">
               <img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px" class="button-bw-icon" />
             </a>
-          </li>
+          </li> -->
           <!-- <li class="page-item">
             <a class="page-link" id="about-btn" onclick="show_info();" data-bs-toggle="modal"
               data-bs-target="#about-modal" title="About">
@@ -211,17 +211,24 @@
 
         <div id="rightpanel" class="collapse show">
           <div id='sidepanel-content' class="tab-content">
-            <!-- <label for="model-toggle" class="label-multiselect"> Model </label>
-            <div id="model-toggle-placeholder">
+            <div id='setuparea'>
+              <!-- <label for="model-toggle" class="label-multiselect"> Model </label>
+              <div id="model-toggle-placeholder">
+              </div>
+              <label for="setup-toggle" class="label-multiselect"> Setup </label> -->
+              <div class="btn-group btn-group-sm setup-toggle" id="setup-toggle" role="group">
+                {% for setup in setups.keys() %}
+                <input type="radio" class="btn-check" name="setup-toggle-radio" id="btnradio-{{ setup }}"
+                  value="{{ setup }}" autocomplete="off">
+                <label class="btn btn-outline-secondary" for="btnradio-{{ setup }}">{{ setup }} </label>
+                {% endfor %}
+              </div>
+              <!-- add a button with question mark for opening the modal `setup-modal` -->
+              <button type="button" class="btn btn-sm btn-outline-secondary btn-setup-info" data-bs-toggle="modal"
+                data-bs-target="#setup-modal"><img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px"
+                  class="button-bw-icon" /></button>
             </div>
-            <label for="setup-toggle" class="label-multiselect"> Setup </label> -->
-            <div class="btn-group btn-group-sm setup-toggle" id="setup-toggle" role="group">
-              {% for setup in setup_names %}
-              <input type="radio" class="btn-check" name="setup-toggle-radio" id="btnradio-{{ setup }}"
-                value="{{ setup }}" autocomplete="off">
-              <label class="btn btn-outline-secondary" for="btnradio-{{ setup }}">{{ setup }} </label>
-              {% endfor %}
-            </div>
+
           </div>
 
           <div id='outputarea'></div>
@@ -234,6 +241,25 @@
   <!-- modal windows -->
 
   <!-- // TODO save on close note-modal dialogue -->
+
+
+  <div class="modal fade" id="setup-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="note-modal-label"><code><span id="setup-name-placeholder"></span></code> setup
+            details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="setup-info-placeholder">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 
+
   <div class="modal fade" id="note-modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -251,7 +277,6 @@
         </div>
       </div>
     </div>
-  </div>
   </div>
 
   <div class="modal fade" id="export-modal" tabindex="-1">
@@ -320,7 +345,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="modal fade" id="info-modal" tabindex="-1">
     <div class="modal-dialog">
@@ -477,6 +502,7 @@
   window.notes = {{ session.get("favourites", {}) | tojson | safe }};
   window.editedCells = {{ session.get("editedCells", {}) | tojson | safe }};
   window.display_table = {{ display_table | tojson | safe }};
+  window.setups = {{ setups | tojson | safe }};
 </script>
 
 <script src="{{ host_prefix }}/static/js/custom.js"></script>
