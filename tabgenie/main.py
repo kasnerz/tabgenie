@@ -10,17 +10,16 @@ import random
 import coloredlogs
 import yaml
 import traceback
-from xlsxwriter import Workbook
 from flask import Flask, render_template, jsonify, request, send_file, session
 from collections import defaultdict
 from .loaders import DATASET_CLASSES
-from .processing.processing import get_pipeline_class_by_name
-from .utils.excel import write_html_table_to_excel, write_annotation_to_excel
+from pathlib import Path
 
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 ANNOTATIONS_DIR = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "annotations")
+SETUP_DIR = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "setups")
 
 app = Flask("tabgenie", template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.config.update(SECRET_KEY=os.urandom(24))
@@ -56,21 +55,6 @@ def save_annotations():
     return jsonify({'status': 'success'})
 
 
-
-# @app.route("/pipeline", methods=["GET", "POST"])
-# def get_pipeline_output():
-#     content = request.json
-#     logger.info(f"Incoming content: {content}")
-
-#     if content.get("edited_cells"):
-#         content["edited_cells"] = json.loads(content["edited_cells"])
-
-#     pipeline_name = content["pipeline"]
-#     out = run_pipeline(pipeline_name, pipeline_args=content, force=bool(content["edited_cells"]))
-
-#     return {"out": str(out), "session": get_session()}
-
-
 def get_session():
     """Retrieve session with default values and serializable"""
     s = {}
@@ -103,37 +87,6 @@ def initialize_dataset(dataset_name):
 
     return dataset
 
-
-# def load_config_template(pipeline_name, pipeline_cfg):
-#     if "config_template_file" in pipeline_cfg:
-#         with app.app_context():
-#             template = render_template(
-#                 pipeline_cfg["config_template_file"],
-#                 pipeline_name=pipeline_name,
-#                 cfg=pipeline_cfg,
-#                 prompts=app.db["prompts"],
-#             )
-#         app.db["cfg_templates"][pipeline_name] = template
-
-
-# def initialize_pipeline(pipeline_name):
-#     pipeline_cfg = app.db["pipelines_cfg"][pipeline_name]
-#     load_config_template(pipeline_name, pipeline_cfg)
-#     pipeline_cls = get_pipeline_class_by_name(pipeline_cfg["pipeline"])
-#     app.db["pipelines_obj"][pipeline_name] = pipeline_cls(name=pipeline_name, cfg=pipeline_cfg)
-
-
-# def run_pipeline(pipeline_name, pipeline_args, cache_only=False, force=False):
-#     pipeline = app.db["pipelines_obj"].get(pipeline_name)
-#     pipeline_args["pipeline_cfg"] = app.db["pipelines_cfg"][pipeline_name]
-
-#     if pipeline_args.get("dataset") and pipeline_args.get("split"):
-#         dataset_obj = get_dataset(dataset_name=pipeline_args["dataset"], split=pipeline_args["split"])
-#         pipeline_args["dataset_obj"] = dataset_obj
-
-#     out = pipeline.run(pipeline_args, cache_only=cache_only, force=force)
-
-#     return out
 
 
 def get_dataset(dataset_name, split):
@@ -224,83 +177,6 @@ def get_dataset_info(dataset_name):
     print(yaml.dump(info_yaml, sort_keys=False))
 
 
-# def load_prompts():
-#     prompts_dir = os.path.join(TEMPLATES_DIR, "prompts")
-#     prompts = {}
-
-#     for file in glob.glob(prompts_dir + "/" + "*.prompt"):
-#         prompt_name = os.path.splitext(os.path.basename(file))[0]
-
-#         with open(file) as f:
-#             prompt = f.read()
-
-#         prompts[prompt_name] = prompt
-
-#     return prompts
-
-
-# @app.route("/note", methods=["GET", "POST"])
-# def note():
-#     content = request.json
-#     action = content.get("action", "edit_note")
-#     dataset = content.get("dataset")
-#     split = content.get("split")
-#     table_idx = content.get("table_idx")
-#     note = content.get("note", "")
-
-#     notes = session.get("notes", {})
-
-#     if action == "remove_all":
-#         notes = {}
-#     else:
-#         assert action == "edit_note"
-#         note_id = f"{dataset}-{split}-{table_idx}"
-#         if len(note) == 0 and note_id in notes:
-#             notes.pop(note_id)
-#         else:
-#             notes[note_id] = {"dataset": dataset, "split": split, "table_idx": table_idx, "note": note}
-
-#     session["notes"] = notes
-#     # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
-#     session.modified = True
-
-#     logging.info(f"/note \n\t{content=}\n\t{get_session()}")
-#     return jsonify(notes)
-
-
-# @app.route("/favourite", methods=["GET", "POST"])
-# def favourite():
-#     content = request.json
-#     dataset = content.get("dataset")
-#     split = content.get("split")
-#     table_idx = content.get("table_idx")
-#     action = content.get("action", "get_all")
-#     if action in ["remove", "insert"]:
-#         assert dataset and split and isinstance(table_idx, int), (dataset, split, table_idx)
-#         favourite_id = f"{dataset}-{split}-{table_idx}"
-#     favourites = session.get("favourites", {})
-#     if action == "remove":
-#         favourite = favourites.pop(favourite_id, None)
-#         logging.info(f"Removed {favourite}")
-#     elif action == "insert":
-#         favourites[favourite_id] = {"dataset": dataset, "split": split, "table_idx": table_idx}
-#     elif action == "remove_all":
-#         favourites = {}
-#     else:
-#         assert action == "get_all"
-
-#     session["favourites"] = favourites
-#     # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
-#     session.modified = True
-
-#     logging.info(f"favourite\n\t{content=}\n\t{get_session()}")
-#     return jsonify(favourites)
-
-
-# @app.errorhandler(404)
-# def page_not_found(error):
-    # return render_template("404.html"), 404
-
 @app.route("/submit_annotations", methods=["POST"])
 def submit_annotations():
     logger.info(f"Received annotations")
@@ -335,7 +211,6 @@ def annotate():
          "model": models[i], 
          "split": "dev", 
          "setup" : "direct", 
-         "parameters_name" : "deterministic",
          "table_idx": 0 } 
          for i in range(3)
     ]
@@ -357,6 +232,8 @@ def index():
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")
     table_idx = request.args.get("table_idx")
+    setup_names = [x.stem for x in Path(SETUP_DIR).glob("*.yaml")]
+
     if (
         dataset_name
         and split
@@ -372,14 +249,11 @@ def index():
         default_dataset = app.config["default_dataset"]
         display_table = None
 
-
     return render_template(
         "index.html",
         datasets=app.config["datasets"],
-        # pipelines=app.db["pipelines_cfg"],
-        # pipelines_cfg_templates=app.db["cfg_templates"],
-        # prompts=app.db["prompts"],
         default_dataset=default_dataset,
         host_prefix=app.config["host_prefix"],
         display_table=display_table,
+        setup_names=setup_names
     )

@@ -404,64 +404,71 @@ function highlight_annotations(annotations) {
   });
 }
 
-
-
-function update_outputs() {
-  const setups = $("#setup-toggle").val();
-  const models = $("#model-toggle").val();
-
-  // unhide relevant setups and models hide others
+function change_setup() {
+  const setup = $("input:radio[name ='setup-toggle-radio']:checked").val();
+  // unhide box-${setup} and hide others
   $(".generated-output-box").hide();
-
-  for (const setup of setups) {
-    for (const model of models) {
-      $(`.box-${model}-${setup}`).show();
-    }
-  }
+  $(".box-" + setup).show();
 }
 
-function create_selectbox(generated_outputs, id, options) {
-  var selectbox = $('<select>', { id: `${id}-toggle`, class: "form-select", multiple: true, "data-placeholder": `Select a ${id}` });
-  for (const option of options) {
-    var optionEl = $('<option>', { value: option }).text(option);
-    selectbox.append(optionEl);
-  }
-  $(`#${id}-toggle-placeholder`).html(selectbox);
-  selectbox.select2({
-    theme: "bootstrap-5",
-    width: '100%',
-    dropdownAutoWidth: true,
-    placeholder: "Select a setup",
-    closeOnSelect: false,
-    containerCssClass: 'select2--small',
-    dropdownCssClass: 'select2--small',
-    allowClear: true,
-    // minimumResultsForSearch: -1
-  });
-  // update outputs on any change
-  selectbox.on('change', function () {
-    update_outputs();
-  });
-}
+
+// function update_outputs() {
+//   // const setups = $("#setup-toggle").val();
+//   const models = $("#model-toggle").val();
+
+//   // unhide relevant setups and models hide others
+//   $(".generated-output-box").hide();
+
+//   // for (const setup of setups) {
+//   for (const model of models) {
+//     $(`.box-${model}-${setup}`).show();
+//   }
+//   // }
+// }
+
+// function create_selectbox(generated_outputs, id, options) {
+//   var selectbox = $('<select>', { id: `${id}-toggle`, class: "form-select", multiple: true, "data-placeholder": `Select a ${id}` });
+//   for (const option of options) {
+//     var optionEl = $('<option>', { value: option }).text(option);
+//     selectbox.append(optionEl);
+//   }
+//   $(`#${id}-toggle-placeholder`).html(selectbox);
+//   selectbox.select2({
+//     theme: "bootstrap-5",
+//     width: '100%',
+//     dropdownAutoWidth: true,
+//     placeholder: "Select a setup",
+//     closeOnSelect: false,
+//     containerCssClass: 'select2--small',
+//     dropdownCssClass: 'select2--small',
+//     allowClear: true,
+//     // minimumResultsForSearch: -1
+//   });
+//   // update outputs on any change
+//   selectbox.on('change', function () {
+//     update_outputs();
+//   });
+// }
 
 
 function show_generated_outputs(generated_outputs) {
   $(".generated-output-box").remove();
 
-  // create a selectbox in #setup-toggle with the setup names (keys in `generated_outputs`)
-  create_selectbox(generated_outputs, "setup", Object.keys(generated_outputs));
+  // // create a selectbox in #setup-toggle with the setup names (keys in `generated_outputs`)
+  // create_selectbox(generated_outputs, "setup", Object.keys(generated_outputs));
 
-  // get model names from the first setup
-  const setup = Object.keys(generated_outputs)[0];
-  const setup_outputs = generated_outputs[setup];
-  const models = setup_outputs.map(o => o.model).sort();
+  // // get model names from the first setup
+  // const setup = Object.keys(generated_outputs)[0];
+  // const setup_outputs = generated_outputs[setup];
+  // const models = setup_outputs.map(o => o.model).sort();
 
-  create_selectbox(generated_outputs, "model", models);
+  // create_selectbox(generated_outputs, "model", models);
 
-  // set the first setup and all models as active
-  $("#setup-toggle").val(setup).trigger('change');
-  $("#model-toggle").val(models).trigger('change');
-
+  // set the first setup and all models as active (if no models and setups are selected yet)
+  // if ($("#setup-toggle").val().length == 0 && $("#model-toggle").val().length == 0) {
+  // $("#setup-toggle").val("direct").trigger('change');
+  // $("#model-toggle").val(models).trigger('change');
+  // }
 
   for (const [setup, setup_outputs] of Object.entries(generated_outputs)) {
     // sort setup_outputs by model name
@@ -476,17 +483,21 @@ function show_generated_outputs(generated_outputs) {
       if (!out_obj.generated) {
         continue;
       }
-      var content = out_obj.generated.out;
+      var content = out_obj.generated.out.replace(/\n/g, '<br>');
       placeholder.html(content);
       $('<div>', {
         id: `out-${name}`,
-        class: `output-box generated-output-box box-${model}-${setup}`,
+        class: `output-box generated-output-box box-${setup}`,
         // style: 'display: none;'
       }).append(label).append(placeholder).appendTo('#outputarea');
     }
   }
-
-  update_outputs();
+  $("input:radio[name ='setup-toggle-radio']").on("change", change_setup);
+  // if no input is checked, set the first setup as active
+  if ($("input:radio[name ='setup-toggle-radio']:checked").length == 0) {
+    $("input:radio[name ='setup-toggle-radio']").first().prop("checked", true);
+  }
+  change_setup();
 }
 
 function fetch_table(dataset, split, table_idx) {

@@ -211,11 +211,16 @@
 
         <div id="rightpanel" class="collapse show">
           <div id='sidepanel-content' class="tab-content">
-            <label for="model-toggle" class="label-multiselect"> Model </label>
+            <!-- <label for="model-toggle" class="label-multiselect"> Model </label>
             <div id="model-toggle-placeholder">
             </div>
-            <label for="setup-toggle" class="label-multiselect"> Setup </label>
-            <div id="setup-toggle-placeholder">
+            <label for="setup-toggle" class="label-multiselect"> Setup </label> -->
+            <div class="btn-group btn-group-sm setup-toggle" id="setup-toggle" role="group">
+              {% for setup in setup_names %}
+              <input type="radio" class="btn-check" name="setup-toggle-radio" id="btnradio-{{ setup }}"
+                value="{{ setup }}" autocomplete="off">
+              <label class="btn btn-outline-secondary" for="btnradio-{{ setup }}">{{ setup }} </label>
+              {% endfor %}
             </div>
           </div>
 
