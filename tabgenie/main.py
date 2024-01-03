@@ -111,6 +111,10 @@ def generate_annotation_index():
 def get_annotations(dataset_name, split, table_idx):
     df = app.db["annotation_index"]
 
+    # todo check what is actually happening here
+    if (df is None) or (df is dict) or (df.empty):
+        return []
+
     df = df[(df["dataset"] == dataset_name) & (df["split"] == split) & (df["table_idx"] == table_idx)]
 
     return df.to_dict(orient="records")
