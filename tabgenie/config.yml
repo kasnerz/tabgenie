@@ -1,60 +1,16 @@
 ---
 datasets:
-# - cacapo
-# - dart
-# - e2e
-# - eventnarrative
-# - hitab
-# - charttotext-s
-# - logic2text
-# - logicnlg
-# # - multiwoz22
-# - numericnlg
-# - scigen
-# - sportsett
-# - totto
-# - webnlg
-# - wikibio
-# - wikisql
-# - wikitabletext
-- basketball
+- ice_hockey
 - openweather
 - owid
 - gsmarena
 - wikidata
-default_dataset: basketball
+default_dataset: ice_hockey
 debug: true
 host_prefix: ""
 cache_dev_splits: false
 generated_outputs_dir: ../outputs
 pipelines:
-  # tk_instruct_model:
-  #   pipeline: model_api
-  #   model_url: http://localhost:8981/
-  #   config_template_file: model_api_config.html
-  #   default_prompt: tk-def-pos-fixed
-  #   interactive: true
-  #   datasets:
-  #     - cacapo
-  #     - dart
-  #     - e2e
-  #     - eventnarrative
-  #     - hitab
-  #     - logic2text
-  #     - logicnlg
-  #     - numericnlg
-  #     - totto
-  #     - webnlg
-  #     - wikibio
-  #     - wikitabletext
-  # rdf_triples:
-  #   pipeline: graph
-  #   interactive: true
-  #   datasets:
-  #     - webnlg
-  #     - dart
-  #     - e2e
-  #     - eventnarrative
   export:
     pipeline: export
     interactive: false

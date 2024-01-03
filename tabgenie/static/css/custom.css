@@ -683,9 +683,15 @@ a:hover {
     /* justify-content: center; */
 }
 
+#setup-extra-btns {
+    display: inline-flex;
+    align-items: center;
+    float: right;
+}
+
 .btn-setup-info {
     /* right-align */
-    float: right;
+
     margin-left: 10px;
 }
 

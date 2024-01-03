@@ -7,6 +7,7 @@ import logging
 import linecache
 import pandas as pd
 import random
+import time
 import coloredlogs
 import yaml
 import traceback
@@ -43,17 +44,6 @@ def success():
     resp = jsonify(success=True)
     return resp
 
-@app.route('/save_annotations', methods=['POST'])
-def save_annotations():
-    data = request.get_json()
-    annotations = data['annotations']
-
-    with open(os.path.join(ANNOTATIONS_DIR, "annotations.jsonl"), "w") as f:
-        for row in annotations:
-            f.write(json.dumps(row) + "\n")
-
-    return jsonify({'status': 'success'})
-
 
 def get_session():
     """Retrieve session with default values and serializable"""
@@ -80,13 +70,11 @@ def render_table():
     return jsonify(table_data)
 
 
-
 def initialize_dataset(dataset_name):
     dataset = DATASET_CLASSES[dataset_name]()
     app.db["datasets_obj"][dataset_name] = dataset
 
     return dataset
-
 
 
 def get_dataset(dataset_name, split):
@@ -106,20 +94,26 @@ def get_dataset(dataset_name, split):
 
     return dataset
 
+
 def generate_annotation_index():
-    with open(os.path.join(ANNOTATIONS_DIR, "annotations.jsonl"), "r") as f:
-        annotations = [json.loads(line) for line in f.readlines()]
+    jsonl_files = glob.glob(os.path.join(ANNOTATIONS_DIR, "*.jsonl"))
 
-    app.db["annotation_index"] = defaultdict(list)
+    annotations = []
+    for jsonl_file in jsonl_files:
+        with open(jsonl_file) as f:
+            for line in f:
+                annotations.append(json.loads(line))
 
-    for annotation in annotations:
-        dataset_name = annotation["dataset"]
-        split = annotation["split"]
-        table_idx = annotation["table_idx"]
-        app.db["annotation_index"][(dataset_name, split, table_idx)].append(annotation)
+    df = pd.DataFrame(annotations)
+    app.db["annotation_index"] = df
+
 
 def get_annotations(dataset_name, split, table_idx):
-    return app.db["annotation_index"].get((dataset_name, split, table_idx), [])
+    df = app.db["annotation_index"]
+
+    df = df[(df["dataset"] == dataset_name) & (df["split"] == split) & (df["table_idx"] == table_idx)]
+
+    return df.to_dict(orient="records")
 
 
 def get_table_data(dataset_name, split, table_idx):
@@ -128,11 +122,12 @@ def get_table_data(dataset_name, split, table_idx):
     html = dataset.render(table=table)
     generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
     annotations = get_annotations(dataset_name, split, table_idx)
+
     dataset_info = dataset.get_info()
 
     return {
         "html": html,
-        "raw_data" : table,
+        "raw_data": table,
         "total_examples": dataset.get_example_count(split),
         "dataset_info": dataset_info,
         "generated_outputs": generated_outputs,
@@ -141,53 +136,21 @@ def get_table_data(dataset_name, split, table_idx):
     }
 
 
-def get_dataset_info(dataset_name):
-
-    if dataset_name is None:
-        print("========================================")
-        print("               TabGenie                ")
-        print("========================================")
-        datasets = app.config["datasets"]
-
-        print("Available datasets:")
-
-        for dataset in datasets:
-            print(f"- {dataset}")
-
-        print("========================================")
-        print("For more information about the dataset, type `tabgenie info -d <dataset_name>`")
-        return
-
-    dataset = get_dataset(dataset_name=dataset_name, split="dev")
-
-    info = dataset.get_info()
-
-    info_yaml = {
-        "dataset": dataset.name,
-        "description": info["description"].replace("\n", ""),
-        "examples": info["examples"],
-        "version": info["version"],
-        "license": info["license"],
-        "citation": info["citation"].replace("\n", ""),
-    }
-
-    if "changes":
-        info_yaml["changes"] = info["changes"]
-
-    print(yaml.dump(info_yaml, sort_keys=False))
-
-
 @app.route("/submit_annotations", methods=["POST"])
 def submit_annotations():
     logger.info(f"Received annotations")
     data = request.get_json()
 
-    with open("annotations.jsonl", "w") as f:
-        for row in data:
-            f.write(json.dumps(row) + "\n")
-    
-    return jsonify({"status": "success"})
+    annotator_id = data["annotator_id"]
+    annotations = data["annotations"]
 
+    now = time.time()
+
+    with open(os.path.join(ANNOTATIONS_DIR, f"{annotator_id}-{now}.jsonl"), "w") as f:
+        for row in annotations:
+            f.write(json.dumps(row) + "\n")
+
+    return jsonify({"status": "success"})
 
 
 @app.route("/annotate", methods=["GET", "POST"])
@@ -195,24 +158,29 @@ def annotate():
     logger.info(f"Annotate page loaded")
 
     models = ["mistral-7b-instruct", "zephyr-7b-beta", "llama2-7b-32k"]
-    dataset = ["openweather", "basketball", "gsmarena", "wikidata", "owid"]
+    dataset = ["openweather", "ice_hockey", "gsmarena", "wikidata", "owid"]
+
+    annotator_id = "ABCDE123"
 
     random.seed(42)
     # annotation_set = [
     #     { "dataset": random.choice(dataset),
-    #      "model": random.choice(models), 
-    #      "split": "dev", 
-    #      "setup" : "direct", 
-    #      "table_idx": random.randint(0,99) } 
+    #      "model": random.choice(models),
+    #      "split": "dev",
+    #      "setup" : "direct",
+    #      "table_idx": random.randint(0,99) }
     #      for _ in range(10)
     # ]
     annotation_set = [
-        { "dataset": "basketball",
-         "model": models[i], 
-         "split": "dev", 
-         "setup" : "direct", 
-         "table_idx": 0 } 
-         for i in range(3)
+        {
+            "annotator_id": annotator_id,
+            "dataset": "ice_hockey",
+            "model": models[i],
+            "split": "dev",
+            "setup": "full-sampl",
+            "table_idx": 0,
+        }
+        for i in range(3)
     ]
 
     return render_template(
@@ -220,6 +188,7 @@ def annotate():
         datasets=app.config["datasets"],
         host_prefix=app.config["host_prefix"],
         annotation_set=annotation_set,
+        annotator_id=annotator_id,
     )
 
 
@@ -261,5 +230,5 @@ def index():
         default_dataset=default_dataset,
         host_prefix=app.config["host_prefix"],
         display_table=display_table,
-        setups=setups
+        setups=setups,
     )
