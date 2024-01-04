@@ -181,7 +181,7 @@ def annotate():
             "dataset": "ice_hockey",
             "model": models[i],
             "split": "dev",
-            "setup": "full-sampl",
+            "setup": "det-0shot",
             "table_idx": 0,
         }
         for i in range(3)

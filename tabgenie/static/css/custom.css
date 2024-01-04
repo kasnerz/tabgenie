@@ -706,3 +706,25 @@ a:hover {
 #setuparea {
     /* background: #F5F5F5; */
 }
+
+/* #annotations-select {
+    
+} */
+
+/* #annotations-area {
+    margin-top: 20px;
+    margin-bottom: 60px;
+} */
+
+#setuparea label {
+    float: right;
+    text-align: right;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+#setuparea select {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+}
