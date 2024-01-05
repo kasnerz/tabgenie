@@ -124,35 +124,24 @@
         <div id="rightpanel" class="collapse show">
           <div id='sidepanel-content' class="tab-content">
             <div id='setuparea'>
-              <!-- <label for="model-toggle" class="label-multiselect"> Model </label>
-              <div id="model-toggle-placeholder">
-              </div>
-              <label for="setup-toggle" class="label-multiselect"> Setup </label> -->
-              <div class="btn-group btn-group-sm setup-toggle" id="setup-toggle" role="group">
-                {% for setup in setups.keys() %}
-                <input type="radio" class="btn-check" name="setup-toggle-radio" id="btnradio-{{ setup }}"
-                  value="{{ setup }}" autocomplete="off">
-                <label class="btn btn-outline-secondary" for="btnradio-{{ setup }}">{{ setup }} </label>
-                {% endfor %}
-              </div>
-
+              <label>Setup
+                <select class="form-select form-select-sm" id="setup-select">
+                  {% for setup in setups.keys() %}
+                  <option value="{{ setup }}">{{ setup }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+              <label>Annotations
+                <select class="form-select form-select-sm" id="annotations-select">
+                  <option value="plain">None</option>
+                  <option value="gpt-4">GPT-4</option>
+                  <option value="human">Human</option>
+                </select>
+              </label>
               <button type="button" class="btn btn-sm btn-outline-secondary btn-setup-info" data-bs-toggle="modal"
                 data-bs-target="#setup-modal"><img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px"
                   class="button-bw-icon" /></button>
-
-              <label>Annotations
-                <select class="form-select form-select-sm" id="annotations-select">
-                  <option value="1">GPT-4</option>
-                  <option value="2">ABC</option>
-                  <option value="3">DEF</option>
-                </select>
-              </label>
-
-              <!-- <div id="annotations-area">
-               
-              </div> -->
             </div>
-
           </div>
 
           <div id='outputarea'></div>

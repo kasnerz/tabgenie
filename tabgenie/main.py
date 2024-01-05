@@ -98,26 +98,27 @@ def get_dataset(dataset_name, split):
 def generate_annotation_index():
     jsonl_files = glob.glob(os.path.join(ANNOTATIONS_DIR, "*.jsonl"))
 
-    annotations = []
+    # contains annotations for each generated output
+    annotations = defaultdict(list)
+
     for jsonl_file in jsonl_files:
         with open(jsonl_file) as f:
             for line in f:
-                annotations.append(json.loads(line))
+                annotation = json.loads(line)
+                
+                key = (annotation["dataset"], annotation["split"], annotation["table_idx"], annotation["model"], annotation["setup"])
 
-    df = pd.DataFrame(annotations)
-    app.db["annotation_index"] = df
+                annotations[key].append(annotation)
+
+    app.db["annotation_index"] = annotations
 
 
-def get_annotations(dataset_name, split, table_idx):
-    df = app.db["annotation_index"]
+def get_annotations(dataset_name, split, table_idx, model, setup):
+    annotation_index = app.db["annotation_index"]
+    key = (dataset_name, split, table_idx, model, setup)
 
-    # todo check what is actually happening here
-    if (df is None) or (df is dict) or (df.empty):
-        return []
+    return annotation_index.get(key, [])
 
-    df = df[(df["dataset"] == dataset_name) & (df["split"] == split) & (df["table_idx"] == table_idx)]
-
-    return df.to_dict(orient="records")
 
 
 def get_table_data(dataset_name, split, table_idx):
@@ -125,7 +126,13 @@ def get_table_data(dataset_name, split, table_idx):
     table = dataset.get_table(split=split, table_idx=table_idx)
     html = dataset.render(table=table)
     generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
-    annotations = get_annotations(dataset_name, split, table_idx)
+
+    for output in generated_outputs:
+        model = output["model"]
+        setup = output["setup"]["name"]
+        annotations = get_annotations(dataset_name, split, table_idx, model, setup)
+
+        output["annotations"] = annotations
 
     dataset_info = dataset.get_info()
 
@@ -135,7 +142,6 @@ def get_table_data(dataset_name, split, table_idx):
         "total_examples": dataset.get_example_count(split),
         "dataset_info": dataset_info,
         "generated_outputs": generated_outputs,
-        "annotations": annotations,
         "session": get_session(),
     }
 
@@ -205,7 +211,7 @@ def index():
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")
     table_idx = request.args.get("table_idx")
-    setup_names = [x.stem for x in Path(SETUP_DIR).glob("*.yaml")]
+    setup_names = sorted([x.stem for x in Path(SETUP_DIR).glob("*.yaml")])
 
     # load the yamls, create a dict
     setups = {}

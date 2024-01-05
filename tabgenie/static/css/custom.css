@@ -139,7 +139,7 @@ pre {
 }
 
 #outputarea {
-    margin-top: 10px;
+    margin-top: 50px;
 }
 
 #pipelinearea {
@@ -674,13 +674,7 @@ a:hover {
 }
 
 #setuparea {
-    /* make centered */
-    /* margin-left: auto; */
-    /* margin-right: auto; */
     display: block;
-    /* flex-wrap: wrap; */
-    /* align-items: center; */
-    /* justify-content: center; */
 }
 
 #setup-extra-btns {
@@ -690,35 +684,17 @@ a:hover {
 }
 
 .btn-setup-info {
-    /* right-align */
-
     margin-left: 10px;
 }
 
 #sidepanel-content {
-    /* display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center; */
     padding: 15px;
 }
 
-#setuparea {
-    /* background: #F5F5F5; */
-}
-
-/* #annotations-select {
-    
-} */
-
-/* #annotations-area {
-    margin-top: 20px;
-    margin-bottom: 60px;
-} */
 
 #setuparea label {
-    float: right;
-    text-align: right;
+    float: left;
+    text-align: left;
     font-weight: normal;
     font-size: 14px;
 }
@@ -727,4 +703,9 @@ a:hover {
     display: inline-block;
     width: auto;
     vertical-align: middle;
+    margin-right: 20px;
+}
+
+.btn-setup-info {
+    float: right;
 }

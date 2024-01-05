@@ -10,13 +10,12 @@ var interactive_mode = false;
 var view_state = "all";
 var mode = window.mode;
 var examples_cached = {};
-var sizes = mode == "annotate" ? [50, 50] : [70, 30];
+var sizes = mode == "annotate" ? [50, 50] : [66, 33];
 
 const error_colors = [
     { name: 'Incorrect', color: '#FFBCBC' },
     { name: 'Not checkable', color: '#e9d2ff' },
     { name: 'Misleading', color: '#FFF79F' },
-    { name: 'Irrelevant', color: '#ffd99f' },
     { name: 'Other', color: '#bbbbbb' }
 ]
 
@@ -257,9 +256,7 @@ function show_annotation() {
         textType = "chart caption";
     }
     $("#text-type").html(`<b>${textType}</b>`);
-
 }
-
 
 function permalinkbtn() {
     let permalink = `${url_prefix}?dataset=${dataset}&split=${split}&table_idx=${table_idx}`;
@@ -288,43 +285,6 @@ function toggle_raw() {
     // toggle display: none on rawarea and tablearea
     $("#rawarea").toggle();
     $("#tablearea").toggle();
-}
-
-
-function set_dataset_info(info) {
-    var ex_array = $.map(info.examples, function (num, split) {
-        return $("<li/>").append([$("<b/>").text(`${split}: `), $("<span/>").text(num)]);
-    });
-    var links_array = $.map(info.links, function (url, page) {
-        return $("<li/>").append([$("<b/>").text(`${page}: `), $("<a/>", { href: url, text: url })]);
-    });
-
-    $("#dataset-info").empty();
-    $("#dataset-info").append([
-        $("<h3/>").text(info.name),
-        $("<p/>").text(info.description),
-        $("<h5/>").text("Number of examples"),
-        $("<p/>").append(
-            $("<ul/>").append(ex_array)),
-        $("<h5/>").text("Links"),
-        $("<p/>").append(
-            $("<ul/>").append(links_array)),
-        $("<h5/>").text("Version"),
-        $("<p/>").text(info.version),
-        $("<h5/>").text("Changes in our version"),
-        $("<p/>").text(info.changes),
-        $("<h5/>").text("License"),
-        $("<p/>").text(info.license),
-        $("<h5/>").text("Citation"),
-        $("<p/>").append($("<code/>").html(info.citation.replace(/\n/g, '<br>'))),
-    ]
-    );
-}
-
-
-function set_output(name, output) {
-    var placeholder = $(`#out-${name}-placeholder`);
-    placeholder.html(output);
 }
 
 
@@ -369,137 +329,130 @@ function postRequestDownload(url, request, filename) {
     xhttp.send(JSON.stringify(request));
 }
 
-function highlight_annotations(annotations) {
+// function highlight_annotations(annotations) {
 
-    annotations.forEach(annotationSet => {
-        const model = annotationSet.model;
 
-        let offset = 0; // Track cumulative offset
+// }
 
-        // sort by start
-        annotationSet.annotations.sort(function (a, b) {
-            return a.start - b.start;
-        });
+// function change_setup() {
+//     const setup = $("input:radio[name ='setup-toggle-radio']:checked").val();
+//     // unhide box-${setup} and hide others
+//     $(".generated-output-box").hide();
+//     $(".box-" + setup).show();
+//     $("#setup-name-placeholder").html(setup);
+//     $("#setup-info-placeholder").html("<pre>" + JSON.stringify(setups[setup], null, 2) + "</pre>");
+// }
 
-        annotationSet.annotations.forEach(annotation => {
-            const annotationType = annotation.type;
-            const color = error_colors[annotationType].color;
-            const text = annotation.text;
 
-            const start = annotation.start + offset;
-            const end = start + text.length;
+// function change_highlights() {
+//     const annotator = $("#annotations-select").val();
 
-            const spanId = `span-${start}-${end}`;
-            const spanContent = `<span id="${spanId}" style="margin-right: 0px;background-color: ${color};">${text}</span>`;
+//     // set display: none to all other annotation types
 
-            // Replace the text content with the highlighted span
-            $(`#out-${model}-placeholder`).html((i, html) => {
-                return html.slice(0, start) + spanContent + html.slice(end);
-            });
+// }
 
-            // Update the offset
-            offset += spanContent.length - text.length;
-
-        });
-    });
+function generate_box(model, setup, annotator) {
+    var placeholder = $('<div>', { id: `out-${model}-${setup}-${annotator}-placeholder`, class: "font-mono out-placeholder" });
+    var label = $('<label>', { class: "label-name" }).text(model);
+    var box = $('<div>', {
+        id: `out-${model}-${setup}-${annotator}`,
+        class: `output-box generated-output-box box-${setup}-${annotator} box-${model}`,
+    }).append(label).append(placeholder);
+    return box;
 }
 
-function change_setup() {
-    const setup = $("input:radio[name ='setup-toggle-radio']:checked").val();
-    // unhide box-${setup} and hide others
+function generate_output_boxes(output) {
+    var output_boxes = [];
+    const model = output.model;
+    const setup_name = output.setup.name;
+
+    // generate a separate box for plain text + for all annotations, hide them
+    const box = generate_box(model, setup_name, "plain");
+    output_boxes.push(box);
+    var content = output.generated;
+
+    if (content == null) {
+        return output_boxes;
+    }
+    content = content.replace(/\\n/g, '<br>');
+    box.find(".out-placeholder").html(content);
+
+
+    return output_boxes;
+
+    // const placeholder = generate_placeholder_with_content(output, plainContent);
+    // placeholder.appendTo('#outputarea');
+
+    // output.annotations.forEach(annotation => {
+    //     const placeholder = generate_placeholder_with_content(output, plainContent, annotation);
+    //     placeholder.appendTo('#outputarea');
+    // });
+
+
+
+
+
+}
+
+// function generate_placeholder_with_highlights(model, content) {
+//     const model = annotationSet.model;
+//     let offset = 0; // Track cumulative offset
+
+//     // sort by start
+//     annotationSet.annotations.sort(function (a, b) {
+//         return a.start - b.start;
+//     });
+
+//     annotationSet.annotations.forEach(annotation => {
+//         const annotationType = annotation.type;
+//         const color = error_colors[annotationType].color;
+//         const text = annotation.text;
+
+//         const start = annotation.start + offset;
+//         const end = start + text.length;
+
+//         const spanId = `span-${start}-${end}`;
+//         const spanContent = `<span id="${spanId}" style="margin-right: 0px;background-color: ${color};">${text}</span>`;
+
+//         // Replace the text content with the highlighted span
+//         $(`#out-${model}-placeholder`).html((i, html) => {
+//             return html.slice(0, start) + spanContent + html.slice(end);
+//         });
+
+//         // Update the offset
+//         offset += spanContent.length - text.length;
+
+//     });
+// }
+
+
+function update_displayed_outputs() {
+    const setup_name = $("#setup-select").val();
+    const annotator_name = $("#annotations-select").val();
+
+    // hide all outputs
     $(".generated-output-box").hide();
-    $(".box-" + setup).show();
-    $("#setup-name-placeholder").html(setup);
-    $("#setup-info-placeholder").html("<pre>" + JSON.stringify(setups[setup], null, 2) + "</pre>");
+
+    // show the selected setup
+    $(`.box-${setup_name}-${annotator_name}`).show();
 }
 
+function create_output_boxes(generated_outputs) {
+    // clear the output area
+    $("#outputarea").empty();
 
-// function update_outputs() {
-//   // const setups = $("#setup-toggle").val();
-//   const models = $("#model-toggle").val();
+    // sort outputs by model name
+    generated_outputs.sort(function (a, b) {
+        return a.model.localeCompare(b.model);
+    });
 
-//   // unhide relevant setups and models hide others
-//   $(".generated-output-box").hide();
+    for (output of generated_outputs) {
+        const output_boxes = generate_output_boxes(output);
 
-//   // for (const setup of setups) {
-//   for (const model of models) {
-//     $(`.box-${model}-${setup}`).show();
-//   }
-//   // }
-// }
-
-// function create_selectbox(generated_outputs, id, options) {
-//   var selectbox = $('<select>', { id: `${id}-toggle`, class: "form-select", multiple: true, "data-placeholder": `Select a ${id}` });
-//   for (const option of options) {
-//     var optionEl = $('<option>', { value: option }).text(option);
-//     selectbox.append(optionEl);
-//   }
-//   $(`#${id}-toggle-placeholder`).html(selectbox);
-//   selectbox.select2({
-//     theme: "bootstrap-5",
-//     width: '100%',
-//     dropdownAutoWidth: true,
-//     placeholder: "Select a setup",
-//     closeOnSelect: false,
-//     containerCssClass: 'select2--small',
-//     dropdownCssClass: 'select2--small',
-//     allowClear: true,
-//     // minimumResultsForSearch: -1
-//   });
-//   // update outputs on any change
-//   selectbox.on('change', function () {
-//     update_outputs();
-//   });
-// }
-
-
-function show_generated_outputs(generated_outputs) {
-    $(".generated-output-box").remove();
-
-    // // create a selectbox in #setup-toggle with the setup names (keys in `generated_outputs`)
-    // create_selectbox(generated_outputs, "setup", Object.keys(generated_outputs));
-
-    // // get model names from the first setup
-    // const setup = Object.keys(generated_outputs)[0];
-    // const setup_outputs = generated_outputs[setup];
-    // const models = setup_outputs.map(o => o.model).sort();
-
-    // create_selectbox(generated_outputs, "model", models);
-
-    // set the first setup and all models as active (if no models and setups are selected yet)
-    // if ($("#setup-toggle").val().length == 0 && $("#model-toggle").val().length == 0) {
-    // $("#setup-toggle").val("direct").trigger('change');
-    // $("#model-toggle").val(models).trigger('change');
-    // }
-
-    for (const [setup, setup_outputs] of Object.entries(generated_outputs)) {
-        // sort setup_outputs by model name
-        setup_outputs.sort(function (a, b) {
-            return a.model.localeCompare(b.model);
+        output_boxes.forEach(output_box => {
+            output_box.appendTo("#outputarea");
         });
-        for (out_obj of setup_outputs) {
-            const model = out_obj.model;
-            const name = model + "-" + setup;
-            var placeholder = $('<div>', { id: `out-${name}-placeholder`, class: "font-mono" });
-            var label = $('<label>', { class: "label-name" }).text(name);
-            if (!out_obj.generated) {
-                continue;
-            }
-            var content = out_obj.generated.out.replace(/\n/g, '<br>');
-            placeholder.html(content);
-            $('<div>', {
-                id: `out-${name}`,
-                class: `output-box generated-output-box box-${setup}`,
-                // style: 'display: none;'
-            }).append(label).append(placeholder).appendTo('#outputarea');
-        }
     }
-    $("input:radio[name ='setup-toggle-radio']").on("change", change_setup);
-    // if no input is checked, set the first setup as active
-    if ($("input:radio[name ='setup-toggle-radio']:checked").length == 0) {
-        $("input:radio[name ='setup-toggle-radio']").first().prop("checked", true);
-    }
-    change_setup();
 }
 
 function fetch_table(dataset, split, table_idx) {
@@ -516,39 +469,22 @@ function fetch_table(dataset, split, table_idx) {
         $("#dataset-spinner").hide();
 
         total_examples = data.total_examples;
-
         $("#total-examples").html(total_examples - 1);
-        show_generated_outputs(data.generated_outputs);
-        highlight_annotations(data.annotations);
+
+        create_output_boxes(data.generated_outputs);
+        update_displayed_outputs();
     });
 }
 
 
 $("#dataset-select").on("change", change_dataset);
 $("#split-select").on("change", change_split);
-
-
-// $("#format-select").on("change", function (e) {
-//   $("#dataset-spinner").show();
-//   fetch_table(dataset, split, table_idx);
-// });
-
-// $('#export-format-select').on("change", function () {
-//   // $('#checkbox-table-props').prop('disabled', this.value == 'csv');
-
-//   if (this.value == 'txt') {
-//     $('#linearization-format-block').css('display', 'inline-block');
-//   } else {
-//     $('#linearization-format-block').css('display', 'none');
-//   }
-// })
+$("#setup-select").on("change", update_displayed_outputs);
+$("#annotations-select").on("change", update_displayed_outputs);
 
 $(document).keydown(function (event) {
     const key = event.key;
 
-    if (select_mode == "edit") {
-        return;
-    }
     if (key === "ArrowRight") {
         event.preventDefault();
         nextbtn();
