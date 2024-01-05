@@ -329,112 +329,94 @@ function postRequestDownload(url, request, filename) {
     xhttp.send(JSON.stringify(request));
 }
 
-// function highlight_annotations(annotations) {
 
 
-// }
-
-// function change_setup() {
-//     const setup = $("input:radio[name ='setup-toggle-radio']:checked").val();
-//     // unhide box-${setup} and hide others
-//     $(".generated-output-box").hide();
-//     $(".box-" + setup).show();
-//     $("#setup-name-placeholder").html(setup);
-//     $("#setup-info-placeholder").html("<pre>" + JSON.stringify(setups[setup], null, 2) + "</pre>");
-// }
-
-
-// function change_highlights() {
-//     const annotator = $("#annotations-select").val();
-
-//     // set display: none to all other annotation types
-
-// }
-
-function generate_box(model, setup, annotator) {
-    var placeholder = $('<div>', { id: `out-${model}-${setup}-${annotator}-placeholder`, class: "font-mono out-placeholder" });
-    var label = $('<label>', { class: "label-name" }).text(model);
-    var box = $('<div>', {
-        id: `out-${model}-${setup}-${annotator}`,
-        class: `output-box generated-output-box box-${setup}-${annotator} box-${model}`,
-    }).append(label).append(placeholder);
-    return box;
-}
-
-function generate_output_boxes(output) {
-    var output_boxes = [];
+function generate_output_box(output) {
     const model = output.model;
-    const setup_name = output.setup.name;
+    const setup = output.setup.name;
 
-    // generate a separate box for plain text + for all annotations, hide them
-    const box = generate_box(model, setup_name, "plain");
-    output_boxes.push(box);
-    var content = output.generated;
+    var label = $('<label>', { class: "label-name" }).text(model);
+    var output_box = $('<div>', {
+        id: `out-${model}-${setup}`,
+        class: `output-box generated-output-box box-${setup} box-${model}`,
+    }).append(label);
 
-    if (content == null) {
-        return output_boxes;
+    if (output.generated == null) {
+        return output_box;
     }
-    content = content.replace(/\\n/g, '<br>');
-    box.find(".out-placeholder").html(content);
+    const content = output.generated.replace(/\\n/g, '<br>');
 
+    for (var annotator of ["plain", "gpt-4", "human"]) {
+        // add default text
+        var placeholder = $('<div>', { id: `out-${model}-${setup}-${annotator}-placeholder`, class: `font-mono out-placeholder out-${annotator}-placeholder` });
 
-    return output_boxes;
+        var annotated_content = annotate_content(content, output.annotations, annotator);
 
-    // const placeholder = generate_placeholder_with_content(output, plainContent);
-    // placeholder.appendTo('#outputarea');
-
-    // output.annotations.forEach(annotation => {
-    //     const placeholder = generate_placeholder_with_content(output, plainContent, annotation);
-    //     placeholder.appendTo('#outputarea');
-    // });
-
-
-
-
-
+        placeholder.html(annotated_content);
+        placeholder.hide();
+        output_box.append(placeholder);
+    }
+    return output_box;
 }
 
-// function generate_placeholder_with_highlights(model, content) {
-//     const model = annotationSet.model;
-//     let offset = 0; // Track cumulative offset
+function annotate_content(content, annotations, annotator) {
+    let annotation_to_display = null;
+    if (annotator == "gpt-4") {
+        // for gpt-4, find the first annotation where the annotator_id begins with gpt-4
+        annotation_to_display = annotations.find(a => a.annotator_id.startsWith("gpt-4"));
+    } else if (annotator == "human") {
+        // for human, find the first annotation where the annotator_id does *not* begin with gpt-4
+        annotation_to_display = annotations.find(a => !a.annotator_id.startsWith("gpt-4"));
+    }
+    if (annotation_to_display == null) {
+        // also for plain
+        return content;
+    }
+    let offset = 0; // Track cumulative offset
+    const annotationSet = annotation_to_display.annotations;
+    // sort by start
+    annotationSet.sort(function (a, b) {
+        return a.start - b.start;
+    });
 
-//     // sort by start
-//     annotationSet.annotations.sort(function (a, b) {
-//         return a.start - b.start;
-//     });
+    var html = content;
 
-//     annotationSet.annotations.forEach(annotation => {
-//         const annotationType = annotation.type;
-//         const color = error_colors[annotationType].color;
-//         const text = annotation.text;
+    annotationSet.forEach(annotation => {
+        const annotationType = annotation.type;
+        const color = error_colors[annotationType].color;
+        const text = annotation.text;
 
-//         const start = annotation.start + offset;
-//         const end = start + text.length;
+        const start = annotation.start + offset;
+        const end = start + text.length;
 
-//         const spanId = `span-${start}-${end}`;
-//         const spanContent = `<span id="${spanId}" style="margin-right: 0px;background-color: ${color};">${text}</span>`;
+        const spanId = `span-${start}-${end}`;
+        const spanContent = `<span id="${spanId}" style="margin-right: 0px;background-color: ${color};">${text}</span>`;
 
-//         // Replace the text content with the highlighted span
-//         $(`#out-${model}-placeholder`).html((i, html) => {
-//             return html.slice(0, start) + spanContent + html.slice(end);
-//         });
+        html = html.slice(0, start) + spanContent + html.slice(end);
+        // Update the offset
+        offset += spanContent.length - text.length;
+    });
+    return html;
+}
 
-//         // Update the offset
-//         offset += spanContent.length - text.length;
+function update_displayed_annotations() {
+    const annotator = $("#annotations-select").val();
 
-//     });
-// }
+    // hide all placeholders
+    $(".out-placeholder").hide();
 
+    // show the selected annotator
+    $(`.out-${annotator}-placeholder`).show();
+}
 
 function update_displayed_outputs() {
     const setup_name = $("#setup-select").val();
-    const annotator_name = $("#annotations-select").val();
 
     // hide all outputs
     $(".generated-output-box").hide();
 
     // show the selected setup
-    $(`.box-${setup_name}-${annotator_name}`).show();
+    $(`.box-${setup_name}`).show();
 }
 
 function create_output_boxes(generated_outputs) {
@@ -447,11 +429,9 @@ function create_output_boxes(generated_outputs) {
     });
 
     for (output of generated_outputs) {
-        const output_boxes = generate_output_boxes(output);
+        const output_box = generate_output_box(output);
+        output_box.appendTo("#outputarea");
 
-        output_boxes.forEach(output_box => {
-            output_box.appendTo("#outputarea");
-        });
     }
 }
 
@@ -473,6 +453,7 @@ function fetch_table(dataset, split, table_idx) {
 
         create_output_boxes(data.generated_outputs);
         update_displayed_outputs();
+        update_displayed_annotations();
     });
 }
 
@@ -480,7 +461,7 @@ function fetch_table(dataset, split, table_idx) {
 $("#dataset-select").on("change", change_dataset);
 $("#split-select").on("change", change_split);
 $("#setup-select").on("change", update_displayed_outputs);
-$("#annotations-select").on("change", update_displayed_outputs);
+$("#annotations-select").on("change", update_displayed_annotations);
 
 $(document).keydown(function (event) {
     const key = event.key;
