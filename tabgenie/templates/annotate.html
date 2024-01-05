@@ -197,7 +197,8 @@
 
             <div id='output-content'>
               <div id='outputarea'>
-                <div id='text-type-info'>The following text is a <span id='text-type'></span>. Please annotate all the
+                <div id='text-type-info'>The following text is a <span id='text-type'></span>. The text should be
+                  written <b><span id='text-style'></span></b>. Please annotate all the
                   errors in the text:
                 </div>
               </div>
@@ -206,17 +207,24 @@
               <!-- <div class="annotation-list"> </div> -->
             </div>
             <div class="" id="checkbox-annotation-box">
-              <p><b>After annotating the errors in the text, do you agree with the following statements?</b></p>
+              <p>After annotating the errors in the text, please also <b>check if you agree with the following
+                  statements</b>:</p>
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="checkbox-style" checked>
-                <label class="form-check-label" for="flexCheckDefault">
-                  The text is written <span id='text-style'></span>
+                <label class="form-check-label" for="checkbox-style">
+                  The text is <span id='text-style'></span>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-broken">
+                <label class="form-check-label" for="checkbox-broken">
+                  The text is missing or incomplete.
                 </label>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="checkbox-correct">
-                <label class="form-check-label" for="flexCheckChecked">
-                  The text is correct and does not contain any errors.
+                <label class="form-check-label" for="checkbox-correct">
+                  The text does not contain any errors.
                 </label>
               </div>
               <div class="d-flex align-items-center justify-content-center" id="submit-annotation-box">
