@@ -150,14 +150,11 @@ def get_table_data(dataset_name, split, table_idx):
 def submit_annotations():
     logger.info(f"Received annotations")
     data = request.get_json()
-
-    annotator_id = data["annotator_id"]
-    annotations = data["annotations"]
-
-    now = time.time()
+    annotator_id = data[0]["annotator_id"]
+    now = int(time.time())
 
     with open(os.path.join(ANNOTATIONS_DIR, f"{annotator_id}-{now}.jsonl"), "w") as f:
-        for row in annotations:
+        for row in data:
             f.write(json.dumps(row) + "\n")
 
     return jsonify({"status": "success"})
@@ -167,10 +164,14 @@ def submit_annotations():
 def annotate():
     logger.info(f"Annotate page loaded")
 
-    models = ["mistral-7b-instruct", "zephyr-7b-beta", "llama2-7b-32k"]
+    models = ["mistral", "zephyr", "llama2"]
     dataset = ["openweather", "ice_hockey", "gsmarena", "wikidata", "owid"]
 
-    annotator_id = "ABCDE123"
+    PROLIFIC_PID = request.args.get("PROLIFIC_PID", "test")
+    SESSION_ID = request.args.get("SESSION_ID")
+    STUDY_ID = request.args.get("STUDY_ID")
+
+    start = int(time.time())
 
     random.seed(42)
     # annotation_set = [
@@ -183,11 +184,14 @@ def annotate():
     # ]
     annotation_set = [
         {
-            "annotator_id": annotator_id,
+            "annotator_id": PROLIFIC_PID,
+            "session_id": SESSION_ID,
+            "study_id": STUDY_ID,
+            "start_timestamp": start,
             "dataset": "ice_hockey",
             "model": models[i],
             "split": "dev",
-            "setup": "det-0shot",
+            "setup": "direct-det",
             "table_idx": 0,
         }
         for i in range(3)
@@ -198,7 +202,7 @@ def annotate():
         datasets=app.config["datasets"],
         host_prefix=app.config["host_prefix"],
         annotation_set=annotation_set,
-        annotator_id=annotator_id,
+        annotator_id=PROLIFIC_PID,
     )
 
 

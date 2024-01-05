@@ -134,8 +134,7 @@ function load_annotations() {
                 for (const [annotation_idx, data] of Object.entries(examples_cached)) {
                     const setup = annotation_set[annotation_idx].setup;
                     const model = annotation_set[annotation_idx].model;
-                    var setup_outputs = data.generated_outputs[setup];
-                    var content = setup_outputs.find(o => o.model === model).generated.out;
+                    var content = data.generated_outputs.find(o => o.setup.name == setup && o.model == model).generated;
 
                     var p = new Paragraph({ 'text': content });
 
@@ -247,7 +246,7 @@ function show_annotation() {
     if (dataset == "openweather") {
         textType = "weather forecast";
     } else if (dataset == "ice_hockey") {
-        textType = "ice hockey game summary";
+        textType = "summary of an ice hockey game";
     } else if (dataset == "gsmarena") {
         textType = "product description";
     } else if (dataset == "wikidata") {
@@ -389,8 +388,18 @@ function annotate_content(content, annotations, annotator) {
         const start = annotation.start + offset;
         const end = start + text.length;
 
+        const error_name = error_colors[annotationType].name;
+        const reason = annotation.reason;
+        let tooltip_text;
+
+        if (annotation.reason !== undefined) {
+            tooltip_text = `${error_name} (${reason})`;
+        } else {
+            tooltip_text = `${error_name}`;
+        }
+
         const spanId = `span-${start}-${end}`;
-        const spanContent = `<span id="${spanId}" style="margin-right: 0px;background-color: ${color};">${text}</span>`;
+        const spanContent = `<span id="${spanId}" style="margin-right: 0px;background-color: ${color};" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip_text}">${text}</span>`;
 
         html = html.slice(0, start) + spanContent + html.slice(end);
         // Update the offset
@@ -407,6 +416,8 @@ function update_displayed_annotations() {
 
     // show the selected annotator
     $(`.out-${annotator}-placeholder`).show();
+
+    enable_tooltips();
 }
 
 function update_displayed_outputs() {
@@ -417,6 +428,10 @@ function update_displayed_outputs() {
 
     // show the selected setup
     $(`.box-${setup_name}`).show();
+
+    $("#setup-name-placeholder").html(setup_name);
+    $("#setup-info-placeholder").html("<pre>" + JSON.stringify(setups[setup_name], null, 2) + "</pre>");
+
 }
 
 function create_output_boxes(generated_outputs) {
@@ -486,6 +501,12 @@ $("#hideOverlayBtn").click(function () {
     $("#overlay-start").fadeOut();
 });
 
+function enable_tooltips() {
+    // enable tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+}
+
 $(document).ready(function () {
     if (mode == "annotate") {
         load_annotations();
@@ -509,7 +530,5 @@ $(document).ready(function () {
         }
     }
 
-    // enable tooltips
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    enable_tooltips();
 });

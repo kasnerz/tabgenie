@@ -298,6 +298,8 @@ pre {
 
 .annotate-box {
     padding: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 2%;
     /* margin: 10px; */
@@ -306,6 +308,19 @@ pre {
     user-select: none;
     /* monospace */
 }
+
+#checkbox-annotation-box {
+    margin-top: 20px;
+    margin-left: 75px;
+    margin-right: 75px;
+    padding: 20px;
+    border: 1px dashed #ddd;
+    border-radius: 2%;
+    /* margin: 10px; */
+    position: relative;
+    font-size: normal;
+}
+
 
 
 .output-box>label {
@@ -394,10 +409,14 @@ ul {
 
 .instructions-accordion {
     padding-top: 10px;
-    padding-bottom: 20px;
+    padding-bottom: 5px;
 }
 
 .instructions-accordion-body {
+    background-color: #eeeeee !important;
+}
+
+.example-accordion-body {
     background-color: #eeeeee !important;
 }
 

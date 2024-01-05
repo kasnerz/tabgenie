@@ -23,28 +23,28 @@ function Meteogram(json, container) {
 Meteogram.prototype.drawWeatherSymbols = function (chart) {
 
     chart.series[0].data.forEach((point, i) => {
-        if (this.resolution > 36e5 || i % 2 === 0) {
-            const symbol = this.symbols[i];
+        // if (this.resolution > 36e5 || i % 2 === 0) {
+        const symbol = this.symbols[i];
 
-            const noDayOrNight = ["04", "09", "10", "11", "12", "13", "14", "15", "22", "23", "30", "31", "32", "33", "34", "46", "47", "48", "49", "50"];
+        const noDayOrNight = ["04", "09", "10", "11", "12", "13", "14", "15", "22", "23", "30", "31", "32", "33", "34", "46", "47", "48", "49", "50"];
 
-            // if first two characters of symbol in noDayOrNight, stripe of "d" or "n"
-            const symbolDayOrNight = noDayOrNight.includes(symbol.substring(0, 2)) ? symbol.substring(0, 2) : symbol;
+        // if first two characters of symbol in noDayOrNight, stripe of "d" or "n"
+        const symbolDayOrNight = noDayOrNight.includes(symbol.substring(0, 2)) ? symbol.substring(0, 2) : symbol;
 
-            chart.renderer
-                .image(
-                    'https://cdn.jsdelivr.net/gh/nrkno/yr-weather-symbols' +
-                    `@8.0.1/dist/svg/${symbolDayOrNight}.svg`,
-                    point.plotX + chart.plotLeft - 8,
-                    point.plotY + chart.plotTop - 30,
-                    30,
-                    30
-                )
-                .attr({
-                    zIndex: 5
-                })
-                .add();
-        }
+        chart.renderer
+            .image(
+                'https://cdn.jsdelivr.net/gh/nrkno/yr-weather-symbols' +
+                `@8.0.1/dist/svg/${symbolDayOrNight}.svg`,
+                point.plotX + chart.plotLeft - 8,
+                point.plotY + chart.plotTop - 30,
+                30,
+                30
+            )
+            .attr({
+                zIndex: 5
+            })
+            .add();
+        // }
     });
 };
 
@@ -143,7 +143,7 @@ Meteogram.prototype.getChartOptions = function (cityName) {
             useHTML: true,
             headerFormat:
                 '<small>{point.x:%A, %b %e, %H:%M} - {point.point.to:%H:%M}</small><br>' +
-                '<b>{point.point.symbolName}</b><br>'
+                '<b>{point.point.weather}</b><br>'
 
         },
 
@@ -402,7 +402,8 @@ Meteogram.prototype.parseData = function () {
             y: data.main.temp,
             // custom options used in the tooltip formatter
             to,
-            symbolName: symbolCode
+            symbolName: symbolCode,
+            weather: weather.description
         });
 
         this.precipitations.push({
@@ -410,13 +411,13 @@ Meteogram.prototype.parseData = function () {
             y: data.rain ? data.rain['3h'] : 0
         });
 
-        if (i % 2 === 0) {
-            this.winds.push({
-                x,
-                value: data.wind.speed,
-                direction: data.wind.deg
-            });
-        }
+        // if (i % 2 === 0) {
+        this.winds.push({
+            x,
+            value: data.wind.speed,
+            direction: data.wind.deg
+        });
+        // }
 
         this.pressures.push({
             x,

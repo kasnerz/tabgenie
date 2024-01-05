@@ -99,13 +99,12 @@
               <div class="accordion-item">
                 <h2 class="accordion-header">
                   <button class="accordion-button collapsed instructions-accordion-button btn-dark" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#hint">
+                    data-bs-toggle="collapse" data-bs-target="#instructions-acc-body">
                     <b>Instructions</b>
                   </button>
                 </h2>
-                <div id="hint" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                <div id="instructions-acc-body" class="accordion-collapse collapse">
                   <div class="accordion-body instructions-accordion-body">
-                    <!-- <div id='output-instructions'> -->
                     Annotate all the <b>errors</b> in the following text <b>given the data on the left side</b>. <br>
                     <br>Use your mouse to <b>highlight specific parts of the text</b> containing the errors.
                     Repeatedly
@@ -123,11 +122,9 @@
                         fact in the text cannot be checked given the data.</li>
                       <li><span style="background-color: #FFF79F"><b>Misleading</b></span> (mouse drag + 2 clicks):
                         The fact in the text is misleading in the given context. </li>
-                      <li><span style="background-color: #ffd99f"><b>Irrelevant</b></span> (mouse drag + 3 clicks):
-                        The text is irrelevant given the purpose of the text. </li>
-                      <li><span style="background-color: #bbbbbb"><b>Other</b></span> (mouse drag + 4 clicks):
-                        An error which does not fit any previous category. </li>
-
+                      <li><span style="background-color: #bbbbbb"><b>Other</b></span> (mouse drag + 3 clicks):
+                        The text is problematic for another reason, e.g. grammatically or stylistically incorrect,
+                        irrelevant, or repetitive. </li>
                     </ol>
                     <br>If you are in doubts, select the shortest span that contains the error.
                     Once you think you have marked all the errors present in the text, click the <b> ✅ Mark example as
@@ -138,7 +135,61 @@
                     marked
                     as complete.
 
-                    <!-- </div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="accordion example-accordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed instructions-accordion-button btn-dark" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#example-acc-body">
+                    <b>Example</b>
+                  </button>
+                </h2>
+                <div id="example-acc-body" class="accordion-collapse collapse">
+                  <div class="accordion-body example-accordion-body">
+
+                    An example of the data input and the corresponding text annotated with errors:
+
+                    <hr>
+                    <div class="example-data">
+                      <h6>data</h6>
+                      <b>Aditi Bhagwat</b>
+                      <ul>
+                        <li><b>occupation:</b> television actor</li>
+                        <li><b>date of birth:</b> 18 January 1981</li>
+                      </ul>
+                    </div>
+                    <hr>
+                    <div class="example-text">
+                      <h6>text (entity description)</h6>
+                      Aditi Bhagwat, born on January 18, <span
+                        style="margin-right: 0px;background-color: #FFBCBC;">1991</span>, <span
+                        style="margin-right: 0px;background-color: #FFF79F;">used to be</span> a <span
+                        style="margin-right: 0px;background-color: #e9d2ff;">popular</span> <span
+                        style="margin-right: 0px;background-color: #e9d2ff;">Indian</span> television actor. <span
+                        style="margin-right: 0px;background-color: #bbbbbb;">The data
+                        comes from a knowledge graph.</span>
+                    </div>
+                    <hr>
+                    <h6>explanation</h6>
+                    <div class="example-explanation">
+                      <ul>
+                        <li><span style="margin-right: 0px;background-color: #FFBCBC;">1991</span>: The data mentions
+                          that the actor was born on 1981.</li>
+                        <li><span style="margin-right: 0px;background-color: #FFF79F;">used to be</span>: Misleadingly
+                          suggests that the actor is not alive.</li>
+                        <li><span style="margin-right: 0px;background-color: #e9d2ff;">popular</span>: Popularity is not
+                          mentioned in the data.</li>
+                        <li><span style="margin-right: 0px;background-color: #e9d2ff;">Indian</span>: Nationality is not
+                          mentioned in the data.</li>
+                        <li><span style="margin-right: 0px;background-color: #bbbbbb;">The data
+                            comes from a knowledge graph.</span>: The note is superfluous.</li>
+                    </div>
+                    <hr>
+                    <i>Note that for the sake of brevity, this particular example is based on a small data input and
+                      contains many errors, which may not always be the case.</i>
                   </div>
                 </div>
               </div>
@@ -146,20 +197,38 @@
 
             <div id='output-content'>
               <div id='outputarea'>
-                <div id='text-type-info'>The following text is a <span id='text-type'></span>:
+                <div id='text-type-info'>The following text is a <span id='text-type'></span>. Please annotate all the
+                  errors in the text:
                 </div>
               </div>
 
-              <div class="annotation-type-list"> </div>
-              <div class="annotation-list"> </div>
+              <!-- <div class="annotation-type-list"> </div> -->
+              <!-- <div class="annotation-list"> </div> -->
             </div>
-            <div class="d-flex align-items-center justify-content-center" id="submit-annotation-box">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-success" onclick="mark_annotation_as_complete();">✅ Mark
-                  example as
-                  complete</button>
+            <div class="" id="checkbox-annotation-box">
+              <p><b>After annotating the errors in the text, do you agree with the following statements?</b></p>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-style" checked>
+                <label class="form-check-label" for="flexCheckDefault">
+                  The text is written <span id='text-style'></span>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-correct">
+                <label class="form-check-label" for="flexCheckChecked">
+                  The text is correct and does not contain any errors.
+                </label>
+              </div>
+              <div class="d-flex align-items-center justify-content-center" id="submit-annotation-box">
+                <!-- checkbox for style -->
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-sm btn-success" onclick="mark_annotation_as_complete();">✅ Mark
+                    example as
+                    complete</button>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -185,10 +254,10 @@
         fact in the text cannot be checked given the data.</li>
       <li><span style="background-color: #FFF79F"><b>Misleading</b></span>:
         The fact in the text is misleading in the given context. </li>
-      <li><span style="background-color: #ffd99f"><b>Irrelevant</b></span>:
-        The text is irrelevant given the purpose of the text. </li>
+      </li>
       <li><span style="background-color: #bbbbbb"><b>Other</b></span>:
-        An error which does not fit any previous category. </li>
+        The text is problematic for another reason, e.g. grammatically or stylistically incorrect, irrelevant, or
+        repetitive. </li>
       <br>
       <p> Use your mouse to <b>highlight specific
           parts of the text</b> containing the errors. To switch between error
@@ -196,6 +265,7 @@
         also have access
         to these instructions during
         the task.</p>
+
 
       <div class="accordion" id="accordionExample">
         <div class="accordion-item">
