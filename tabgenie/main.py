@@ -96,21 +96,23 @@ def get_dataset(dataset_name, split):
 
 
 def generate_annotation_index():
-    jsonl_files = glob.glob(os.path.join(ANNOTATIONS_DIR, "*.jsonl"))
+    for source in ["gpt-4", "human"]:
+        jsonl_files = glob.glob(os.path.join(ANNOTATIONS_DIR, source, "*.jsonl"))
 
-    # contains annotations for each generated output
-    annotations = defaultdict(list)
+        # contains annotations for each generated output
+        annotations = defaultdict(list)
 
-    for jsonl_file in jsonl_files:
-        with open(jsonl_file) as f:
-            for line in f:
-                annotation = json.loads(line)
-                
-                key = (annotation["dataset"], annotation["split"], annotation["table_idx"], annotation["model"], annotation["setup"])
+        for jsonl_file in jsonl_files:
+            with open(jsonl_file) as f:
+                for line in f:
+                    annotation = json.loads(line)
+                    
+                    key = (annotation["dataset"], annotation["split"], annotation["table_idx"], annotation["model"], annotation["setup"])
 
-                annotations[key].append(annotation)
+                    annotations[key].append(annotation)
 
     app.db["annotation_index"] = annotations
+    return annotations
 
 
 def get_annotations(dataset_name, split, table_idx, model, setup):
@@ -153,49 +155,122 @@ def submit_annotations():
     annotator_id = data[0]["annotator_id"]
     now = int(time.time())
 
-    with open(os.path.join(ANNOTATIONS_DIR, f"{annotator_id}-{now}.jsonl"), "w") as f:
+    os.makedirs(os.path.join(ANNOTATIONS_DIR, "human"), exist_ok=True)
+
+    df = pd.read_csv("../annotations/annotations_prolific.csv")
+
+    with open(os.path.join(ANNOTATIONS_DIR, "human", f"{annotator_id}-{now}.jsonl"), "w") as f:
         for row in data:
             f.write(json.dumps(row) + "\n")
 
+            # mark the annotation as finished in the csv
+            idx = df[
+                (df["dataset_name"] == row["dataset"])
+                & (df["split"] == row["split"])
+                & (df["model"] == row["model"])
+                & (df["setup"] == row["setup"])
+                & (df["table_idx"] == row["table_idx"])
+            ].index[0]
+
+            df.loc[idx, "status"] = "finished"
+
+    df.to_csv("../annotations/annotations_prolific.csv", index=False)
+
     return jsonify({"status": "success"})
+
+
+def get_annotation_batch(args):
+    PROLIFIC_PID = args.get("PROLIFIC_PID", "test")
+    SESSION_ID = args.get("SESSION_ID")
+    STUDY_ID = args.get("STUDY_ID")
+
+    # load the csv and select 15 non-assigned examples, preferably in a sequential order
+    df = pd.read_csv("../annotations/annotations_prolific.csv")
+    
+    free_examples = df[df["status"] == "free"]
+
+    annotation_batch = []
+    start = int(time.time())
+    examples_per_batch = 9
+
+    # we want to select a random subset of examples *in a sequence*
+    # select random index, which is at most `examples_per_batch` away from the end
+    random.seed(SESSION_ID)
+    index = random.randint(0, len(free_examples) - examples_per_batch)
+    free_examples = free_examples.iloc[index:index + examples_per_batch]
+
+    logger.info(f"Selecting examples from {index} to {index + examples_per_batch}")
+
+    for i, row in free_examples.iterrows():
+        dataset = row["dataset_name"]
+        table_idx = row["table_idx"]
+        model = row["model"]
+        setup = row["setup"]
+
+        annotation_batch.append({
+            "annotator_id": PROLIFIC_PID,
+            "session_id": SESSION_ID,
+            "study_id": STUDY_ID,
+            "start_timestamp": start,
+            "dataset": dataset,
+            "split": "test",
+            "model": model,
+            "setup": setup,
+            "table_idx": table_idx,
+        })
+        # update the CSV
+        df.loc[i, "status"] = "assigned"
+        df.loc[i, "annotator_id"] = PROLIFIC_PID
+
+        if len(annotation_batch) >= examples_per_batch:
+            break
+
+    df.to_csv("../annotations/annotations_prolific.csv", index=False)
+
+    return annotation_batch
+
+def get_setup_names():
+    return sorted([x.stem for x in Path(SETUP_DIR).glob("*.yaml")])
+
+def generate_annotation_csv():
+    # load all outputs
+    split = "test"
+    records = []
+
+    for dataset_name in app.config["datasets"]:
+        dataset = get_dataset(dataset_name, split)
+
+        for table_idx in range(dataset.get_example_count(split)):
+            generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
+
+            for output in generated_outputs:
+                if output["generated"] is None:
+                    continue
+
+                model = output["model"]
+                setup = output["setup"]["name"]
+
+                records.append({
+                    "dataset_name": dataset_name,
+                    "table_idx": table_idx,
+                    "model": model,
+                    "setup": setup,
+                    "annotator_id": "",
+                    "status": "free",
+                })
+
+    df = pd.DataFrame.from_records(records)
+    df.to_csv("../annotations/annotations_prolific.csv", index=False)
 
 
 @app.route("/annotate", methods=["GET", "POST"])
 def annotate():
     logger.info(f"Annotate page loaded")
 
-    models = ["mistral", "zephyr", "llama2"]
-    dataset = ["openweather", "ice_hockey", "gsmarena", "wikidata", "owid"]
+    generate_annotation_csv()
 
     PROLIFIC_PID = request.args.get("PROLIFIC_PID", "test")
-    SESSION_ID = request.args.get("SESSION_ID")
-    STUDY_ID = request.args.get("STUDY_ID")
-
-    start = int(time.time())
-
-    random.seed(42)
-    # annotation_set = [
-    #     { "dataset": random.choice(dataset),
-    #      "model": random.choice(models),
-    #      "split": "dev",
-    #      "setup" : "direct",
-    #      "table_idx": random.randint(0,99) }
-    #      for _ in range(10)
-    # ]
-    annotation_set = [
-        {
-            "annotator_id": PROLIFIC_PID,
-            "session_id": SESSION_ID,
-            "study_id": STUDY_ID,
-            "start_timestamp": start,
-            "dataset": "ice_hockey",
-            "model": models[i],
-            "split": "dev",
-            "setup": "direct-det",
-            "table_idx": 0,
-        }
-        for i in range(3)
-    ]
+    annotation_set = get_annotation_batch(request.args)
 
     return render_template(
         "annotate.html",
@@ -215,7 +290,8 @@ def index():
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")
     table_idx = request.args.get("table_idx")
-    setup_names = sorted([x.stem for x in Path(SETUP_DIR).glob("*.yaml")])
+    
+    setup_names = get_setup_names()
 
     # load the yamls, create a dict
     setups = {}

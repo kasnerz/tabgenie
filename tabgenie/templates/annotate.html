@@ -106,7 +106,8 @@
                 <div id="instructions-acc-body" class="accordion-collapse collapse">
                   <div class="accordion-body instructions-accordion-body">
                     Annotate all the <b>errors</b> in the following text <b>given the data on the left side</b>. <br>
-                    <br>Use your mouse to <b>highlight specific parts of the text</b> containing the errors.
+                    <br>Drag your mouse to <b>highlight specific parts of the text</b> containing the errors (dragging
+                    from back to front works better).
                     Repeatedly
                     click
                     on the highlighted text to switch between the following error
@@ -126,7 +127,12 @@
                         The text is problematic for another reason, e.g. grammatically or stylistically incorrect,
                         irrelevant, or repetitive. </li>
                     </ol>
-                    <br>If you are in doubts, select the shortest span that contains the error.
+                    <br>Always select the shortest span that contains the error, including all the words related to the
+                    error. If the fact
+                    is probably true, but
+                    cannot be derived from the data, mark it as not checkable. If you are not really sure if the fact
+                    should be marked as an error, you can leave it unmarked.
+                    <br>
                     Once you think you have marked all the errors present in the text, click the <b> ✅ Mark example as
                       complete</b>
                     button (you can still update the annotation later). You will be able to submit the annotations
@@ -197,8 +203,10 @@
 
             <div id='output-content'>
               <div id='outputarea'>
-                <div id='text-type-info'>The following text is a <span id='text-type'></span>. The text should be
-                  written <b><span id='text-style'></span></b>. Please annotate all the
+                <div id='text-type-info'>The following text is a(n) <b><span class='text-type'></span></b>. The text
+                  should
+                  be
+                  <b><span class='text-style'></span></b>. <br>Please annotate all the
                   errors in the text:
                 </div>
               </div>
@@ -207,24 +215,24 @@
               <!-- <div class="annotation-list"> </div> -->
             </div>
             <div class="" id="checkbox-annotation-box">
-              <p>After annotating the errors in the text, please also <b>check if you agree with the following
-                  statements</b>:</p>
+              <p>After annotating the errors in the text, please also <b>check if you agree with any of the following
+                  statements</b>, then mark the example as complete:</p>
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="checkbox-style" checked>
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-style">
                 <label class="form-check-label" for="checkbox-style">
-                  The text is <span id='text-style'></span>
+                  The text does not seem to be <span class='text-style'></span>.
                 </label>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="checkbox-broken">
                 <label class="form-check-label" for="checkbox-broken">
-                  The text is missing or incomplete.
+                  The text is missing, broken, or incomplete.
                 </label>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="checkbox-correct">
                 <label class="form-check-label" for="checkbox-correct">
-                  The text does not contain any errors.
+                  The text 100 % accurate and does not contain any errors.
                 </label>
               </div>
               <div class="d-flex align-items-center justify-content-center" id="submit-annotation-box">

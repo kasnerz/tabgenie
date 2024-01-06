@@ -102,6 +102,13 @@ function fetch_annotation(dataset, split, table_idx, annotation_idx) {
                 class: `annotate-box `,
                 style: 'display: none;'
             }).appendTo('#outputarea');
+
+            // filter the data to only include the setup and model we want
+            const setup = annotation_set[annotation_idx].setup;
+            const model = annotation_set[annotation_idx].model;
+
+            data.generated_outputs = data.generated_outputs.filter(o => o.setup.name == setup && o.model == model)[0];
+
             examples_cached[annotation_idx] = data;
 
             resolve();
@@ -132,11 +139,8 @@ function load_annotations() {
                 var paragraphs = {};
 
                 for (const [annotation_idx, data] of Object.entries(examples_cached)) {
-                    const setup = annotation_set[annotation_idx].setup;
-                    const model = annotation_set[annotation_idx].model;
-                    var content = data.generated_outputs.find(o => o.setup.name == setup && o.model == model).generated;
 
-                    var p = new Paragraph({ 'text': content });
+                    var p = new Paragraph({ 'text': data.generated_outputs.generated });
 
                     paragraphs[`p${annotation_idx}`] = p;
                     regions[`p${annotation_idx}`] = `#out-text-${annotation_idx}`;
@@ -197,13 +201,34 @@ function submit_annotations() {
 
 
 function mark_annotation_as_complete() {
+    var collection = YPet[`p${table_idx}`].currentView.collection.parentDocument.get('annotations').toJSON();
+
+    const checkbox_correct = $("#checkbox-correct").is(":checked");
+    const checkbox_style = $("#checkbox-style").is(":checked");
+    const checkbox_broken = $("#checkbox-broken").is(":checked");
+
+
+    // if the collection is empty but the `checkbox-correct` is not checked, display an alert
+    if (collection.length == 0 && !checkbox_correct) {
+        alert("Are you *really* sure that the example does not contain any errors? If so, please check the last box to mark the example as complete.");
+        return;
+    }
+
+    annotation_set[table_idx]["annotations"] = collection;
+    annotation_set[table_idx]["flags"] = {
+        "is_fully_correct": checkbox_correct,
+        "has_violated_style": checkbox_style,
+        "has_broken_text": checkbox_broken,
+    };
+
     $('#page-link-' + table_idx).removeClass("bg-incomplete");
     $('#page-link-' + table_idx).addClass("bg-complete");
 
+    // uncheck all checkboxes
+    $("#checkbox-correct").prop("checked", false);
+    $("#checkbox-style").prop("checked", false);
+    $("#checkbox-broken").prop("checked", false);
 
-    var collection = YPet[`p${table_idx}`].currentView.collection.parentDocument.get('annotations').toJSON();
-    annotation_set[table_idx]["annotations"] = collection;
-    // console.log(annotation_set[table_idx]);
 
     // if all the examples are annotated, post the annotations
     if ($(".bg-incomplete").length == 0) {
@@ -236,25 +261,27 @@ function show_annotation() {
     $(".annotate-box").hide();
     $(`#out-text-${table_idx}`).show();
 
-    data = examples_cached[table_idx];
+    const data = examples_cached[table_idx];
+    const output = data.generated_outputs;
 
-    $("#tablearea").html(data.html);
-    show_raw_data(data);
+    const dataset_name = annotation_set[table_idx].dataset;
+    const type = output.setup.output[dataset_name];
 
-    const dataset = annotation_set[table_idx].dataset;
-    let textType;
-    if (dataset == "openweather") {
-        textType = "weather forecast";
-    } else if (dataset == "ice_hockey") {
-        textType = "summary of an ice hockey game";
-    } else if (dataset == "gsmarena") {
-        textType = "product description";
-    } else if (dataset == "wikidata") {
-        textType = "graph description";
-    } else if (dataset == "owid") {
-        textType = "chart caption";
+    var textStyle = "written in a neutral and balanced way";
+
+    if (output.setup.style !== undefined) {
+        const style = output.setup.style[dataset_name];
+        textStyle = "written " + style;
+    } else if (output.setup.aspect !== undefined) {
+        const aspect = output.setup.aspect[dataset_name];
+        textStyle = "focusing solely on " + aspect;
     }
-    $("#text-type").html(`<b>${textType}</b>`);
+    $("#tablearea").html(data.html);
+
+    // show_raw_data(data);
+
+    $(".text-type").html(`${type}`);
+    $(".text-style").html(`${textStyle}`);
 }
 
 function permalinkbtn() {
