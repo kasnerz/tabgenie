@@ -3,6 +3,7 @@ import os
 import json
 import glob
 import shutil
+import time
 import logging
 import linecache
 import pandas as pd
@@ -12,6 +13,7 @@ import coloredlogs
 import yaml
 import threading
 import traceback
+import numpy as np
 from flask import Flask, render_template, jsonify, request, send_file, session
 from collections import defaultdict
 from .loaders import DATASET_CLASSES
@@ -187,13 +189,19 @@ def get_annotation_batch(args):
     STUDY_ID = args.get("STUDY_ID")
 
     with app.db["lock"]:
+        logging.info(f"Acquiring lock for {PROLIFIC_PID}")
+
         # load the csv and select 15 non-assigned examples, preferably in a sequential order
         df = pd.read_csv("../annotations/annotations_prolific.csv")
         free_examples = df[df["status"] == "free"]
 
         annotation_batch = []
         start = int(time.time())
-        example = free_examples.sample()
+
+        random.seed(str(start) + PROLIFIC_PID + SESSION_ID)
+        np_seed = random.randint(0, 2**32 - 1)
+
+        example = free_examples.sample(random_state=np_seed)
         table_idx = int(example.table_idx.values[0])
         models = ["mistral", "llama2", "zephyr", "gpt-3.5"]
 
@@ -220,6 +228,8 @@ def get_annotation_batch(args):
                 df.loc[i, "annotator_id"] = PROLIFIC_PID
 
         df.to_csv("../annotations/annotations_prolific.csv", index=False)
+
+        logging.info(f"Releasing lock for {PROLIFIC_PID}")
 
     return annotation_batch
 
