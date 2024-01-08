@@ -163,8 +163,9 @@ def submit_annotations():
 
     with app.db["lock"]:
         df = pd.read_csv("../annotations/annotations_prolific.csv")
+        table_idx = data[0]['table_idx']
 
-        with open(os.path.join(ANNOTATIONS_DIR, "human", f"{annotator_id}-{now}.jsonl"), "w") as f:
+        with open(os.path.join(ANNOTATIONS_DIR, "human", f"{table_idx}-{annotator_id}-{now}.jsonl"), "w") as f:
             for row in data:
                 f.write(json.dumps(row) + "\n")
 
@@ -175,7 +176,7 @@ def submit_annotations():
                 df.loc[idx, "status"] = "finished"
 
         df.to_csv("../annotations/annotations_prolific.csv", index=False)
-        logger.info(f"Annotations for {row['table_idx']} saved")
+        logger.info(f"Annotations for {table_idx} saved")
 
     return jsonify({"status": "success"})
 
