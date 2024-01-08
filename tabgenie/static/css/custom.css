@@ -139,7 +139,7 @@ pre {
 }
 
 #outputarea {
-    margin-top: 10px;
+    margin-top: 50px;
 }
 
 #pipelinearea {
@@ -298,6 +298,8 @@ pre {
 
 .annotate-box {
     padding: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 2%;
     /* margin: 10px; */
@@ -307,22 +309,48 @@ pre {
     /* monospace */
 }
 
+#checkbox-annotation-box {
+    margin-top: 20px;
+    margin-left: 75px;
+    margin-right: 75px;
+    padding: 20px;
+    border: 1px dashed #ddd;
+    border-radius: 2%;
+    /* margin: 10px; */
+    position: relative;
+    font-size: normal;
+}
+
+
 
 .output-box>label {
     position: absolute;
     font-size: smaller;
-    top: -8px;
+    top: -17px;
     padding-left: 3px;
     padding-right: 3px;
     background-color: white;
+}
+
+
+.select2-search--inline {
+    display: none !important;
 }
 
 .pipeline-box {
     border: 1px solid #0175ac !important;
 }
 
+
+/* .multiselect.form-select {
+    line-height: 1 !important;
+} */
+
+
 .label-name {
     left: 20px;
+
+    margin-top: 10px;
 }
 
 .label-settings {
@@ -330,6 +358,13 @@ pre {
     top: -9px !important;
     right: 10px;
 }
+
+.label-multiselect {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
 
 /* .label-reload {
     right: 10px;
@@ -368,16 +403,25 @@ ul {
     padding-bottom: 20px;
 } */
 
+#accordion-all {
+    margin-top: 20px;
+
+}
+
 .accordion-button {
     font-size: normal;
 }
 
 .instructions-accordion {
     padding-top: 10px;
-    padding-bottom: 20px;
+    padding-bottom: 5px;
 }
 
 .instructions-accordion-body {
+    background-color: #eeeeee !important;
+}
+
+.example-accordion-body {
     background-color: #eeeeee !important;
 }
 
@@ -653,12 +697,39 @@ a:hover {
     background-color: #f8f9fa;
 }
 
-#task-toggle {
-    /* make centered */
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    flex-wrap: wrap;
+#setuparea {
+    display: block;
+}
+
+#setup-extra-btns {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
+    float: right;
+}
+
+.btn-setup-info {
+    margin-left: 10px;
+}
+
+#sidepanel-content {
+    padding: 15px;
+}
+
+
+#setuparea label {
+    float: left;
+    text-align: left;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+#setuparea select {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+    margin-right: 20px;
+}
+
+.btn-setup-info {
+    float: right;
 }

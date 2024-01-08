@@ -4,8 +4,12 @@
 <head>
   <title>TabGenie</title>
   <link rel="stylesheet" media="screen" href="{{ host_prefix }}/static/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" media="screen" href="{{ host_prefix }}/static/css/bootstrap-multiselect.min.css"> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
   <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/custom.css">
-  <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/d3graphs.css">
+  <!-- <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/d3graphs.css"> -->
   <link rel="stylesheet" type="text/css" href="{{ host_prefix }}/static/css/jquery.highlight-within-textarea.css">
   <link rel="shortcut icon" href="{{ host_prefix }}/static/img/favicon.ico">
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
@@ -13,6 +17,8 @@
   <script src="{{ host_prefix }}/static/js/jquery.min.js"></script>
   <script src="{{ host_prefix }}/static/js/popper.min.js"></script>
   <script src="{{ host_prefix }}/static/js/bootstrap.min.js"></script>
+  <!-- <script src="{{ host_prefix }}/static/js/bootstrap-multiselect.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
   <script src="{{ host_prefix }}/static/js/jquery.highlight-within-textarea.js"></script>
   <script src="{{ host_prefix }}/static/js/jsonview.js"></script>
   <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -23,9 +29,9 @@
   <script src="https://code.highcharts.com/modules/accessibility.js"></script>
   <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.3.5/split.min.js"></script>
-  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
   <script src="{{ host_prefix }}/static/js/meteogram.js"></script>
-  <script src="{{ host_prefix }}/static/js/d3graphs.js"></script>
+  <!-- <script src="{{ host_prefix }}/static/js/d3graphs.js"></script> -->
 </head>
 
 
@@ -48,9 +54,8 @@
           <li class="nav-item">
             <select id="split-select" class="form-select form-select-sm"
               style="display: inline-block; margin-right: 10px; max-width: 200px;">
-              <option value="dev" selected>dev</option>
-              <option value="test">test</option>
-              <option value="train">train</option>
+              <option value="test" selected>test</option>
+              <option value="dev">dev</option>
             </select>
           </li>
           <li class="page-item">
@@ -82,29 +87,6 @@
           </li>
         </ul>
 
-        <!-- <ul class="pagination" id="nav-examples">
-          
-          <li class="page-item">
-            <span data-bs-toggle="modal" data-bs-target="#note-modal">
-              <a class="page-link" id="note-btn" class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip"
-                data-bs-placement="bottom" title="Add a note">
-                📑
-              </a>
-            </span>
-          </li>
-          <li class="page-item">
-            <a class="page-link" id="favourite-btn" onclick="favouritebtn();" data-bs-toggle="tooltip"
-              data-bs-placement="bottom" title="Add to favourites">
-              ★
-            </a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" id="permalink-btn" onclick="permalinkbtn();" data-bs-toggle="popover"
-              data-bs-title="Permalink" data-bs-content="None" data-bs-placement="bottom">
-              <img src="{{ host_prefix }}/static/img/link.png" width="12px" />
-            </a>
-          </li>
-        </ul> -->
       </div>
       <div class="navblock">
         <ul class="pagination" style="margin-left: 10px;">
@@ -114,38 +96,7 @@
               🎲
             </a>
           </li>
-          <!-- <li class="page-item">
-            <a class="page-link" id="interactive-btn" onclick="toggle_interactive();" autocomplete="off">
-              <img src="{{ host_prefix }}/static/img/unicode/lightning.png" width="12px" class="button-bw-icon" />
-            </a>
-          </li> -->
-          <!-- <li class="page-item">
-            <a class="page-link" data-bs-toggle="modal" data-bs-target="#favourites-modal">
-              <img src="{{ host_prefix }}/static/img/unicode/star.png" width="12px" class="button-bw-icon" />
-            </a>
-          </li> -->
-          <!-- <li class="page-item">
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                  data-bs-target="#notes-modal">
-                  <img src="{{ host_prefix }}/static/img/unicode/pencil.png" width="12px" class="button-bw-icon" />
-                </button>
-              </li> -->
-          <!-- <li class="page-item">
-            <a class="page-link" data-bs-toggle="modal" data-bs-target="#export-modal">
-              <img src="{{ host_prefix }}/static/img/unicode/arrowd.png" width="12px" class="button-bw-icon" />
-            </a>
-          </li> -->
-          <li class="page-item">
-            <a class="page-link" data-bs-toggle="modal" data-bs-target="#info-modal">
-              <img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px" class="button-bw-icon" />
-            </a>
-          </li>
-          <!-- <li class="page-item">
-            <a class="page-link" id="about-btn" onclick="show_info();" data-bs-toggle="modal"
-              data-bs-target="#about-modal" title="About">
-              <img src="{{ host_prefix }}/static/img/about.png" id="about-icon" />
-            </a>
-          </li> -->
+
         </ul>
       </div>
     </div>
@@ -154,40 +105,7 @@
 
   <div class="large-container container">
     <div class="row">
-      <!-- <div id="leftpanel" class="col-2">
-        <div class="infoarea"> -->
 
-      <!-- 
-          <div class="selectarea" id="mode-selectarea" style="display: none;">
-            <div><b>mode</b></div>
-            <div class="btn-group d-flex" id="mode-select" role="group">
-              <input type="radio" value="select" class="btn-check" name="interactive-mode-radio" id="btn-mode-select"
-                autocomplete="off" checked>
-              <label class="btn btn-outline-secondary" for="btn-mode-select" data-bs-toggle="tooltip"
-                data-bs-placement="bottom" title="Select">🖱️</label>
-              <input type="radio" value="highlight" class="btn-check" name="interactive-mode-radio"
-                id="btn-mode-highlight" autocomplete="off">
-              <label class="btn btn-outline-secondary" for="btn-mode-highlight" data-bs-toggle="tooltip"
-                data-bs-placement="bottom" title="Highlight">👆</label>
-              <input type="radio" value="edit" class="btn-check" name="interactive-mode-radio" id="btn-mode-edit"
-                autocomplete="off">
-              <label class="btn btn-outline-secondary" for="btn-mode-edit" data-bs-toggle="tooltip"
-                data-bs-placement="bottom" title="Edit">✏️</label>
-            </div>
-          </div> -->
-
-      <!-- <div class="selectarea" id="mode-selectarea" style="display: none;">
-            <b>mode</b>
-            <select id="mode-select" class="form-select form-select-sm">
-              <option value="select" selected>select</option>
-              <option value="highlight">highlight</option>
-              <option value="edit">edit</option>
-            </select>
-          </div> -->
-
-      <!-- </div> -->
-
-      <!-- </div> -->
       <div class="split col-12">
         <div id="centerpanel" class="collapse show">
           <div class="tab-content">
@@ -205,115 +123,53 @@
 
         <div id="rightpanel" class="collapse show">
           <div id='sidepanel-content' class="tab-content">
-            <!-- selectbox to select outputs -->
-            <div id='selectboxarea' class="tab-pane sidepanel-panel active" role="tabpanel">
-              <div class="btn-group btn-group-sm task-toggle" id="task-toggle" role="group">
-                {% for task in task_names %}
-                <input type="radio" class="btn-check" name="task-toggle-radio" id="btnradio-{{ task }}"
-                  value="{{ task }}" autocomplete="off">
-                <label class="btn btn-outline-secondary" for="btnradio-{{ task }}">{{ task }} </label>
-                {% endfor %}
-              </div>
+            <div id='setuparea'>
+              <label>Setup
+                <select class="form-select form-select-sm" id="setup-select">
+                  {% for setup in setups.keys() %}
+                  <option value="{{ setup }}">{{ setup }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+              <label>Annotations
+                <select class="form-select form-select-sm" id="annotations-select">
+                  <option value="gpt-4">GPT-4</option>
+                  <option value="human">Human</option>
+                  <option value="plain">None</option>
+                </select>
+              </label>
+              <button type="button" class="btn btn-sm btn-outline-secondary btn-setup-info" data-bs-toggle="modal"
+                data-bs-target="#setup-modal"><img src="{{ host_prefix }}/static/img/unicode/info.png" width="12px"
+                  class="button-bw-icon" /></button>
             </div>
-
-
-            <div id='outputarea'></div>
           </div>
+
+          <div id='outputarea'></div>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- modal windows -->
 
-  <!-- // TODO save on close note-modal dialogue -->
-  <div class="modal fade" id="note-modal" tabindex="-1">
+  <div class="modal fade" id="setup-modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="note-modal-label">Edit note</h5>
+          <h5 class="modal-title" id="note-modal-label"><code><span id="setup-name-placeholder"></span></code>
+            setup
+            details</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <input class="modalNoteInput form-control" placeholder="Add your note" />
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="delete-note-button btn btn-primary" onclick="delete_note();">Delete</button>
-          <button type="button" class="save-note-button btn btn-primary" data-bs-dismiss="modal"
-            onclick="save_note();">Save changes</button>
+          <div id="setup-info-placeholder">
+          </div>
         </div>
       </div>
     </div>
   </div>
-  </div>
 
-  <div class="modal fade" id="export-modal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="export-modal-label">Export</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-
-          <div class="export-block">
-            <h5>Format</h5>
-
-            <select class="form-select form-select-sm" id="export-format-select" style="width: 200px;">
-              <option value="xlsx" selected>XLSX</option>
-              <option value="html">HTML</option>
-              <option value="json">JSON</option>
-              <option value="csv">CSV</option>
-              <option value="txt">TXT</option>
-            </select>
-          </div>
-
-          <div class="export-block">
-            <h5>Options</h5>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="checkbox-table-props">
-              <label class="form-check-label" for="checkbox-table-props">Include table properties</label>
-            </div>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="checkbox-edited-cells" disabled>
-              <label class="form-check-label" for="checkbox-edited-cells">Include edited cells (current
-                only)</label>
-            </div>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="checkbox-notes" disabled>
-              <label class="form-check-label" for="checkbox-notes">Include notes (zip only)</label>
-            </div>
-          </div>
-
-          <div id="linearization-format-block" style="display: none; margin-bottom: 20px;">
-            <label for="linearization-format-select" class="control-label"> Linearization style </label>
-            <select class="form-select form-select-sm" id="linearization-format-select" style="width: 200px">
-              <option value="2d" selected>2d</option>
-              <option value="index">index</option>
-              <option value="markers">markers</option>
-            </select>
-          </div>
-
-          <div class="export-block">
-            <h5>Export</h5>
-            <button type="button" id="btn-export-current" class="btn btn-sm btn-primary"
-              onclick="export_table('current');">Current
-              example</button>
-            <button type="button" id="btn-export-favourites" class="btn btn-sm btn-secondary"
-              onclick="export_table('favourites');" disabled>Favourite examples
-              (ZIP)</button>
-            <button type="button" id="btn-export-notes" class="btn btn-sm btn-secondary"
-              onclick="export_table('notes');" disabled>Examples with notes
-              (ZIP)</button>
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="modal fade" id="info-modal" tabindex="-1">
     <div class="modal-dialog">
@@ -334,77 +190,6 @@
     </div>
   </div>
 
-  <!-- <div class="modal fade" id="your-edits-modal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="your-edits-modal-label">Your edits</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <ul class="list-group list-group-flush" id="your-edits-dataset-mode-box"></ul>
-          <ul class="list-group list-group-flush" id="your-edits-notes-mode-box"></ul>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="clear_edits();">Delete all</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
-  <div class="modal fade" id="favourites-modal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="favourites-modal-label">Favourites</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <ul class="list-group list-group-flush" id="favourites-box"></ul>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="clear_favourites();">Delete all</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="notes-modal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="notes-modal-label">Notes</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <ul class="list-group list-group-flush" id="notes-box"></ul>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="clear_notes();">Delete all</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="permalink-modal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="permalink-modal-label">Permalink</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="permalink-placeholder"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="modal fade" id="about-modal" tabindex="-1">
     <div class="modal-dialog">
@@ -417,10 +202,12 @@
         <div class="modal-body">
           <div id='aboutarea' class="tab-pane sidepanel-panel" role="tabpanel" tabindex="0">
             <div id="about-info" class="area-content">
-              <p>TabGenie is a toolkit for <i>table-to-text generation</i> – the task of generating a description for
+              <p>TabGenie is a toolkit for <i>table-to-text generation</i> – the task of generating a
+                description for
                 the tabular data.
               </p>
-              <p>The web interface enables to explore existing table-to-text generation datasets and interact with
+              <p>The web interface enables to explore existing table-to-text generation datasets and
+                interact with
                 processing pipelines.</p>
 
               <p>Built using HTML5, CSS, <a href="https://jquery.com">jQuery</a>, <a
@@ -446,7 +233,8 @@
               <p>
                 © 2023 <a href="https://ufal.mff.cuni.cz/">
                   Institute of Formal and Applied
-                  Linguistics, Charles University</a> | <a href="https://rug.nl">University of Groningen</a>.
+                  Linguistics, Charles University</a> | <a href="https://rug.nl">University of
+                  Groningen</a>.
               </p>
 
             </div>
@@ -470,6 +258,7 @@
   window.notes = {{ session.get("favourites", {}) | tojson | safe }};
   window.editedCells = {{ session.get("editedCells", {}) | tojson | safe }};
   window.display_table = {{ display_table | tojson | safe }};
+  window.setups = {{ setups | tojson | safe }};
 </script>
 
 <script src="{{ host_prefix }}/static/js/custom.js"></script>

@@ -99,46 +99,71 @@
               <div class="accordion-item">
                 <h2 class="accordion-header">
                   <button class="accordion-button collapsed instructions-accordion-button btn-dark" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#hint">
+                    data-bs-toggle="collapse" data-bs-target="#instructions-acc-body">
                     <b>Instructions</b>
                   </button>
                 </h2>
-                <div id="hint" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                <div id="instructions-acc-body" class="accordion-collapse collapse">
                   <div class="accordion-body instructions-accordion-body">
-                    <!-- <div id='output-instructions'> -->
-                    Annotate all the <b>errors</b> in the following text <b>given the data on the left side</b>. <br>
-                    <br>Use your mouse to <b>highlight specific parts of the text</b> containing the errors.
-                    Repeatedly
-                    click
-                    on the highlighted text to switch between the following error
-                    categories:
 
-                    <ol>
-                      <li><span style="background-color: #FFBCBC"><b>Incorrect fact</b></span> (mouse drag): The fact
-                        in the
-                        text contradicts the data.</li>
-                      <li><span style="background-color: #e9d2ff"><b>Not checkable</b></span> (mouse drag + 1
-                        click):
-                        The
-                        fact in the text cannot be checked given the data.</li>
-                      <li><span style="background-color: #FFF79F"><b>Misleading</b></span> (mouse drag + 2 clicks):
-                        The fact in the text is misleading in the given context. </li>
-                      <li><span style="background-color: #ffd99f"><b>Irrelevant</b></span> (mouse drag + 3 clicks):
-                        The text is irrelevant given the purpose of the text. </li>
-                      <li><span style="background-color: #bbbbbb"><b>Other</b></span> (mouse drag + 4 clicks):
-                        An error which does not fit any previous category. </li>
+                    {% include 'instructions.html' %}
 
-                    </ol>
-                    <br>If you are in doubts, select the shortest span that contains the error.
-                    Once you think you have marked all the errors present in the text, click the <b> ✅ Mark example as
-                      complete</b>
-                    button (you can still update the annotation later). You will be able to submit the annotations
-                    once they
-                    are all are
-                    marked
-                    as complete.
 
-                    <!-- </div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="accordion example-accordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed instructions-accordion-button btn-dark" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#example-acc-body">
+                    <b>Example</b>
+                  </button>
+                </h2>
+                <div id="example-acc-body" class="accordion-collapse collapse">
+                  <div class="accordion-body example-accordion-body">
+
+                    An example of the data input and the corresponding text annotated with errors:
+
+                    <hr>
+                    <div class="example-data">
+                      <h6>data</h6>
+                      <b>Aditi Bhagwat</b>
+                      <ul>
+                        <li><b>occupation:</b> television actor</li>
+                        <li><b>date of birth:</b> 18 January 1981</li>
+                      </ul>
+                    </div>
+                    <hr>
+                    <div class="example-text">
+                      <h6>text (entity description)</h6>
+                      Aditi Bhagwat, born on January 18, <span
+                        style="margin-right: 0px;background-color: #FFBCBC;">1991</span>, <span
+                        style="margin-right: 0px;background-color: #FFF79F;">used to be</span> a <span
+                        style="margin-right: 0px;background-color: #e9d2ff;">popular</span> <span
+                        style="margin-right: 0px;background-color: #e9d2ff;">Indian</span> television actor. <span
+                        style="margin-right: 0px;background-color: #bbbbbb;">The data
+                        comes from a knowledge graph.</span>
+                    </div>
+                    <hr>
+                    <h6>explanation</h6>
+                    <div class="example-explanation">
+                      <ul>
+                        <li><span style="margin-right: 0px;background-color: #FFBCBC;">1991</span>: The data mentions
+                          that the actor was born on 1981.</li>
+                        <li><span style="margin-right: 0px;background-color: #FFF79F;">used to be</span>: Misleadingly
+                          suggests that the actor is not alive.</li>
+                        <li><span style="margin-right: 0px;background-color: #e9d2ff;">popular</span>: Popularity is not
+                          mentioned in the data.</li>
+                        <li><span style="margin-right: 0px;background-color: #e9d2ff;">Indian</span>: Nationality is not
+                          mentioned in the data.</li>
+                        <li><span style="margin-right: 0px;background-color: #bbbbbb;">The data
+                            comes from a knowledge graph.</span>: The note is superfluous.</li>
+                    </div>
+                    <hr>
+                    <i>Note that for the sake of brevity, this particular example is based on a small data input and
+                      contains many errors, which may not always be the case.</i>
                   </div>
                 </div>
               </div>
@@ -146,20 +171,46 @@
 
             <div id='output-content'>
               <div id='outputarea'>
-                <div id='text-type-info'>The following text is a <span id='text-type'></span>:
+                <div id='text-type-info'>The following text is a(n) <b><span class='text-type'></span></b>. Please
+                  annotate all the
+                  errors in the text:
                 </div>
               </div>
 
-              <div class="annotation-type-list"> </div>
-              <div class="annotation-list"> </div>
+              <!-- <div class="annotation-type-list"> </div> -->
+              <!-- <div class="annotation-list"> </div> -->
             </div>
-            <div class="d-flex align-items-center justify-content-center" id="submit-annotation-box">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-success" onclick="mark_annotation_as_complete();">✅ Mark
-                  example as
-                  complete</button>
+            <div class="" id="checkbox-annotation-box">
+              <p>After annotating the errors in the text, please also <b>check if you agree with any of the following
+                  statements</b>, then mark the example as complete:</p>
+              <!-- <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-style">
+                <label class="form-check-label" for="checkbox-style">
+                  The text does not seem to be <span class='text-style'></span>.
+                </label>
+              </div> -->
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-broken">
+                <label class="form-check-label" for="checkbox-broken">
+                  The text is missing, broken, or incomplete.
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-correct">
+                <label class="form-check-label" for="checkbox-correct">
+                  The text 100% accurate and does not contain any errors.
+                </label>
+              </div>
+              <div class="d-flex align-items-center justify-content-center" id="submit-annotation-box">
+                <!-- checkbox for style -->
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-sm btn-success" onclick="mark_annotation_as_complete();">✅ Mark
+                    example as
+                    complete</button>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -170,73 +221,13 @@
     <div id="overlay-start-content" class="overlay-content">
       <h1>Welcome!</h1>
 
-      <p>In this task, you will see <b>data</b> on the
-        left side and a <b>text</b> on the right side. Your task is to <b>annotate errors</b> in
-        the text with respect to the data.
-      </p>
-      <p>
-        There are five
-        types of errors that you can mark in the generated text:</p>
-      <li><span style="background-color: #FFBCBC"><b>Incorrect fact</b></span>: The fact
-        in the
-        text contradicts the data.</li>
-      <li><span style="background-color: #e9d2ff"><b>Not checkable</b></span>:
-        The
-        fact in the text cannot be checked given the data.</li>
-      <li><span style="background-color: #FFF79F"><b>Misleading</b></span>:
-        The fact in the text is misleading in the given context. </li>
-      <li><span style="background-color: #ffd99f"><b>Irrelevant</b></span>:
-        The text is irrelevant given the purpose of the text. </li>
-      <li><span style="background-color: #bbbbbb"><b>Other</b></span>:
-        An error which does not fit any previous category. </li>
-      <br>
-      <p> Use your mouse to <b>highlight specific
-          parts of the text</b> containing the errors. To switch between error
-        categories, repeatedly click on the highlighted text. If you don't remember everything, don't worry – you will
-        also have access
-        to these instructions during
-        the task.</p>
+      <p>Please, make sure you are familiar with the instructions below. If you don't remember everything, don't worry –
+        you will also have
+        access to these instructions also during the task.</p>
 
-      <div class="accordion" id="accordionExample">
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#collapseOne">
-              What is the source of the data and the texts?
-            </button>
-          </h2>
-          <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-              The data is downloaded from public sources
-              <!-- (ourworldindata.com, rapidapi.com, wikidata.com, openweathermap.org, gsmarena.com).  -->
-              (<a href="https://ourworldindata.org/">ourworldindata.com</a>, <a
-                href="https://rapidapi.com/">rapidapi.com</a>, <a href="https://www.wikidata.org/">wikidata.com</a>, <a
-                href="https://openweathermap.org/">openweathermap.org</a>, <a
-                href="https://www.gsmarena.com/">gsmarena.com</a>).
-              The texts are
-              generated by open-access large language models.
-            </div>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#collapseTwo">
-              What is the purpose of the research?
-            </button>
-          </h2>
-          <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-              The research is conducted by the NLP research group at Charles University in Prague. Your annotations will
-              help
-              evaluating and
-              improving data-to-text generation systems based on open-access large language models.
-            </div>
-          </div>
-        </div>
-
-      </div>
+      {% include 'instructions.html' %}
       <br>
+
       <button id="hideOverlayBtn" class="btn btn-danger">I understand, let's begin!</button>
     </div>
   </div>
@@ -261,6 +252,7 @@
   window.url_prefix = "{{ host_prefix }}";
   window.annotation_set = {{ annotation_set | tojson | safe }};
   window.mode = "annotate";
+  window.annotator_id = "{{ annotator_id }}";
 </script>
 
 <script src="{{ host_prefix }}/static/js/custom.js"></script>

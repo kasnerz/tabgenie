@@ -7,25 +7,30 @@ import logging
 import linecache
 import pandas as pd
 import random
+import time
 import coloredlogs
 import yaml
+import threading
 import traceback
-from xlsxwriter import Workbook
 from flask import Flask, render_template, jsonify, request, send_file, session
-
+from collections import defaultdict
 from .loaders import DATASET_CLASSES
-from .processing.processing import get_pipeline_class_by_name
-from .utils.excel import write_html_table_to_excel, write_annotation_to_excel
+from pathlib import Path
 
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
-
+ANNOTATIONS_DIR = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "annotations")
+SETUP_DIR = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "setups")
 
 app = Flask("tabgenie", template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.config.update(SECRET_KEY=os.urandom(24))
 app.db = {}
 app.db["cfg_templates"] = {}
+app.db["annotation_index"] = {}
+app.db["compl_code"] = "CK388WFU"
+app.db["lock"] = threading.Lock()
+
 
 file_handler = logging.FileHandler("error.log")
 file_handler.setLevel(logging.ERROR)
@@ -42,32 +47,6 @@ coloredlogs.install(level="INFO", logger=logger, fmt="%(asctime)s %(levelname)s 
 def success():
     resp = jsonify(success=True)
     return resp
-
-@app.route('/save_annotations', methods=['POST'])
-def save_annotations():
-    global annotations
-    data = request.get_json()
-    annotations = data['annotations']
-    return jsonify({'status': 'success'})
-
-@app.route('/get_annotations')
-def get_annotations():
-    global annotations
-    return jsonify({'annotations': annotations})
-
-
-# @app.route("/pipeline", methods=["GET", "POST"])
-# def get_pipeline_output():
-#     content = request.json
-#     logger.info(f"Incoming content: {content}")
-
-#     if content.get("edited_cells"):
-#         content["edited_cells"] = json.loads(content["edited_cells"])
-
-#     pipeline_name = content["pipeline"]
-#     out = run_pipeline(pipeline_name, pipeline_args=content, force=bool(content["edited_cells"]))
-
-#     return {"out": str(out), "session": get_session()}
 
 
 def get_session():
@@ -95,44 +74,11 @@ def render_table():
     return jsonify(table_data)
 
 
-
 def initialize_dataset(dataset_name):
     dataset = DATASET_CLASSES[dataset_name]()
     app.db["datasets_obj"][dataset_name] = dataset
 
     return dataset
-
-
-# def load_config_template(pipeline_name, pipeline_cfg):
-#     if "config_template_file" in pipeline_cfg:
-#         with app.app_context():
-#             template = render_template(
-#                 pipeline_cfg["config_template_file"],
-#                 pipeline_name=pipeline_name,
-#                 cfg=pipeline_cfg,
-#                 prompts=app.db["prompts"],
-#             )
-#         app.db["cfg_templates"][pipeline_name] = template
-
-
-# def initialize_pipeline(pipeline_name):
-#     pipeline_cfg = app.db["pipelines_cfg"][pipeline_name]
-#     load_config_template(pipeline_name, pipeline_cfg)
-#     pipeline_cls = get_pipeline_class_by_name(pipeline_cfg["pipeline"])
-#     app.db["pipelines_obj"][pipeline_name] = pipeline_cls(name=pipeline_name, cfg=pipeline_cfg)
-
-
-# def run_pipeline(pipeline_name, pipeline_args, cache_only=False, force=False):
-#     pipeline = app.db["pipelines_obj"].get(pipeline_name)
-#     pipeline_args["pipeline_cfg"] = app.db["pipelines_cfg"][pipeline_name]
-
-#     if pipeline_args.get("dataset") and pipeline_args.get("split"):
-#         dataset_obj = get_dataset(dataset_name=pipeline_args["dataset"], split=pipeline_args["split"])
-#         pipeline_args["dataset_obj"] = dataset_obj
-
-#     out = pipeline.run(pipeline_args, cache_only=cache_only, force=force)
-
-#     return out
 
 
 def get_dataset(dataset_name, split):
@@ -153,15 +99,52 @@ def get_dataset(dataset_name, split):
     return dataset
 
 
+def generate_annotation_index():
+    for source in ["gpt-4", "human"]:
+        jsonl_files = glob.glob(os.path.join(ANNOTATIONS_DIR, source, "*.jsonl"))
+
+        # contains annotations for each generated output
+        annotations = defaultdict(list)
+
+        for jsonl_file in jsonl_files:
+            with open(jsonl_file) as f:
+                for line in f:
+                    annotation = json.loads(line)
+                    
+                    key = (annotation["dataset"], annotation["split"], annotation["table_idx"], annotation["model"], annotation["setup"])
+
+                    annotations[key].append(annotation)
+
+    app.db["annotation_index"] = annotations
+    return annotations
+
+
+def get_annotations(dataset_name, split, table_idx, model, setup):
+    annotation_index = app.db["annotation_index"]
+    key = (dataset_name, split, table_idx, model, setup)
+
+    return annotation_index.get(key, [])
+
+
+
 def get_table_data(dataset_name, split, table_idx):
     dataset = get_dataset(dataset_name=dataset_name, split=split)
     table = dataset.get_table(split=split, table_idx=table_idx)
     html = dataset.render(table=table)
     generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
+
+    for output in generated_outputs:
+        model = output["model"]
+        setup = output["setup"]["name"]
+        annotations = get_annotations(dataset_name, split, table_idx, model, setup)
+
+        output["annotations"] = annotations
+
     dataset_info = dataset.get_info()
+    
     return {
         "html": html,
-        "raw_data" : table,
+        "raw_data": table,
         "total_examples": dataset.get_example_count(split),
         "dataset_info": dataset_info,
         "generated_outputs": generated_outputs,
@@ -169,163 +152,159 @@ def get_table_data(dataset_name, split, table_idx):
     }
 
 
-def get_dataset_info(dataset_name):
-
-    if dataset_name is None:
-        print("========================================")
-        print("               TabGenie                ")
-        print("========================================")
-        datasets = app.config["datasets"]
-
-        print("Available datasets:")
-
-        for dataset in datasets:
-            print(f"- {dataset}")
-
-        print("========================================")
-        print("For more information about the dataset, type `tabgenie info -d <dataset_name>`")
-        return
-
-    dataset = get_dataset(dataset_name=dataset_name, split="dev")
-
-    info = dataset.get_info()
-
-    info_yaml = {
-        "dataset": dataset.name,
-        "description": info["description"].replace("\n", ""),
-        "examples": info["examples"],
-        "version": info["version"],
-        "license": info["license"],
-        "citation": info["citation"].replace("\n", ""),
-    }
-
-    if "changes":
-        info_yaml["changes"] = info["changes"]
-
-    print(yaml.dump(info_yaml, sort_keys=False))
-
-
-# def load_prompts():
-#     prompts_dir = os.path.join(TEMPLATES_DIR, "prompts")
-#     prompts = {}
-
-#     for file in glob.glob(prompts_dir + "/" + "*.prompt"):
-#         prompt_name = os.path.splitext(os.path.basename(file))[0]
-
-#         with open(file) as f:
-#             prompt = f.read()
-
-#         prompts[prompt_name] = prompt
-
-#     return prompts
-
-
-# @app.route("/note", methods=["GET", "POST"])
-# def note():
-#     content = request.json
-#     action = content.get("action", "edit_note")
-#     dataset = content.get("dataset")
-#     split = content.get("split")
-#     table_idx = content.get("table_idx")
-#     note = content.get("note", "")
-
-#     notes = session.get("notes", {})
-
-#     if action == "remove_all":
-#         notes = {}
-#     else:
-#         assert action == "edit_note"
-#         note_id = f"{dataset}-{split}-{table_idx}"
-#         if len(note) == 0 and note_id in notes:
-#             notes.pop(note_id)
-#         else:
-#             notes[note_id] = {"dataset": dataset, "split": split, "table_idx": table_idx, "note": note}
-
-#     session["notes"] = notes
-#     # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
-#     session.modified = True
-
-#     logging.info(f"/note \n\t{content=}\n\t{get_session()}")
-#     return jsonify(notes)
-
-
-# @app.route("/favourite", methods=["GET", "POST"])
-# def favourite():
-#     content = request.json
-#     dataset = content.get("dataset")
-#     split = content.get("split")
-#     table_idx = content.get("table_idx")
-#     action = content.get("action", "get_all")
-#     if action in ["remove", "insert"]:
-#         assert dataset and split and isinstance(table_idx, int), (dataset, split, table_idx)
-#         favourite_id = f"{dataset}-{split}-{table_idx}"
-#     favourites = session.get("favourites", {})
-#     if action == "remove":
-#         favourite = favourites.pop(favourite_id, None)
-#         logging.info(f"Removed {favourite}")
-#     elif action == "insert":
-#         favourites[favourite_id] = {"dataset": dataset, "split": split, "table_idx": table_idx}
-#     elif action == "remove_all":
-#         favourites = {}
-#     else:
-#         assert action == "get_all"
-
-#     session["favourites"] = favourites
-#     # Important. See https://tedboy.github.io/flask/interface_api.session.html#flask.session.modified
-#     session.modified = True
-
-#     logging.info(f"favourite\n\t{content=}\n\t{get_session()}")
-#     return jsonify(favourites)
-
-
-# @app.errorhandler(404)
-# def page_not_found(error):
-    # return render_template("404.html"), 404
-
 @app.route("/submit_annotations", methods=["POST"])
 def submit_annotations():
     logger.info(f"Received annotations")
     data = request.get_json()
+    annotator_id = data[0]["annotator_id"]
+    now = int(time.time())
 
-    with open("annotations.jsonl", "w") as f:
-        for row in data:
-            f.write(json.dumps(row) + "\n")
-    
+    os.makedirs(os.path.join(ANNOTATIONS_DIR, "human"), exist_ok=True)
+
+    with app.db["lock"]:
+        df = pd.read_csv("../annotations/annotations_prolific.csv")
+
+        with open(os.path.join(ANNOTATIONS_DIR, "human", f"{annotator_id}-{now}.jsonl"), "w") as f:
+            for row in data:
+                f.write(json.dumps(row) + "\n")
+
+                # mark the annotation as finished in the csv
+                idx = df[(df["table_idx"] == row["table_idx"])
+                ].index[0]
+
+                df.loc[idx, "status"] = "finished"
+
+        df.to_csv("../annotations/annotations_prolific.csv", index=False)
+
     return jsonify({"status": "success"})
 
+
+def get_annotation_batch(args):
+    PROLIFIC_PID = args.get("PROLIFIC_PID", "test")
+    SESSION_ID = args.get("SESSION_ID")
+    STUDY_ID = args.get("STUDY_ID")
+
+    with app.db["lock"]:
+        # load the csv and select 15 non-assigned examples, preferably in a sequential order
+        df = pd.read_csv("../annotations/annotations_prolific.csv")
+        free_examples = df[df["status"] == "free"]
+
+        annotation_batch = []
+        start = int(time.time())
+        example = free_examples.sample()
+        table_idx = int(example.table_idx.values[0])
+        models = ["mistral", "llama2", "zephyr", "gpt-3.5"]
+
+        logger.info(f"Selecting example {table_idx}")
+
+        for dataset in ["ice_hockey", "gsmarena", "openweather", "owid", "wikidata"]:
+            random.shuffle(models)
+            for model in models:
+                annotation_batch.append({
+                    "annotator_id": PROLIFIC_PID,
+                    "session_id": SESSION_ID,
+                    "study_id": STUDY_ID,
+                    "start_timestamp": start,
+                    "dataset": dataset,
+                    "split": "test",
+                    "model": model,
+                    "setup": "direct",
+                    "table_idx": table_idx,
+                })
+                i = example.index[0]
+
+                # update the CSV
+                df.loc[i, "status"] = "assigned"
+                df.loc[i, "annotator_id"] = PROLIFIC_PID
+
+        df.to_csv("../annotations/annotations_prolific.csv", index=False)
+
+    return annotation_batch
+
+def get_setup_names():
+    return sorted([x.stem for x in Path(SETUP_DIR).glob("*.yaml")])
+
+def generate_annotation_csv():
+    # load all outputs
+    split = "test"
+    records = []
+
+    for table_idx in range(100):
+        # for dataset_name in app.config["datasets"]:
+            # dataset = get_dataset(dataset_name, split)
+
+        records.append({
+                # "dataset_name": dataset_name,
+                "table_idx": table_idx,
+                "annotator_id": "",
+                "status": "free",
+            })
+            # generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
+
+            # # keep only outputs with the "direct" setup
+            # generated_outputs = [x for x in generated_outputs if x["setup"]["name"].startswith("direct")]
+
+            # # shuffle the models
+            # random.shuffle(generated_outputs)
+
+            # for output in generated_outputs:
+            #     if output["generated"] is None:
+            #         continue
+
+            #     model = output["model"]
+            #     setup = output["setup"]["name"]
+
+            #     records.append({
+            #         "dataset_name": dataset_name,
+            #         "table_idx": table_idx,
+            #         "model": model,
+            #         "setup": setup,
+            #         "annotator_id": "",
+            #         "status": "free",
+            #     })
+
+    df = pd.DataFrame.from_records(records)
+    df.to_csv("../annotations/annotations_prolific.csv", index=False)
 
 
 @app.route("/annotate", methods=["GET", "POST"])
 def annotate():
     logger.info(f"Annotate page loaded")
 
-    models = ["mistral-7b-instruct", "zephyr-7b-beta", "llama2-7b-chat"]
-    dataset = ["openweather", "basketball", "gsmarena", "wikidata", "owid"]
+    generate_annotation_csv()
 
-    random.seed(42)
-    annotation_set = [
-        { "dataset": random.choice(dataset),
-         "model": random.choice(models), 
-         "split": "dev", 
-         "task" : "direct", 
-         "table_idx": random.randint(0,99) } 
-         for _ in range(10)
-    ]
+    PROLIFIC_PID = request.args.get("PROLIFIC_PID", "test")
+    annotation_set = get_annotation_batch(request.args)
+
     return render_template(
         "annotate.html",
         datasets=app.config["datasets"],
         host_prefix=app.config["host_prefix"],
         annotation_set=annotation_set,
+        annotation_example_cnt=len(annotation_set),
+        annotator_id=PROLIFIC_PID,
+        compl_code=app.db["compl_code"],
     )
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/data", methods=["GET", "POST"])
 def index():
     logger.info(f"Page loaded")
+
+    generate_annotation_index()
 
     dataset_name = request.args.get("dataset")
     split = request.args.get("split")
     table_idx = request.args.get("table_idx")
+    
+    setup_names = get_setup_names()
+
+    # load the yamls, create a dict
+    setups = {}
+    for setup_name in setup_names:
+        with open(os.path.join(SETUP_DIR, f"{setup_name}.yaml"), "r") as f:
+            setups[setup_name] = yaml.safe_load(f)
+
     if (
         dataset_name
         and split
@@ -344,11 +323,8 @@ def index():
     return render_template(
         "index.html",
         datasets=app.config["datasets"],
-        # pipelines=app.db["pipelines_cfg"],
-        # pipelines_cfg_templates=app.db["cfg_templates"],
-        # prompts=app.db["prompts"],
         default_dataset=default_dataset,
         host_prefix=app.config["host_prefix"],
         display_table=display_table,
-        task_names=app.config["task_names"],
+        setups=setups,
     )
