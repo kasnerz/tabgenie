@@ -272,7 +272,7 @@ def generate_annotation_csv():
 def annotate():
     logger.info(f"Annotate page loaded")
 
-    generate_annotation_csv()
+    # generate_annotation_csv()
 
     PROLIFIC_PID = request.args.get("PROLIFIC_PID", "test")
     annotation_set = get_annotation_batch(request.args)
