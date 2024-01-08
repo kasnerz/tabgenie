@@ -175,6 +175,7 @@ def submit_annotations():
                 df.loc[idx, "status"] = "finished"
 
         df.to_csv("../annotations/annotations_prolific.csv", index=False)
+        logger.info(f"Annotations for {row['table_idx']} saved")
 
     return jsonify({"status": "success"})
 
