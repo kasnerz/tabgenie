@@ -1,0 +1,129 @@
+<p>In this task, you will annotate <b>{{ annotation_example_cnt }} examples</b> in total. For each example, you will see
+    <b>data</b> on the
+    left side and a <b>text</b> on the right side. Your task is to <b>annotate errors</b> in
+    the text with respect to the data.
+</p>
+<p>
+    There are five
+    types of errors that you can mark in the generated text:</p>
+
+<ol>
+    <li><span style="background-color: #FFBCBC"><b>Incorrect fact</b></span>: The fact
+        in the
+        text contradicts the data.</li>
+    <li><span style="background-color: #e9d2ff"><b>Not checkable</b></span> :
+        The
+        fact in the text cannot be checked given the data.</li>
+    <li><span style="background-color: #FFF79F"><b>Misleading</b></span>:
+        The fact in the text is misleading in the given context. </li>
+    <li><span style="background-color: #bbbbbb"><b>Other</b></span> :
+        The text is problematic for another reason, e.g. grammatically or stylistically incorrect,
+        irrelevant, or repetitive. </li>
+</ol>
+
+<div class="accordion" id="accordion-all">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseOne">
+                How to mark and submit the annotations?
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordion-all">
+            <div class="accordion-body">
+
+                <p> Use your mouse to <b>highlight specific
+                        parts of the text</b> containing the errors. To switch between error
+                    categories, repeatedly click on the highlighted text.
+
+                    <br><br>
+                    Once you think you have marked all the errors present in the text, click the <b> ✅ Mark example as
+                        complete</b>
+                    button (you can still update the annotation later). You will be able to submit the annotations
+                    once they
+                    are all are
+                    marked
+                    as complete.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo">
+                What if I am not sure if the fact is an error?
+            </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordion-all">
+            <div class="accordion-body">
+
+                If the fact
+                is probably true, but
+                cannot be derived from the data, mark it as not checkable. If you are not really sure if the fact
+                should be marked as an error, you can leave it unmarked. Always select the shortest span that contains
+                the error, but include all the words related to the
+                error.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseThree">
+                What kinds of text can I encounter?
+            </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordion-all">
+            <div class="accordion-body">
+
+                You can encounter the following kinds of texts:
+                <ul>
+                    <li>5-day weather forecast,</li>
+                    <li>description of a product (phones etc.),</li>
+                    <li>ice hockey game report,</li>
+                    <li>caption of a health-related chart,</li>
+                    <li>description of an entity (human, country, film, or company).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseFour">
+                What is the source of the data and the texts?
+            </button>
+        </h2>
+        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordion-all">
+            <div class="accordion-body">
+                The data is downloaded from public sources
+                <!-- (ourworldindata.com, rapidapi.com, wikidata.com, openweathermap.org, gsmarena.com).  -->
+                (,
+                <a href="https://openweathermap.org/">openweathermap.org</a>, <a
+                    href="https://www.gsmarena.com/">gsmarena.com</a>, <a href="https://rapidapi.com/">rapidapi.com</a>,
+                <a href="https://ourworldindata.org/">ourworldindata.com</a>, <a
+                    href="https://www.wikidata.org/">wikidata.com</a>).
+                The texts are
+                generated by open-access large language models.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseFive">
+                What is the purpose of the research?
+            </button>
+        </h2>
+        <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordion-all">
+            <div class="accordion-body">
+                The research is conducted by the NLP research group at Charles University in Prague. Your annotations
+                will
+                help
+                evaluating and
+                improving data-to-text generation systems based on open-access large language models.
+            </div>
+        </div>
+    </div>
+
+</div>

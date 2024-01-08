@@ -4,7 +4,7 @@ var table_idx = 0;
 var total_examples = 1;
 var dataset = window.default_dataset;
 var generated_outputs = window.generated_outputs;
-var split = "dev";
+var split = "test";
 var select_mode = "select";
 var interactive_mode = false;
 var view_state = "all";
@@ -204,7 +204,7 @@ function mark_annotation_as_complete() {
     var collection = YPet[`p${table_idx}`].currentView.collection.parentDocument.get('annotations').toJSON();
 
     const checkbox_correct = $("#checkbox-correct").is(":checked");
-    const checkbox_style = $("#checkbox-style").is(":checked");
+    // const checkbox_style = $("#checkbox-style").is(":checked");
     const checkbox_broken = $("#checkbox-broken").is(":checked");
 
 
@@ -217,7 +217,7 @@ function mark_annotation_as_complete() {
     annotation_set[table_idx]["annotations"] = collection;
     annotation_set[table_idx]["flags"] = {
         "is_fully_correct": checkbox_correct,
-        "has_violated_style": checkbox_style,
+        // "has_violated_style": checkbox_style,
         "has_broken_text": checkbox_broken,
     };
 
@@ -559,3 +559,9 @@ $(document).ready(function () {
 
     enable_tooltips();
 });
+
+if (mode == "annotate") {
+    window.onbeforeunload = function () {
+        return "Are you sure you want to reload the page? Your work will be lost.";
+    }
+}

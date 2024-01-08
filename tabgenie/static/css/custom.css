@@ -403,6 +403,11 @@ ul {
     padding-bottom: 20px;
 } */
 
+#accordion-all {
+    margin-top: 20px;
+
+}
+
 .accordion-button {
     font-size: normal;
 }

@@ -10,6 +10,7 @@ import random
 import time
 import coloredlogs
 import yaml
+import threading
 import traceback
 from flask import Flask, render_template, jsonify, request, send_file, session
 from collections import defaultdict
@@ -27,6 +28,9 @@ app.config.update(SECRET_KEY=os.urandom(24))
 app.db = {}
 app.db["cfg_templates"] = {}
 app.db["annotation_index"] = {}
+app.db["compl_code"] = "CK388WFU"
+app.db["lock"] = threading.Lock()
+
 
 file_handler = logging.FileHandler("error.log")
 file_handler.setLevel(logging.ERROR)
@@ -137,7 +141,7 @@ def get_table_data(dataset_name, split, table_idx):
         output["annotations"] = annotations
 
     dataset_info = dataset.get_info()
-
+    
     return {
         "html": html,
         "raw_data": table,
@@ -157,24 +161,20 @@ def submit_annotations():
 
     os.makedirs(os.path.join(ANNOTATIONS_DIR, "human"), exist_ok=True)
 
-    df = pd.read_csv("../annotations/annotations_prolific.csv")
+    with app.db["lock"]:
+        df = pd.read_csv("../annotations/annotations_prolific.csv")
 
-    with open(os.path.join(ANNOTATIONS_DIR, "human", f"{annotator_id}-{now}.jsonl"), "w") as f:
-        for row in data:
-            f.write(json.dumps(row) + "\n")
+        with open(os.path.join(ANNOTATIONS_DIR, "human", f"{annotator_id}-{now}.jsonl"), "w") as f:
+            for row in data:
+                f.write(json.dumps(row) + "\n")
 
-            # mark the annotation as finished in the csv
-            idx = df[
-                (df["dataset_name"] == row["dataset"])
-                & (df["split"] == row["split"])
-                & (df["model"] == row["model"])
-                & (df["setup"] == row["setup"])
-                & (df["table_idx"] == row["table_idx"])
-            ].index[0]
+                # mark the annotation as finished in the csv
+                idx = df[(df["table_idx"] == row["table_idx"])
+                ].index[0]
 
-            df.loc[idx, "status"] = "finished"
+                df.loc[idx, "status"] = "finished"
 
-    df.to_csv("../annotations/annotations_prolific.csv", index=False)
+        df.to_csv("../annotations/annotations_prolific.csv", index=False)
 
     return jsonify({"status": "success"})
 
@@ -184,48 +184,40 @@ def get_annotation_batch(args):
     SESSION_ID = args.get("SESSION_ID")
     STUDY_ID = args.get("STUDY_ID")
 
-    # load the csv and select 15 non-assigned examples, preferably in a sequential order
-    df = pd.read_csv("../annotations/annotations_prolific.csv")
-    
-    free_examples = df[df["status"] == "free"]
+    with app.db["lock"]:
+        # load the csv and select 15 non-assigned examples, preferably in a sequential order
+        df = pd.read_csv("../annotations/annotations_prolific.csv")
+        free_examples = df[df["status"] == "free"]
 
-    annotation_batch = []
-    start = int(time.time())
-    examples_per_batch = 9
+        annotation_batch = []
+        start = int(time.time())
+        example = free_examples.sample()
+        table_idx = int(example.table_idx.values[0])
+        models = ["mistral", "llama2", "zephyr", "gpt-3.5"]
 
-    # we want to select a random subset of examples *in a sequence*
-    # select random index, which is at most `examples_per_batch` away from the end
-    random.seed(SESSION_ID)
-    index = random.randint(0, len(free_examples) - examples_per_batch)
-    free_examples = free_examples.iloc[index:index + examples_per_batch]
+        logger.info(f"Selecting example {table_idx}")
 
-    logger.info(f"Selecting examples from {index} to {index + examples_per_batch}")
+        for dataset in ["ice_hockey", "gsmarena", "openweather", "owid", "wikidata"]:
+            random.shuffle(models)
+            for model in models:
+                annotation_batch.append({
+                    "annotator_id": PROLIFIC_PID,
+                    "session_id": SESSION_ID,
+                    "study_id": STUDY_ID,
+                    "start_timestamp": start,
+                    "dataset": dataset,
+                    "split": "test",
+                    "model": model,
+                    "setup": "direct",
+                    "table_idx": table_idx,
+                })
+                i = example.index[0]
 
-    for i, row in free_examples.iterrows():
-        dataset = row["dataset_name"]
-        table_idx = row["table_idx"]
-        model = row["model"]
-        setup = row["setup"]
+                # update the CSV
+                df.loc[i, "status"] = "assigned"
+                df.loc[i, "annotator_id"] = PROLIFIC_PID
 
-        annotation_batch.append({
-            "annotator_id": PROLIFIC_PID,
-            "session_id": SESSION_ID,
-            "study_id": STUDY_ID,
-            "start_timestamp": start,
-            "dataset": dataset,
-            "split": "test",
-            "model": model,
-            "setup": setup,
-            "table_idx": table_idx,
-        })
-        # update the CSV
-        df.loc[i, "status"] = "assigned"
-        df.loc[i, "annotator_id"] = PROLIFIC_PID
-
-        if len(annotation_batch) >= examples_per_batch:
-            break
-
-    df.to_csv("../annotations/annotations_prolific.csv", index=False)
+        df.to_csv("../annotations/annotations_prolific.csv", index=False)
 
     return annotation_batch
 
@@ -237,27 +229,39 @@ def generate_annotation_csv():
     split = "test"
     records = []
 
-    for dataset_name in app.config["datasets"]:
-        dataset = get_dataset(dataset_name, split)
+    for table_idx in range(100):
+        # for dataset_name in app.config["datasets"]:
+            # dataset = get_dataset(dataset_name, split)
 
-        for table_idx in range(dataset.get_example_count(split)):
-            generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
+        records.append({
+                # "dataset_name": dataset_name,
+                "table_idx": table_idx,
+                "annotator_id": "",
+                "status": "free",
+            })
+            # generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
 
-            for output in generated_outputs:
-                if output["generated"] is None:
-                    continue
+            # # keep only outputs with the "direct" setup
+            # generated_outputs = [x for x in generated_outputs if x["setup"]["name"].startswith("direct")]
 
-                model = output["model"]
-                setup = output["setup"]["name"]
+            # # shuffle the models
+            # random.shuffle(generated_outputs)
 
-                records.append({
-                    "dataset_name": dataset_name,
-                    "table_idx": table_idx,
-                    "model": model,
-                    "setup": setup,
-                    "annotator_id": "",
-                    "status": "free",
-                })
+            # for output in generated_outputs:
+            #     if output["generated"] is None:
+            #         continue
+
+            #     model = output["model"]
+            #     setup = output["setup"]["name"]
+
+            #     records.append({
+            #         "dataset_name": dataset_name,
+            #         "table_idx": table_idx,
+            #         "model": model,
+            #         "setup": setup,
+            #         "annotator_id": "",
+            #         "status": "free",
+            #     })
 
     df = pd.DataFrame.from_records(records)
     df.to_csv("../annotations/annotations_prolific.csv", index=False)
@@ -277,11 +281,13 @@ def annotate():
         datasets=app.config["datasets"],
         host_prefix=app.config["host_prefix"],
         annotation_set=annotation_set,
+        annotation_example_cnt=len(annotation_set),
         annotator_id=PROLIFIC_PID,
+        compl_code=app.db["compl_code"],
     )
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/data", methods=["GET", "POST"])
 def index():
     logger.info(f"Page loaded")
 
