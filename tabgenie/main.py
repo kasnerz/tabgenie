@@ -185,8 +185,8 @@ def submit_annotations():
 
 def get_annotation_batch(args):
     PROLIFIC_PID = args.get("PROLIFIC_PID", "test")
-    SESSION_ID = args.get("SESSION_ID")
-    STUDY_ID = args.get("STUDY_ID")
+    SESSION_ID = args.get("SESSION_ID", "test")
+    STUDY_ID = args.get("STUDY_ID", "test")
 
     with app.db["lock"]:
         logging.info(f"Acquiring lock for {PROLIFIC_PID}")
