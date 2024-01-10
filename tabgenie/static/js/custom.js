@@ -69,6 +69,7 @@ function gotoannotation(page) {
     $(`#page-link-${page}`).addClass("bg-active");
     // table_idx = annotation_set[page].table_idx;
     // table_idx = page;
+    save_current_only();
     show_annotation();
 }
 
@@ -194,9 +195,25 @@ function submit_annotations() {
         contentType: 'application/json', // Specify JSON content type
         data: JSON.stringify(annotation_set),
         success: function (data) {
+            window.onbeforeunload = null;
             $("#overlay-end").show();
         }
     });
+}
+
+function save_current_only() {
+    var collection = YPet[`p${table_idx}`].currentView.collection.parentDocument.get('annotations').toJSON();
+
+    const checkbox_correct = $("#checkbox-correct").is(":checked");
+    const checkbox_missing = $("#checkbox-missing").is(":checked");
+    const checkbox_off_topic = $("#checkbox-off-topic").is(":checked");
+
+    annotation_set[table_idx]["annotations"] = collection;
+    annotation_set[table_idx]["flags"] = {
+        "is_fully_correct": checkbox_correct,
+        "is_missing": checkbox_missing,
+        "is_off_topic": checkbox_off_topic,
+    };
 }
 
 
