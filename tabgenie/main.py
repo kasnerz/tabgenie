@@ -102,11 +102,11 @@ def get_dataset(dataset_name, split):
 
 
 def generate_annotation_index():
+    # contains annotations for each generated output
+    annotations = defaultdict(list)
+
     for source in ["gpt-4", "human"]:
         jsonl_files = glob.glob(os.path.join(ANNOTATIONS_DIR, source, "*.jsonl"))
-
-        # contains annotations for each generated output
-        annotations = defaultdict(list)
 
         for jsonl_file in jsonl_files:
             with open(jsonl_file) as f:
@@ -118,6 +118,7 @@ def generate_annotation_index():
                     annotations[key].append(annotation)
 
     app.db["annotation_index"] = annotations
+
     return annotations
 
 

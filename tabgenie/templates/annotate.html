@@ -113,61 +113,7 @@
                 </div>
               </div>
             </div>
-            <div class="accordion example-accordion">
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed instructions-accordion-button btn-dark" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#example-acc-body">
-                    <b>Example</b>
-                  </button>
-                </h2>
-                <div id="example-acc-body" class="accordion-collapse collapse">
-                  <div class="accordion-body example-accordion-body">
 
-                    An example of the data input and the corresponding text annotated with errors:
-
-                    <hr>
-                    <div class="example-data">
-                      <h6>data</h6>
-                      <b>Aditi Bhagwat</b>
-                      <ul>
-                        <li><b>occupation:</b> television actor</li>
-                        <li><b>date of birth:</b> 18 January 1981</li>
-                      </ul>
-                    </div>
-                    <hr>
-                    <div class="example-text">
-                      <h6>text (entity description)</h6>
-                      Aditi Bhagwat, born on January 18, <span
-                        style="margin-right: 0px;background-color: #FFBCBC;">1991</span>, <span
-                        style="margin-right: 0px;background-color: #FFF79F;">used to be</span> a <span
-                        style="margin-right: 0px;background-color: #e9d2ff;">popular</span> <span
-                        style="margin-right: 0px;background-color: #e9d2ff;">Indian</span> television actor. <span
-                        style="margin-right: 0px;background-color: #bbbbbb;">The data
-                        comes from a knowledge graph.</span>
-                    </div>
-                    <hr>
-                    <h6>explanation</h6>
-                    <div class="example-explanation">
-                      <ul>
-                        <li><span style="margin-right: 0px;background-color: #FFBCBC;">1991</span>: The data mentions
-                          that the actor was born on 1981.</li>
-                        <li><span style="margin-right: 0px;background-color: #FFF79F;">used to be</span>: Misleadingly
-                          suggests that the actor is not alive.</li>
-                        <li><span style="margin-right: 0px;background-color: #e9d2ff;">popular</span>: Popularity is not
-                          mentioned in the data.</li>
-                        <li><span style="margin-right: 0px;background-color: #e9d2ff;">Indian</span>: Nationality is not
-                          mentioned in the data.</li>
-                        <li><span style="margin-right: 0px;background-color: #bbbbbb;">The data
-                            comes from a knowledge graph.</span>: The note is superfluous.</li>
-                    </div>
-                    <hr>
-                    <i>Note that for the sake of brevity, this particular example is based on a small data input and
-                      contains many errors, which may not always be the case.</i>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <div id='output-content'>
               <div id='outputarea'>
@@ -183,16 +129,16 @@
             <div class="" id="checkbox-annotation-box">
               <p>After annotating the errors in the text, please also <b>check if you agree with any of the following
                   statements</b>, then mark the example as complete:</p>
-              <!-- <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="checkbox-style">
-                <label class="form-check-label" for="checkbox-style">
-                  The text does not seem to be <span class='text-style'></span>.
-                </label>
-              </div> -->
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="checkbox-broken">
-                <label class="form-check-label" for="checkbox-broken">
-                  The text is missing, broken, or incomplete.
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-off-topic">
+                <label class="form-check-label" for="checkbox-off-topic">
+                  The text is severely off-topic (seems completely unrelated to the data).
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-missing">
+                <label class="form-check-label" for="checkbox-missing">
+                  The text is missing or incomplete.
                 </label>
               </div>
               <div class="form-check">
@@ -223,7 +169,7 @@
 
       <p>Please, make sure you are familiar with the instructions below. If you don't remember everything, don't worry –
         you will also have
-        access to these instructions also during the task.</p>
+        access to these instructions during the task.</p>
 
       {% include 'instructions.html' %}
       <br>

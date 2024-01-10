@@ -204,12 +204,12 @@ function mark_annotation_as_complete() {
     var collection = YPet[`p${table_idx}`].currentView.collection.parentDocument.get('annotations').toJSON();
 
     const checkbox_correct = $("#checkbox-correct").is(":checked");
-    // const checkbox_style = $("#checkbox-style").is(":checked");
-    const checkbox_broken = $("#checkbox-broken").is(":checked");
+    const checkbox_missing = $("#checkbox-missing").is(":checked");
+    const checkbox_off_topic = $("#checkbox-off-topic").is(":checked");
 
 
     // if the collection is empty but the `checkbox-correct` is not checked, display an alert
-    if (collection.length == 0 && !checkbox_correct) {
+    if (collection.length == 0 && !(checkbox_correct || checkbox_missing)) {
         alert("Are you *really* sure that the example does not contain any errors? If so, please check the last box to mark the example as complete.");
         return;
     }
@@ -217,8 +217,8 @@ function mark_annotation_as_complete() {
     annotation_set[table_idx]["annotations"] = collection;
     annotation_set[table_idx]["flags"] = {
         "is_fully_correct": checkbox_correct,
-        // "has_violated_style": checkbox_style,
-        "has_broken_text": checkbox_broken,
+        "is_missing": checkbox_missing,
+        "is_off_topic": checkbox_off_topic,
     };
 
     $('#page-link-' + table_idx).removeClass("bg-incomplete");
@@ -226,8 +226,8 @@ function mark_annotation_as_complete() {
 
     // uncheck all checkboxes
     $("#checkbox-correct").prop("checked", false);
-    $("#checkbox-style").prop("checked", false);
-    $("#checkbox-broken").prop("checked", false);
+    $("#checkbox-missing").prop("checked", false);
+    $("#checkbox-off-topic").prop("checked", false);
 
 
     // if all the examples are annotated, post the annotations
@@ -267,21 +267,33 @@ function show_annotation() {
     const dataset_name = annotation_set[table_idx].dataset;
     const type = output.setup.output[dataset_name];
 
-    var textStyle = "written in a neutral and balanced way";
+    const flags = annotation_set[table_idx].flags;
 
-    if (output.setup.style !== undefined) {
-        const style = output.setup.style[dataset_name];
-        textStyle = "written " + style;
-    } else if (output.setup.aspect !== undefined) {
-        const aspect = output.setup.aspect[dataset_name];
-        textStyle = "focusing solely on " + aspect;
+    if (flags !== undefined) {
+        $("#checkbox-correct").prop("checked", flags.is_fully_correct);
+        $("#checkbox-missing").prop("checked", flags.is_missing);
+        $("#checkbox-off-topic").prop("checked", flags.is_off_topic);
+    } else {
+        $("#checkbox-correct").prop("checked", false);
+        $("#checkbox-missing").prop("checked", false);
+        $("#checkbox-off-topic").prop("checked", false);
     }
+
+    // var textStyle = "written in a neutral and balanced way";
+
+    // if (output.setup.style !== undefined) {
+    //     const style = output.setup.style[dataset_name];
+    //     textStyle = "written " + style;
+    // } else if (output.setup.aspect !== undefined) {
+    //     const aspect = output.setup.aspect[dataset_name];
+    //     textStyle = "focusing solely on " + aspect;
+    // }
     $("#tablearea").html(data.html);
 
     // show_raw_data(data);
 
     $(".text-type").html(`${type}`);
-    $(".text-style").html(`${textStyle}`);
+    // $(".text-style").html(`${textStyle}`);
 }
 
 function permalinkbtn() {
