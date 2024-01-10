@@ -266,7 +266,7 @@ Meteogram.prototype.getChartOptions = function (cityName) {
             },
             tooltip: {
                 pointFormat: '<span style="color:{point.color}">\u25CF</span> ' +
-                    '{series.name}: <b>{point.y}°C</b><br/>'
+                    '{series.name}: <b>{point.y}°C</b> (feels like {point.feelslike}°C)<br/>'
             },
             zIndex: 1,
             color: '#FF3333',
@@ -344,6 +344,8 @@ Meteogram.prototype.getChartOptions = function (cityName) {
             vectorLength: 18,
             yOffset: -15,
             tooltip: {
+                pointFormat: '<span style="color:{point.color}">\u25CF</span> ' +
+                    '{series.name}: <b>{point.value}</b> (gust {point.gust} m/s)<br/>',
                 valueSuffix: ' m/s'
             }
         }]
@@ -386,10 +388,10 @@ Meteogram.prototype.parseData = function () {
     // Loop over hourly forecasts
     this.json.list.forEach((data, i) => {
 
-        const x = Date.parse(data.dt_txt),
+        const x = Date.parse(data.dt_txt + "Z"), // signalling it is UTC time
             weather = data.weather[0],
             symbolCode = weather.icon,
-            to = x + 6 * 36e5; // Assuming each forecast is 3 hours apart
+            to = x + 6 * 36e5; // Assuming each forecast is 6 hours apart
 
         // if (to > pointStart + 48 * 36e5) {
         //     return;
@@ -402,6 +404,7 @@ Meteogram.prototype.parseData = function () {
             y: data.main.temp,
             // custom options used in the tooltip formatter
             to,
+            feelslike: data.main.feels_like,
             symbolName: symbolCode,
             weather: weather.description
         });
@@ -415,7 +418,8 @@ Meteogram.prototype.parseData = function () {
         this.winds.push({
             x,
             value: data.wind.speed,
-            direction: data.wind.deg
+            direction: data.wind.deg,
+            gust: data.wind.gust
         });
         // }
 
