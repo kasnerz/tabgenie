@@ -102,11 +102,11 @@ def get_dataset(dataset_name, split):
 
 
 def generate_annotation_index():
+    # contains annotations for each generated output
+    annotations = defaultdict(list)
+
     for source in ["gpt-4", "human"]:
         jsonl_files = glob.glob(os.path.join(ANNOTATIONS_DIR, source, "*.jsonl"))
-
-        # contains annotations for each generated output
-        annotations = defaultdict(list)
 
         for jsonl_file in jsonl_files:
             with open(jsonl_file) as f:
@@ -118,6 +118,7 @@ def generate_annotation_index():
                     annotations[key].append(annotation)
 
     app.db["annotation_index"] = annotations
+
     return annotations
 
 
@@ -191,12 +192,20 @@ def get_annotation_batch(args):
     with app.db["lock"]:
         logging.info(f"Acquiring lock for {PROLIFIC_PID}")
 
-        # load the csv and select 15 non-assigned examples, preferably in a sequential order
-        df = pd.read_csv("../annotations/annotations_prolific.csv")
-        free_examples = df[df["status"] == "free"]
-
-        annotation_batch = []
         start = int(time.time())
+
+
+        df = pd.read_csv("../annotations/annotations_prolific.csv")
+
+        # check if there are annotations which are idle for more than 2 hours: set them to free
+        idle_examples = df[(df["status"] == "assigned") & (df["start"] < start - 2 * 60 * 60)]
+        for i in idle_examples.index:
+            df.loc[i, "status"] = "free"
+            df.loc[i, "start"] = ""
+            df.loc[i, "annotator_id"] = ""
+
+        free_examples = df[df["status"] == "free"]
+        annotation_batch = []
 
         random.seed(str(start) + PROLIFIC_PID + SESSION_ID)
         np_seed = random.randint(0, 2**32 - 1)
@@ -225,6 +234,7 @@ def get_annotation_batch(args):
 
                 # update the CSV
                 df.loc[i, "status"] = "assigned"
+                df.loc[i, "start"] = start
                 df.loc[i, "annotator_id"] = PROLIFIC_PID
 
         df.to_csv("../annotations/annotations_prolific.csv", index=False)
@@ -250,6 +260,7 @@ def generate_annotation_csv():
                 "table_idx": table_idx,
                 "annotator_id": "",
                 "status": "free",
+                "start": "",
             })
             # generated_outputs = dataset.get_generated_outputs(split=split, output_idx=table_idx)
 
