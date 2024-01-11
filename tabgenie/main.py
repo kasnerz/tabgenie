@@ -205,10 +205,19 @@ def get_annotation_batch(args):
             df.loc[i, "annotator_id"] = ""
 
         free_examples = df[df["status"] == "free"]
+
         annotation_batch = []
 
         random.seed(str(start) + PROLIFIC_PID + SESSION_ID)
         np_seed = random.randint(0, 2**32 - 1)
+
+        # if no free examples, take the oldest assigned example
+        if len(free_examples) == 0:
+            free_examples = df[df["status"] == "assigned"]
+            free_examples = free_examples.sort_values(by=["start"])
+            free_examples = free_examples.head(1)
+
+            logger.info(f"Annotating extra example {free_examples.index[0]}")
 
         example = free_examples.sample(random_state=np_seed)
         table_idx = int(example.table_idx.values[0])
