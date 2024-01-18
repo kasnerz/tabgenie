@@ -124,13 +124,16 @@
         <div id="rightpanel" class="collapse show">
           <div id='sidepanel-content' class="tab-content">
             <div id='setuparea'>
-              <label>Setup
+              <!-- <label>Setup
                 <select class="form-select form-select-sm" id="setup-select">
                   {% for setup in setups.keys() %}
                   <option value="{{ setup }}">{{ setup }}</option>
                   {% endfor %}
                 </select>
-              </label>
+              </label> -->
+              <select class="form-select form-select-sm" id="setup-select" style="display: none;">
+                <option value="direct">direct</option>
+              </select>
               <label>Annotations
                 <select class="form-select form-select-sm" id="annotations-select">
                   <option value="gpt-4">GPT-4</option>
